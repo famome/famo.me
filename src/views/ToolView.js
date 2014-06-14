@@ -28,7 +28,6 @@ define(function(require, exports, module) {
         });
                 
         this.toolModifier = new StateModifier({
-            size: [this.options.size, this.options.size],
             opacity: 1,
             transform: Transform.translate(0, 0, 1),
             origin: [0.5, 0],

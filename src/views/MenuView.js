@@ -47,13 +47,15 @@ define(function(require, exports, module) {
     }
     
     function _createSquareTool(draggable) {
-        this.squareTool = new ToolView();
-        this.squareToolModifier = new StateModifier({
-            transform: Transform.translate(0, this.options.topOffset, 1)
+        this.squareToolView = new ToolView();
+        this.squareToolViewModifier = new StateModifier({
+            transform: Transform.translate(0, this.options.topOffset, 1),
+            origin: [0.5, 0],
+            align: [0.5, 0]
         });
-
-        draggable.subscribe(this.squareTool);
-        this.add(this.squareToolModifier).add(draggable).add(this.squareTool);
+        
+        draggable.subscribe(this.squareToolView);
+        this.add(this.squareToolViewModifier).add(draggable).add(this.squareToolView);
     }
 
     module.exports = MenuView;

@@ -44,7 +44,7 @@ define(function(require, exports, module) {
     }
     
     function _setListeners() {
-        this.menuView.squareTool.on('toolClick', this.createWorkSquare.bind(this));
+        this.menuView.squareToolView.on('toolClick', this.createWorkSquare.bind(this));
 
         this.on('keydown', function(event) {
             if (event.altKey) {
