@@ -1,0 +1,163 @@
+body {
+  color: #404040;
+  background-color: #f2f2f0;
+}
+
+.main {
+  background-color: white;
+}
+
+a {
+  color: #fa5c4f;
+}
+
+.red {
+  color: #fa5c4f;
+}
+
+.light-grey {
+  color: #f2f2f0;
+}
+
+.medium-grey {
+  color: #878785;
+}
+
+.red-bg {
+  color: white;
+  background-color: #fa5c4f;
+}
+
+.red-outline {
+  border: 2px solid #fa5c4f;
+}
+
+.grey-bg {
+  background-color: #404040;
+  color: white;
+}
+
+.spacer-line {
+  border-top: 1px solid #fa5c4f;
+}
+
+.white-bg {
+  background-color: white;
+}
+
+@font-face {
+  font-family: "Avenir Next W04 Demi";
+  src: url("fonts/7adddd91-84e0-4423-b40e-61945189916d.eot") format("eot"), url("fonts/b0908846-3d5c-4768-af33-5f968b1da156.woff") format("woff"), url("fonts/fe1602be-28ca-467e-9cd3-7bfc586f31bc.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "AvenirNextLTW02-Regular";
+  src: url("fonts/7a1b7ae7-5c29-481f-83ac-652e932c5509.eot") format("eot"), url("fonts/3a42a252-67ff-4186-88cf-762f56719ca1.woff") format("woff"), url("fonts/dbc39ae3-2636-4653-a23e-8938bce2cf51.ttf") format("truetype");
+}
+
+input:focus {
+  border: 1px solid #fa5c4f;
+}
+
+input:hover {
+  border: 1px solid #404040;
+}
+
+input {
+  outline: 0px;
+  border-radius: 5px;
+  border: 1px solid #f2f2f0;
+  padding: 18px;
+}
+
+body, input {
+  font-family: "AvenirNextLTW02-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 25px;
+}
+
+h1 {
+  font-size: 67px;
+  line-height: 109px;
+  margin-bottom: 67px;
+}
+
+h2 {
+  font-size: 41px;
+  line-height: 67px;
+  margin-bottom: 41px;
+}
+
+h3 {
+  font-size: 25px;
+  line-height: 41px;
+  margin-bottom: 25px;
+}
+
+h4 {
+  font-family: "Avenir Next W04 Demi";
+}
+
+h4, h5, h6, p, li, a {
+  font-size: 16px;
+  line-height: 25px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  max-width: 845px;
+}
+
+p {
+  max-width: 522px;
+}
+
+h5 {
+  text-transform: uppercase;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+pre {
+  font-family: monospace;
+  width: 100%;
+  background-color: #404040;
+  border-radius: 5px;
+  padding: 27px 18px;
+  overflow-x: scroll;
+}
+
+ul {
+  margin-left: 25px;
+}
+
+code {
+  width: 100%;
+}
+
+p, pre, ul {
+  margin-bottom: 25px;
+}
+
+small {
+  font-size: 9px;
+  line-height: 9px;
+}
+
+.button {
+  padding: 18px;
+  border-radius: 3px;
+  margin: 29px 0px;
+}
+
+.backface-visible {
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+  -moz-backface-visibility: visible;
+  -ms-backface-visibility: visible;
+}
