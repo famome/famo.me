@@ -8,6 +8,7 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
         
         _createTool.call(this);
+        _setListeners.call(this);
     }
 
     ToolView.prototype = Object.create(View.prototype);
@@ -35,6 +36,12 @@ define(function(require, exports, module) {
         });
         
         this.add(this.toolModifier).add(this.tool);
+    }
+    
+    function _setListeners() {
+      this.tool.on('click', function() {
+        this._eventOutput.emit('toolClick');
+      }.bind(this));
     }
 
     module.exports = ToolView;

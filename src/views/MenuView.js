@@ -27,12 +27,14 @@ define(function(require, exports, module) {
         this.toolMenu = new Surface({
             size: [this.options.menuSize, undefined],
             properties: {
-                backgroundColor: '#FFFFF5'
+                backgroundColor: '#FFFFF5',
+                zIndex: 1
             }
         });
                 
         this.toolMenuModifier = new StateModifier({
-            opacity: 0.75
+            opacity: 0.75,
+            transform: Transform.translate(0, 0, 1)
         });
         
         draggable.subscribe(this.toolMenu);
@@ -44,7 +46,7 @@ define(function(require, exports, module) {
     function _createSquareTool(draggable) {
         this.squareTool = new ToolView();
         this.squareToolModifier = new StateModifier({
-            transform: Transform.translate(0, this.options.topOffset, 1)
+            transform: Transform.translate(0, this.options.topOffset, 0)
         });
         
         draggable.subscribe(this.squareTool);
