@@ -25,14 +25,20 @@ define(function(require, exports, module) {
           size: [this.options.squareSize, this.options.squareSize],
           properties: {
               backgroundColor: 'pink',
-          }
+          },
       });
         
       var squareModifier = new StateModifier({
-          opacity: 1,
           origin: [0.5, 0.5],
           align: [0.5, 0.5]
       });
+      
+      square.on('dblclick', function() {
+          square.setContent('hi');
+          square.setProperties({
+              textAlign: 'center'
+          });
+      }.bind(this));
       
       draginator.subscribe(square);
       var node = this.add(squareModifier).add(draginator).add(square);

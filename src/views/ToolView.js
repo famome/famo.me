@@ -29,9 +29,7 @@ define(function(require, exports, module) {
                 
         this.toolModifier = new StateModifier({
             opacity: 1,
-            transform: Transform.translate(0, 0, 1),
-            origin: [0.5, 0],
-            align: [0.5, 0]
+            transform: Transform.translate(0, 0, 1)
         });
         
         this.add(this.toolModifier).add(this.tool);
