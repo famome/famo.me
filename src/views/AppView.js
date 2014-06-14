@@ -15,10 +15,14 @@ define(function(require, exports, module) {
         
         _createMenuView.call(this);
         _createWorkView.call(this);
+        _setListeners.call(this);
     }
     
     AppView.prototype = Object.create(View.prototype);
     AppView.prototype.constructor = AppView;
+    AppView.prototype.createWorkSquare = function() {
+        this.workView.createSquare();
+    };
 
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150
@@ -36,6 +40,10 @@ define(function(require, exports, module) {
         this.workView = new WorkView();
         this.workModifier = new StateModifier();
         this.add(this.workModifier).add(this.workView);
+    }
+    
+    function _setListeners() {
+      this.menuView.squareTool.on('toolClick', this.createWorkSquare.bind(this));
     }
 
     module.exports = AppView;
