@@ -53,6 +53,7 @@ _createButtons.call(this, draggable);
         var grid = new GridLayout({
             dimensions: [2, 2],
             gutterSize: [5, 5]
+    
         });
 
         var tools = [];
