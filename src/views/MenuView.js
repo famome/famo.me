@@ -49,7 +49,7 @@ define(function(require, exports, module) {
     function _createSquareTool(draggable) {
         this.squareTool = new ToolView();
         this.squareToolModifier = new StateModifier({
-            transform: Transform.translate(0, this.options.topOffset, 0)
+            transform: Transform.translate(0, this.options.topOffset, 1)
         });
 
         draggable.subscribe(this.squareTool);
