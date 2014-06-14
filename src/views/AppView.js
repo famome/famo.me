@@ -20,6 +20,7 @@ define(function(require, exports, module) {
     
     AppView.prototype = Object.create(View.prototype);
     AppView.prototype.constructor = AppView;
+
     AppView.prototype.createWorkSquare = function() {
         this.workView.createSquare();
     };
@@ -43,8 +44,21 @@ define(function(require, exports, module) {
     }
     
     function _setListeners() {
-      this.menuView.squareTool.on('toolClick', this.createWorkSquare.bind(this));
+        this.menuView.squareTool.on('toolClick', this.createWorkSquare.bind(this));
+
+        this.on('keydown', function(event) {
+            if (event.altKey) {
+                console.log('keydown');
+            }
+        }, false);
+
+        this.on('keyup', function(event) {
+            if (!event.altKey) {
+                console.log('keydown with option-key');
+            }
+        }, false);
     }
+
 
     module.exports = AppView;
 });
