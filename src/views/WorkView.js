@@ -2,6 +2,7 @@ define(function(require, exports, module) {
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
+    var ModifierChain = require('famous/modifiers/ModifierChain');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Draggable     = require('famous/modifiers/Draggable');
 
@@ -28,7 +29,6 @@ define(function(require, exports, module) {
           }
       });
 
-
       var squareModifier = new StateModifier({
           size: [this.options.squareSize, this.options.squareSize],
           opacity: 1,
@@ -36,10 +36,13 @@ define(function(require, exports, module) {
           align: [0.5, 0.5]
       });
 
-      _enableKeymovement(square, squareModifier);
+      var squareModifierChain = new ModifierChain();
+      squareModifierChain.addModifier(squareModifier);
+
+      _enableKeymovement(square, squareModifierChain);
 
       draggable.subscribe(square);
-      var node = this.add(squareModifier).add(draggable).add(square);
+      var node = this.add(squareModifierChain).add(draggable).add(square);
       this.squares['square'+this.numSquares] = node;
     };
 
@@ -64,47 +67,115 @@ define(function(require, exports, module) {
     }
 
     module.exports = WorkView;
+
     var moveElement;
 
     function _enableKeymovement(currentSurf, currentMod) {
+        console.log('enabling key movement for surface', currentSurf, 'and modifier', currentMod);
         var keyListener = function(currentMod) {
-            var x = currentMod._transformState._final[12];
-            var y = currentMod._transformState._final[13];
+            var rx = 0;
+            var ry = 0;
+            var rz = 0;
+            var sx;
+            var sy;
+            var sz;
+            var tx;
+            var ty;
+            var tz;
 
-            var moveElement = function(event) {
-                if (event.keyIdentifier === "Right") {
-                    if (event.shiftKey) {
-                    x = x + 5;
-                    } else {
-                        x++;
-                    }
-                    currentMod.setTransform(Transform.translate(x, y, 0));
-                } else if (event.keyIdentifier === "Down") {
-                    if (event.shiftKey) {
-                        y = y + 5;
-                    } else {
-                        y++;
-                    }
-                    currentMod.setTransform(Transform.translate(x, y, 0));
-                } else if (event.keyIdentifier === "Left") {
-                    if (event.shiftKey) {
-                        x = x - 5;
-                    } else {
-                        x--;
-                    }
-                    currentMod.setTransform(Transform.translate(x, y, 0));
-                } else if (event.keyIdentifier === "Up") {
-                    if (event.shiftKey) {
-                        y = y - 5;
-                    } else {
-                        y--;
-                    }
-                    currentMod.setTransform(Transform.translate(x, y, 0));
+            var moveUp = function(event) {
+                var options;
+
+                if (event.shiftKey) {
+                    options = { transform: Transform.translate(tx, ty - 5, tz) };
+                } else if (event.metaKey) {
+                    options = { transform: Transform.scale(sx, sy - 1, sz) };
+                } else if (event.altKey) {
+                    options = { transform: Transform.rotateZ(tz - .01) };
+                } else if (event.altKey && event.shiftKey) {
+                    options = { transform: Transform.rotateZ(tz - .05) };
+                } else {
+                    options = { transform: Transform.translate(tx, ty - 1, tz) };
                 }
+
+                var newTransform = new StateModifier(options);
+                currentMod.addModifier(newTransform);
+            };
+
+            var moveDown = function(event) {
+                var options;
+
+                if (event.shiftKey) {
+                    options = { transform: Transform.translate(tx, ty + 5, tz) };
+                } else if (event.metaKey) {
+                    options = { transform: Transform.scale(sx, sy + 1, sz) };
+                } else if (event.altKey) {
+                    options = { transform: Transform.rotateZ(tz + .01) };
+                } else if (event.altKey && event.shiftKey) {
+                    options = { transform: Transform.rotateZ(tz + .05) };
+                } else {
+                    options = { transform: Transform.translate(tx, ty + 1, tz) };
+                }
+
+                var newTransform = new StateModifier(options);
+                currentMod.addModifier(newTransform);
+            };
+
+            var moveLeft = function(event) {
+                var options;
+
+                if (event.shiftKey) {
+                    options = { transform: Transform.translate(tx - 5, ty, tz) };
+                } else if (event.metaKey) {
+                    options = { transform: Transform.scale(sx - 1, sy, sz) };
+                } else if (event.altKey) {
+                    options = { transform: Transform.rotateY(ty - .01) };
+                } else if (event.altKey && event.shiftKey) {
+                    options = { transform: Transform.rotateY(ty - .05) };
+                } else {
+                    options = { transform: Transform.translate(tx - 1, ty, tz) };
+                }
+
+                var newTransform = new StateModifier(options);
+                currentMod.addModifier(newTransform);
+            };
+
+            var moveRight = function(event) {
+                var options;
+
+                if (event.shiftKey) {
+                    options = { transform: Transform.translate(tx + 5, ty, tz) };
+                } else if (event.metaKey) {
+                    options = { transform: Transform.scale(sx + 1, sy, sz) };
+                } else if (event.altKey) {
+                    options = { transform: Transform.rotateY(ty + .01) };
+                } else if (event.altKey && event.shiftKey) {
+                    options = { transform: Transform.rotateY(ty + .05) };
+                } else {
+                    options = { transform: Transform.translate(tx + 1, ty, tz) };
+                }
+
+                var newTransform = new StateModifier(options);
+                currentMod.addModifier(newTransform);
+            };
+
+            var move = {
+                "Up": moveUp,
+                "Down": moveDown,
+                "Left": moveLeft,
+                "Right": moveRight
             };
 
             window.onkeydown = function(event) {
-                moveElement(event);
+                //moveElement(event);
+                var direction = event.keyIdentifier;
+                sx = currentMod._chain[0]._transformState._final[0];
+                sy = currentMod._chain[0]._transformState._final[5];
+                sz = currentMod._chain[0]._transformState._final[10];
+                tx = currentMod._chain[0]._transformState._final[12];
+                ty = currentMod._chain[0]._transformState._final[13];
+                tz = currentMod._chain[0]._transformState._final[14];
+                move[direction](event);
             };
         };
 
