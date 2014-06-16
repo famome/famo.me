@@ -5,7 +5,10 @@ define(function(require, exports, module) {
     var StateModifier = require('famous/modifiers/StateModifier');
     var Draginator    = require('Draginator');
     
-    var HeaderFooterLayout = require('famous/views/HeaderFooterLayout');
+    var BasicLayout   = require('utils/BasicLayout');
+    
+    
+    
     var RenderController = require('famous/views/RenderController');
 
     function WorkView() {
@@ -16,7 +19,7 @@ define(function(require, exports, module) {
         this.renderController = new RenderController();
         this.add(this.renderController);
         
-        _createContent.call(this);
+        BasicLayout.createContent.call(this);
     }
 
     WorkView.prototype = Object.create(View.prototype);
@@ -32,13 +35,7 @@ define(function(require, exports, module) {
     };
     
     WorkView.prototype.createHeaderFooter = function() {
-        this.layout = new HeaderFooterLayout();
-        if (this.header) _createHeader.call(this);
-        
-        if (this.footer) _createFooter.call(this);
-        
-        if (this.header || this.footer) this.renderController.show(this.layout);
-        else this.renderController.hide(this.layout);
+        BasicLayout.render.call(this);
     };
     
     WorkView.prototype.createSquare = function() {
@@ -74,64 +71,6 @@ define(function(require, exports, module) {
     WorkView.DEFAULT_OPTIONS = {
         squareSize: 50
     };
-    
-    function _createContent() {
-        var background = new Surface({
-            size: [undefined, undefined],
-            classes: ["grey-bg"],
-            properties: {
-                lineHeight: '150px',
-                textAlign: "center",
-                zIndex: -1
-            }
-        });
-        
-        var backgroundModifier = new StateModifier({
-            transform: Transform.translate(0, 0, -1)
-        });
-        
-        this.add(backgroundModifier).add(background);
-    }
-    
-    function _createHeader() {
-        var header = new Surface({
-            size: [undefined, 100],
-            content: "Header",
-            classes: ["red-bg"],
-            properties: {
-                lineHeight: '100px',
-                textAlign: "center",
-                zIndex: -1
-            }
-        });
-        
-        // var headerModifier = new StateModifier({
-        //     transform: Transform.translate(0, 0, -1)
-        // });
-        
-        this.layout.header.add(header);
-        
-        // this.add(this.headerNode);
-    }
-    
-    function _createFooter() {
-        var footer = new Surface({
-            size: [undefined, 50],
-            content: "Footer",
-            classes: ["red-bg"],
-            properties: {
-                lineHeight: '50px',
-                textAlign: "center",
-                zIndex: -1
-            }
-        });
-        
-        // var footerModifier = new StateModifier({
-        //     transform: Transform.translate(0, 0, -1)
-        // });
-        
-        this.layout.footer.add(footer);        
-    }
 
     module.exports = WorkView;
 });
