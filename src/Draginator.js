@@ -1,34 +1,97 @@
+/*             
+ * , . ..           
+ * ,      ://.//./.
+ *
+ * : @.
+ * @  .
+ * @  , . 
+ */
+
 define(function(require, exports, module) {
     var Transform = require('famous/core/Transform');
     var Transitionable = require('famous/transitions/Transitionable');
     var EventHandler = require('famous/core/EventHandler');
     var Utilities = require('famous/math/Utilities');
 
-    var Draggable = require('famous/modifiers/Draggable')
-
-    var Draginator = function(){
-        Draggable.call(this);
-
-        this._active = {
-            "draggable": true,
-            "resizeable": false,
-            "rotateable": false
-        };
-    }
-
-    Draginator.prototype.constructor = Draginator;
-    Draginator.prototype = Object.create(Draggable.prototype);
+    var GenericSync = require('famous/inputs/GenericSync');
+    var MouseSync = require('famous/inputs/MouseSync');
+    var TouchSync = require('famous/inputs/TouchSync');
+    GenericSync.register({'mouse': MouseSync, 'touch': TouchSync});
 
     /**
-     * Helper function that returns true if there exists a propery in obj that is true
+     * Makes added render nodes responsive to drag beahvior.
+     *   Emits events 'start', 'update', 'end'.
+     * @class Draginator
+     * @constructor
+     * @param {Object} [options] options configuration object.
+     * @param {Number} [options.snapX] grid width for snapping during drag
+     * @param {Number} [options.snapY] grid height for snapping during drag
+     * @param {Array.Number} [options.xRange] maxmimum [negative, positive] x displacement from start of drag
+     * @param {Array.Number} [options.yRange] maxmimum [negative, positive] y displacement from start of drag
+     * @param {Number} [options.scale] one pixel of input motion translates to this many pixels of output drag motion
+     * @param {Number} [options.projection] User should set to Draginator._direction.x or
+     *    Draginator._direction.y to constrain to one axis.
      *
-     * @method activate
-     *
-     * @param {object} object to check if any properties
-     *      Will deactivate other types of actions
-     *
-     * @return {boolean} true if there exists a property in obj that is true
      */
+    function Draginator(options) {
+        this.options = Object.create(Draginator.DEFAULT_OPTIONS);
+        if (options) this.setOptions(options);
+
+        this._positionState = new Transitionable([0,0]);
+        this._differential  = [0,0];
+        this._active = {
+            "draggable": true,
+            "resizeable": true,
+            "rotateable": false
+        };
+
+        this.sync = new GenericSync(['mouse', 'touch'], {scale : this.options.scale});
+        this.eventOutput = new EventHandler();
+        EventHandler.setInputHandler(this,  this.sync);
+        EventHandler.setOutputHandler(this, this.eventOutput);
+
+        _bindEvents.call(this);
+    }
+
+
+    //binary representation of directions for bitwise operations
+    var _direction = {
+        x : 0x01,         //001
+        y : 0x02          //010
+    };
+
+    Draginator.DIRECTION_X = _direction.x;
+    Draginator.DIRECTION_Y = _direction.y;
+
+    var _clamp = Utilities.clamp;
+
+    Draginator.DEFAULT_OPTIONS = {
+        projection  : _direction.x | _direction.y,
+        scale       : 1,
+        xRange      : null,
+        yRange      : null,
+        snapX       : 0,
+        snapY       : 0,
+        transition  : {duration : 0}
+    };
+
+    function _mapDifferential(differential) {
+        var opts        = this.options;
+        var projection  = opts.projection;
+        var snapX       = opts.snapX;
+        var snapY       = opts.snapY;
+
+        //axes
+        var tx = (projection & _direction.x) ? differential[0] : 0;
+        var ty = (projection & _direction.y) ? differential[1] : 0;
+
+        //snapping
+        if (snapX > 0) tx -= tx % snapX;
+        if (snapY > 0) ty -= ty % snapY;
+
+        return [tx, ty];
+    }
+
     function hasTrueProperty(obj) {
         for (var key in obj) {
             if (obj[key]) return true;
@@ -45,6 +108,12 @@ define(function(require, exports, module) {
 
     function _handleMove(event) {
         if (!hasTrueProperty(this._active)) return;
+
+        if (window.event.altKey) {
+            this.activate('resizeable');
+        } else {
+            this.activate('draggable');
+        }
 
         var options = this.options;
         this._differential = event.position;
@@ -79,6 +148,83 @@ define(function(require, exports, module) {
         this.eventOutput.emit('end', {position : this.getPosition()});
     }
 
+    function _bindEvents() {
+        this.sync.on('start', _handleStart.bind(this));
+        this.sync.on('update', _handleMove.bind(this));
+        this.sync.on('end', _handleEnd.bind(this));
+    }
+
+    /**
+     * Set internal options, overriding any default options
+     *
+     * @method setOptions
+     *
+     * @param {Object} [options] overrides of default options.  See constructor.
+     */
+    Draginator.prototype.setOptions = function setOptions(options) {
+        var currentOptions = this.options;
+        if (options.projection !== undefined) {
+            var proj = options.projection;
+            this.options.projection = 0;
+            ['x', 'y'].forEach(function(val) {
+                if (proj.indexOf(val) !== -1) currentOptions.projection |= _direction[val];
+            });
+        }
+        if (options.scale  !== undefined) {
+            currentOptions.scale  = options.scale;
+            this.sync.setOptions({
+                scale: options.scale
+            });
+        }
+        if (options.xRange !== undefined) currentOptions.xRange = options.xRange;
+        if (options.yRange !== undefined) currentOptions.yRange = options.yRange;
+        if (options.snapX  !== undefined) currentOptions.snapX  = options.snapX;
+        if (options.snapY  !== undefined) currentOptions.snapY  = options.snapY;
+    };
+
+    /**
+     * Get current delta in position from where this draginator started.
+     *
+     * @method getPosition
+     *
+     * @return {array<number>} [x, y] position delta from start.
+     */
+    Draginator.prototype.getPosition = function getPosition() {
+        return this._positionState.get();
+    };
+
+    /**
+     * Transition the element to the desired relative position via provided transition.
+     *  For example, calling this with [0,0] will not change the position.
+     *  Callback will be executed on completion.
+     *
+     * @method setRelativePosition
+     *
+     * @param {array<number>} position end state to which we interpolate
+     * @param {transition} transition transition object specifying how object moves to new position
+     * @param {function} callback zero-argument function to call on observed completion
+     */
+    Draginator.prototype.setRelativePosition = function setRelativePosition(position, transition, callback) {
+        var currPos = this.getPosition();
+        var relativePosition = [currPos[0] + position[0], currPos[1] + position[1]];
+        this.setPosition(relativePosition, transition, callback);
+    };
+
+    /**
+     * Transition the element to the desired absolute position via provided transition.
+     *  Callback will be executed on completion.
+     *
+     * @method setPosition
+     *
+     * @param {array<number>} position end state to which we interpolate
+     * @param {transition} transition transition object specifying how object moves to new position
+     * @param {function} callback zero-argument function to call on observed completion
+     */
+    Draginator.prototype.setPosition = function setPosition(position, transition, callback) {
+        if (this._positionState.isActive()) this._positionState.halt();
+        this._positionState.set(position, transition, callback);
+    };
+
     /**
      * Set this draginator to respond to user input for the particular types of actions passed.
      *
@@ -88,18 +234,22 @@ define(function(require, exports, module) {
      *      Will deactivate other types of actions
      */
     Draginator.prototype.activate = function activate(type) {
-        for (var key in this._active) this.deactivate(key);
+        for (var key in this._active) {
+            console.log('deactivating ', key);
+            this.deactivate(key);
+        }
+        console.log('activating ', type);
         this._active[type] = true;
     };
 
     /**
-     * Set this draggable to ignore user input.
+     * Set this draginator to ignore user input.
      *
      * @method deactivate
      *
      * @param {string} type of action to deactivate
      */
-    Draggable.prototype.deactivate = function deactivate(type) {
+    Draginator.prototype.deactivate = function deactivate(type) {
         this._active[type] = false;
     };
 
@@ -121,11 +271,11 @@ define(function(require, exports, module) {
 
         if (this._active["draggable"])
             transform = Transform.translate(pos[0], pos[1]);
-        else if (this._active["resizeable"])
-            transform = Transform.scale(pos[0]/100 || .001, pos[2]/100 || .001)
-        else if (this._active["rotateable"])
-            // Fix me Fix me Fix me
-            transform = Transform.identity();
+        // else if (this._active["resizeable"])
+        //     ;
+        // else if (this._active["rotateable"])
+        //     // Fix me Fix me Fix me
+        //     transform = Transform.identity();
         else
             return false;
 
