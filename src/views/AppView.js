@@ -24,6 +24,14 @@ define(function(require, exports, module) {
     AppView.prototype.createWorkSquare = function() {
         this.workView.createSquare();
     };
+    
+    AppView.prototype.toggleHeader = function() {
+        this.workView.toggleHeader();
+    };
+    
+    AppView.prototype.toggleFooter = function() {
+        this.workView.toggleFooter();
+    };
 
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150
@@ -44,7 +52,9 @@ define(function(require, exports, module) {
     }
     
     function _setListeners() {
-        this.menuView.squareTool.on('toolClick', this.createWorkSquare.bind(this));
+        // this.menuView.squareToolView.on('toolClick', this.createWorkSquare.bind(this));
+        // this.menuView.headerToolView.on('toolClick', this.toggleHeader.bind(this));
+        this.menuView.footerToolView.on('toolClick', this.toggleFooter.bind(this));
 
         this.on('keydown', function(event) {
             if (event.altKey) {
