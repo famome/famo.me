@@ -23,7 +23,7 @@ define(function(require, exports, module) {
             size: [this.options.size, this.options.size],
             properties: {
                 backgroundColor: 'pink',
-                zIndex: 1
+                zIndex: 1,
             }
         });
                 

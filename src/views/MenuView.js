@@ -4,7 +4,8 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var ModifierChain = require('famous/modifiers/ModifierChain');
-    var GridLayout    = require("famous/views/GridLayout");
+    var GridLayout    = require('famous/views/GridLayout');
+    var RenderNode    = require('famous/core/RenderNode');
     var Draggable     = require('famous/modifiers/Draggable');
 
     var ToolView      = require('views/ToolView');
@@ -15,9 +16,6 @@ define(function(require, exports, module) {
         var draggable = new Draggable();
 
         _createToolMenu.call(this, draggable);
-        // _createSquareTool.call(this, draggable);
-        // _createHeaderTool.call(this, draggable);
-        // _createFooterTool.call(this, draggable);
         _createButtons.call(this, draggable);
     }
 
@@ -31,6 +29,8 @@ define(function(require, exports, module) {
     function _createToolMenu(draggable) {
         this.toolMenu = new Surface({
             size: [this.options.menuSize, undefined],
+            origin: [0.5, 0],
+            align: [0.5, 0],
             properties: {
                 backgroundColor: '#FFFFF5',
                 zIndex: 1,
@@ -49,73 +49,17 @@ define(function(require, exports, module) {
         this.add(this.toolMenuModifier).add(draggable).add(this.toolMenu);
     }
     
-    function _createSquareTool(draggable) {
-        this.squareToolView = new ToolView();
-        this.squareToolViewModifier = new StateModifier({
-            transform: Transform.translate(0, this.options.topOffset, 1),
-            origin: [0.5, 0],
-            align: [0.5, 0]
-        });
-        
-        draggable.subscribe(this.squareToolView);
-        this.add(this.squareToolViewModifier).add(draggable).add(this.squareToolView);
-    }
-    
-    function _createHeaderTool(draggable) {
-        this.headerToolView = new ToolView();
-        this.headerToolViewModifier = new StateModifier({
-            transform: Transform.translate(0, this.options.topOffset, 1),
-            origin: [0.5, 0],
-            align: [0.5, 0]
-        });
-        
-        this.headerToolView.tool.setOptions({
-            content: '⬒',
-            origin: [0.5, 0.5],
-            align: [0.5, 0.5],
-            properties: {
-                textAlign: 'center',
-                fontSize: 40 + 'px'
-            }
-        });
-        
-        draggable.subscribe(this.headerToolView);
-        this.add(this.headerToolViewModifier).add(draggable).add(this.headerToolView);
-    }
-    
-    function _createFooterTool(draggable) {
-        this.footerToolView = new ToolView();
-        this.footerToolViewModifier = new StateModifier({
-            transform: Transform.translate(0, this.options.topOffset, 1),
-            origin: [0.5, 0],
-            align: [0.5, 0]
-        });
-        
-        // ⿲⿳
-        this.footerToolView.tool.setOptions({
-            content: '⬓',
-            origin: [0.5, 0.5],
-            align: [0.5, 0.5],
-            properties: {
-                textAlign: 'center',
-                fontSize: 40 + 'px'
-            }
-        });
-        
-        draggable.subscribe(this.footerToolView);
-        this.add(this.footerToolViewModifier).add(draggable).add(this.footerToolView);
-    }
-    
     function _createButtons(draggable) {
         var grid = new GridLayout({
-            dimensions: [2, 2]
+            dimensions: [2, 2],
+            gutterSize: [5, 5]
         });
         
         var tools = [];
         grid.sequenceFrom(tools);
         var icons = ['⬒', '⬓', '⿳', '⿲'];
-
-        for(var i = 0; i < 4; i++) {
+        
+        for (var i = 0; i < 4; i++) {
             var toolView = new ToolView();
             toolView.tool.setOptions({
                 content: icons[i],
@@ -124,9 +68,10 @@ define(function(require, exports, module) {
                 align: [0.5, 0.5],
                 properties: {
                     backgroundColor: 'pink',
-                    lineHeight: '200px',
+                    lineHeight: '60px',
                     textAlign: 'center',
-                    fontSize: 40 + 'px'
+                    fontSize: 40 + 'px',
+                    cursor: 'pointer'
                 }
             });
             
@@ -136,23 +81,23 @@ define(function(require, exports, module) {
                 this.menu.current = this.content;
                 this.menu._eventOutput.emit('menu');
             });
-            
-            draggable.subscribe(toolView);
-            
-            tools.push(toolView);
-            // tools.push(new Surface({
-            //     content: icons[i],
-            //     size: [undefined, undefined],
-            //     properties: {
-            //         backgroundColor: 'pink',
-            //         lineHeight: '200px',
-            //         textAlign: 'center',
-            //         fontSize: 40 + 'px'
-            //     }
-            // }));
+                        
+            tools.push(toolView.tool);
         }
-        console.log(this.toolMenu)
-        this.add(grid);
+        
+        
+        var gridModifier = new StateModifier({
+            size: [125, 125], 
+            origin: [.5, .25],
+            transform: Transform.translate(0, 0, 1),
+            properties: {
+                zIndex: 1
+            }
+        });
+        
+        draggable.subscribe(grid);
+        
+        this.add(draggable).add(gridModifier).add(grid);        
     }
 
     module.exports = MenuView;

@@ -48,6 +48,7 @@ define(function(require, exports, module) {
           size: [this.options.squareSize, this.options.squareSize],
           properties: {
               backgroundColor: 'pink',
+              cursor: '-webkit-grab'
           },
       });
         

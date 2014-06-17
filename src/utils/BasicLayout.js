@@ -36,11 +36,11 @@ define(function(require, exports, module) {
                 }
             });
         
-            // var headerModifier = new StateModifier({
-            //     transform: Transform.translate(0, 0, -1)
-            // });
+            var headerModifier = new StateModifier({
+                transform: Transform.translate(0, 0, -1)
+            });
         
-            this.layout.header.add(header);
+            this.layout.header.add(headerModifier).add(header);
         },
         
         createFooter: function() {
@@ -55,17 +55,16 @@ define(function(require, exports, module) {
                 }
             });
         
-            // var footerModifier = new StateModifier({
-            //     transform: Transform.translate(0, 0, -1)
-            // });
+            var footerModifier = new StateModifier({
+                transform: Transform.translate(0, 0, -1)
+            });
         
-            this.layout.footer.add(footer);        
+            this.layout.footer.add(footerModifier).add(footer);        
         },
         
         render: function() {
             this.layout = new HeaderFooterLayout();
             if (this.header) BasicLayout.createHeader.call(this);
-        
             if (this.footer) BasicLayout.createFooter.call(this);
         
             if (this.header || this.footer) this.renderController.show(this.layout);
