@@ -4,7 +4,7 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var ModifierChain = require('famous/modifiers/ModifierChain');
-
+    var GridLayout    = require("famous/views/GridLayout");
     var Draggable     = require('famous/modifiers/Draggable');
 
     var ToolView      = require('views/ToolView');
@@ -17,7 +17,8 @@ define(function(require, exports, module) {
         _createToolMenu.call(this, draggable);
         // _createSquareTool.call(this, draggable);
         // _createHeaderTool.call(this, draggable);
-        _createFooterTool.call(this, draggable);
+        // _createFooterTool.call(this, draggable);
+        _createButtons.call(this, draggable);
     }
 
     MenuView.prototype = Object.create(View.prototype);
@@ -90,6 +91,7 @@ define(function(require, exports, module) {
             align: [0.5, 0]
         });
         
+        // ⿲⿳
         this.footerToolView.tool.setOptions({
             content: '⬓',
             origin: [0.5, 0.5],
@@ -102,6 +104,55 @@ define(function(require, exports, module) {
         
         draggable.subscribe(this.footerToolView);
         this.add(this.footerToolViewModifier).add(draggable).add(this.footerToolView);
+    }
+    
+    function _createButtons(draggable) {
+        var grid = new GridLayout({
+            dimensions: [2, 2]
+        });
+        
+        var tools = [];
+        grid.sequenceFrom(tools);
+        var icons = ['⬒', '⬓', '⿳', '⿲'];
+
+        for(var i = 0; i < 4; i++) {
+            var toolView = new ToolView();
+            toolView.tool.setOptions({
+                content: icons[i],
+                size: [undefined, undefined],
+                origin: [0.5, 0.5],
+                align: [0.5, 0.5],
+                properties: {
+                    backgroundColor: 'pink',
+                    lineHeight: '200px',
+                    textAlign: 'center',
+                    fontSize: 40 + 'px'
+                }
+            });
+            
+            toolView.tool.menu = this;
+            
+            toolView.tool.on('click', function() {
+                this.menu.current = this.content;
+                this.menu._eventOutput.emit('menu');
+            });
+            
+            draggable.subscribe(toolView);
+            
+            tools.push(toolView);
+            // tools.push(new Surface({
+            //     content: icons[i],
+            //     size: [undefined, undefined],
+            //     properties: {
+            //         backgroundColor: 'pink',
+            //         lineHeight: '200px',
+            //         textAlign: 'center',
+            //         fontSize: 40 + 'px'
+            //     }
+            // }));
+        }
+        console.log(this.toolMenu)
+        this.add(grid);
     }
 
     module.exports = MenuView;

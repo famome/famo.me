@@ -57,7 +57,7 @@ define(function(require, exports, module) {
       });
       
       square.on('dblclick', function() {
-          square.setContent('hi');
+          square.setContent('click?');
           square.setProperties({
               textAlign: 'center'
           });
