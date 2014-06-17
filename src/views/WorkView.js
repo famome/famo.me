@@ -46,6 +46,7 @@ define(function(require, exports, module) {
           size: [this.options.squareSize, this.options.squareSize],
           properties: {
               backgroundColor: 'pink',
+              cursor: '-webkit-grab'
           },
       });
 
@@ -68,7 +69,7 @@ define(function(require, exports, module) {
       var node = this.add(squareModifierChain).add(draginator).add(renderController);
 
       square.on('dblclick', function() {
-          square.setContent('hi');
+          square.setContent('click?');
           square.setProperties({
               textAlign: 'center'
           });

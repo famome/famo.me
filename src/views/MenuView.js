@@ -4,7 +4,8 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var ModifierChain = require('famous/modifiers/ModifierChain');
-
+    var GridLayout    = require('famous/views/GridLayout');
+    var RenderNode    = require('famous/core/RenderNode');
     var Draggable     = require('famous/modifiers/Draggable');
 
     var ToolView      = require('views/ToolView');
@@ -15,9 +16,7 @@ define(function(require, exports, module) {
         var draggable = new Draggable();
 
         _createToolMenu.call(this, draggable);
-        _createSquareTool.call(this, draggable);
-        // _createHeaderTool.call(this, draggable);
-        // _createFooterTool.call(this, draggable);
+_createButtons.call(this, draggable);
     }
 
     MenuView.prototype = Object.create(View.prototype);
@@ -30,6 +29,8 @@ define(function(require, exports, module) {
     function _createToolMenu(draggable) {
         this.toolMenu = new Surface({
             size: [this.options.menuSize, undefined],
+            origin: [0.5, 0],
+            align: [0.5, 0],
             properties: {
                 backgroundColor: '#FFFFF5',
                 zIndex: 1,
@@ -48,60 +49,55 @@ define(function(require, exports, module) {
         this.add(this.toolMenuModifier).add(draggable).add(this.toolMenu);
     }
 
-    function _createSquareTool(draggable) {
-        this.squareToolView = new ToolView();
-        this.squareToolViewModifier = new StateModifier({
-            transform: Transform.translate(0, this.options.topOffset, 1),
-            origin: [0.5, 0],
-            align: [0.5, 0]
+    function _createButtons(draggable) {
+        var grid = new GridLayout({
+            dimensions: [2, 2],
+            gutterSize: [5, 5]
         });
 
-        draggable.subscribe(this.squareToolView);
-        this.add(this.squareToolViewModifier).add(draggable).add(this.squareToolView);
-    }
+        var tools = [];
+        grid.sequenceFrom(tools);
+        var icons = ['⬒', '⬓', '⿳', '⿲'];
 
-    function _createHeaderTool(draggable) {
-        this.headerToolView = new ToolView();
-        this.headerToolViewModifier = new StateModifier({
-            transform: Transform.translate(0, this.options.topOffset, 1),
-            origin: [0.5, 0],
-            align: [0.5, 0]
-        });
+        for (var i = 0; i < 4; i++) {
+            var toolView = new ToolView();
+            toolView.tool.setOptions({
+                content: icons[i],
+                size: [undefined, undefined],
+                origin: [0.5, 0.5],
+                align: [0.5, 0.5],
+                properties: {
+                    backgroundColor: 'pink',
+                    lineHeight: '60px',
+                    textAlign: 'center',
+                    fontSize: 40 + 'px',
+                    cursor: 'pointer'
+                }
+            });
 
-        this.headerToolView.tool.setOptions({
-            content: '⬒',
-            origin: [0.5, 0.5],
-            align: [0.5, 0.5],
+            toolView.tool.menu = this;
+
+            toolView.tool.on('click', function() {
+                this.menu.current = this.content;
+                this.menu._eventOutput.emit('menu');
+            });
+
+            tools.push(toolView.tool);
+        }
+
+
+        var gridModifier = new StateModifier({
+            size: [125, 125],
+            origin: [.5, .25],
+            transform: Transform.translate(0, 0, 1),
             properties: {
-                textAlign: 'center',
-                fontSize: 40 + 'px'
+                zIndex: 1
             }
         });
 
-        draggable.subscribe(this.headerToolView);
-        this.add(this.headerToolViewModifier).add(draggable).add(this.headerToolView);
-    }
+        draggable.subscribe(grid);
 
-    function _createFooterTool(draggable) {
-        this.footerToolView = new ToolView();
-        this.footerToolViewModifier = new StateModifier({
-            transform: Transform.translate(0, this.options.topOffset, 1),
-            origin: [0.5, 0],
-            align: [0.5, 0]
-        });
-
-        this.footerToolView.tool.setOptions({
-            content: '⬓',
-            origin: [0.5, 0.5],
-            align: [0.5, 0.5],
-            properties: {
-                textAlign: 'center',
-                fontSize: 40 + 'px'
-            }
-        });
-
-        draggable.subscribe(this.footerToolView);
-        this.add(this.footerToolViewModifier).add(draggable).add(this.footerToolView);
+        this.add(draggable).add(gridModifier).add(grid);
     }
 
     module.exports = MenuView;
