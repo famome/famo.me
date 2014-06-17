@@ -49,6 +49,7 @@ define(function(require, exports, module) {
         this.workView = new WorkView();
         this.workModifier = new StateModifier();
         this.add(this.workModifier).add(this.workView);
+        window.work = this.workView;
     }
 
     function _setListeners() {
