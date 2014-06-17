@@ -51,7 +51,6 @@ define(function(require, exports, module) {
       });
 
       var squareModifier = new StateModifier({
-          size: [this.options.squareSize, this.options.squareSize],
           opacity: 1,
           origin: [0.5, 0.5],
           align: [0.5, 0.5]
