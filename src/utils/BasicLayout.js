@@ -3,7 +3,7 @@ define(function(require, exports, module) {
     var Transform          = require('famous/core/Transform');
     var StateModifier      = require('famous/modifiers/StateModifier');
     var HeaderFooterLayout = require('famous/views/HeaderFooterLayout');
-    
+
 
     var BasicLayout = {
         createContent: function() {
@@ -16,14 +16,14 @@ define(function(require, exports, module) {
                     zIndex: -1
                 }
             });
-        
+
             var backgroundModifier = new StateModifier({
                 transform: Transform.translate(0, 0, -1)
             });
-        
+
             this.add(backgroundModifier).add(background);
         },
-        
+
         createHeader: function() {
             var header = new Surface({
                 size: [undefined, 100],
@@ -35,14 +35,14 @@ define(function(require, exports, module) {
                     zIndex: -1
                 }
             });
-        
+
             var headerModifier = new StateModifier({
                 transform: Transform.translate(0, 0, -1)
             });
-        
+
             this.layout.header.add(headerModifier).add(header);
         },
-        
+
         createFooter: function() {
             var footer = new Surface({
                 size: [undefined, 50],
@@ -54,23 +54,23 @@ define(function(require, exports, module) {
                     zIndex: -1
                 }
             });
-        
+
             var footerModifier = new StateModifier({
                 transform: Transform.translate(0, 0, -1)
             });
-        
-            this.layout.footer.add(footerModifier).add(footer);        
+
+            this.layout.footer.add(footerModifier).add(footer);
         },
-        
+
         render: function() {
             this.layout = new HeaderFooterLayout();
             if (this.header) BasicLayout.createHeader.call(this);
             if (this.footer) BasicLayout.createFooter.call(this);
-        
+
             if (this.header || this.footer) this.renderController.show(this.layout);
             else this.renderController.hide(this.layout);
         }
     };
-    
+
     module.exports = BasicLayout;
 });

@@ -119,7 +119,7 @@ define(function(require, exports, module) {
         var pos = this.getPosition();
         var transform;
 
-        if (this._active["draggable"]) 
+        if (this._active["draggable"])
             transform = Transform.translate(pos[0], pos[1]);
         else if (this._active["resizeable"])
             transform = Transform.scale(pos[0]/100 || .001, pos[2]/100 || .001)
