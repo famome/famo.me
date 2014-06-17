@@ -54,7 +54,26 @@ define(function(require, exports, module) {
     function _setListeners() {
         // this.menuView.squareToolView.on('toolClick', this.createWorkSquare.bind(this));
         // this.menuView.headerToolView.on('toolClick', this.toggleHeader.bind(this));
-        this.menuView.footerToolView.on('toolClick', this.toggleFooter.bind(this));
+        // this.menuView.toolView.on('toolClick', this.toggleFooter.bind(this));
+        var events = {
+            '⬒': function() {
+                this.workView.toggleHeader();
+            },
+            '⬓': function() {
+                this.workView.toggleFooter();
+            },
+            '⿲': function() {
+                this.workView.createSquare();
+            },
+            '⿳': function() {
+                console.log('you clicked a thing');
+            }
+        };
+        
+        this.menuView.on('menu', function() {
+            events[this.menuView.current].bind(this)();
+            console.log(this.menuView.current, 'ive been clicked! oh god ive been clicked!');
+        }.bind(this));
 
         this.on('keydown', function(event) {
             if (event.altKey) {
