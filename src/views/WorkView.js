@@ -11,8 +11,8 @@ define(function(require, exports, module) {
 
     function WorkView() {
         View.apply(this, arguments);
-        this.squares = {};
-        this.numSquares = 0;
+        this.layoutViews = {};
+        this.numLayoutViews = 0;
 
         this.renderController = new RenderController();
         this.add(this.renderController);
@@ -36,51 +36,55 @@ define(function(require, exports, module) {
         BasicLayout.render.call(this);
     };
 
-    WorkView.prototype.createSquare = function() {
-      this.numSquares++;
-      console.log('creating square', this.numSquares);
+    WorkView.prototype.createLayoutView = function() {
+      this.numLayoutViews++;
+      console.log('creating layoutView', this.numLayoutViews);
 
       var draginator = new Draginator();
 
-      var square = new Surface({
-          size: [this.options.squareSize, this.options.squareSize],
+      var layoutView = new View({
+          size: [this.options.layoutViewSize, this.options.layoutViewSize]
+      });
+
+      layoutView.surface = new Surface({
+          size: [this.options.layoutViewSize, this.options.layoutViewSize],
           properties: {
               backgroundColor: 'pink',
               cursor: '-webkit-grab'
           },
       });
+      layoutView.surface.pipe(layoutView);
+      layoutView._eventInput.pipe(draginator);
 
-      var squareModifier = new StateModifier({
-          size: [this.options.squareSize, this.options.squareSize],
+      var viewNode = layoutView.add(layoutView.surface);
+
+      var layoutViewModifier = new StateModifier({
+          size: [this.options.layoutViewSize, this.options.layoutViewSize],
           opacity: 1,
           origin: [0.5, 0.5],
           align: [0.5, 0.5]
       });
 
-      var squareModifierChain = new ModifierChain();
-      squareModifierChain.addModifier(squareModifier);
+      // draginator.subscribe(layoutView);
 
-
-      draginator.subscribe(square);
       var renderController = new RenderController();
-      renderController.show(square);
-      Keyhandling.enableKeymovement(square, squareModifierChain, renderController);
+      renderController.show(viewNode);
+      Keyhandling.enableKeymovement(layoutView, layoutViewModifier, renderController);
 
-      var node = this.add(squareModifierChain).add(draginator).add(renderController);
+      var node = this.add(layoutViewModifier).add(draginator).add(renderController);
 
-      square.on('dblclick', function() {
-          square.setContent('click?');
-          square.setProperties({
+      layoutView.on('dblclick', function() {
+          layoutView.setContent('click?');
+          layoutView.setProperties({
               textAlign: 'center'
           });
       }.bind(this));
 
-
-      this.squares['square'+this.numSquares] = node;
+      this.layoutViews['layoutView' + this.numLayoutViews] = node;
     };
 
     WorkView.DEFAULT_OPTIONS = {
-        squareSize: 50
+        layoutViewSize: 50
     };
 
     module.exports = WorkView;

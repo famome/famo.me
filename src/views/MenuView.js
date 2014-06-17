@@ -53,7 +53,6 @@ _createButtons.call(this, draggable);
         var grid = new GridLayout({
             dimensions: [2, 2],
             gutterSize: [5, 5]
-    
         });
 
         var tools = [];
@@ -99,9 +98,6 @@ _createButtons.call(this, draggable);
         draggable.subscribe(grid);
 
         this.add(draggable).add(gridModifier).add(grid);
-        
-        draggable.subscribe(this.squareToolView);
-        this.add(this.squareToolViewModifier).add(draggable).add(this.squareToolView);
     }
 
     module.exports = MenuView;
