@@ -51,15 +51,15 @@ _createButtons.call(this, draggable);
 
     function _createButtons(draggable) {
         var grid = new GridLayout({
-            dimensions: [2, 2],
+            dimensions: [2, 3],
             gutterSize: [5, 5]
         });
 
         var tools = [];
         grid.sequenceFrom(tools);
-        var icons = ['⬒', '⬓', '⿳', '⿲'];
+        var icons = ['⬒', '⬓', '▤', '▥', '□', '⿴'];
 
-        for (var i = 0; i < 4; i++) {
+        for (var i = 0; i < 6; i++) {
             var toolView = new ToolView();
             toolView.tool.setOptions({
                 content: icons[i],
@@ -87,7 +87,7 @@ _createButtons.call(this, draggable);
 
 
         var gridModifier = new StateModifier({
-            size: [125, 125],
+            size: [125, 187.5],
             origin: [.5, .25],
             transform: Transform.translate(0, 0, 1),
             properties: {
