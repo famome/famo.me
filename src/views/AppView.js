@@ -21,8 +21,8 @@ define(function(require, exports, module) {
     AppView.prototype = Object.create(View.prototype);
     AppView.prototype.constructor = AppView;
 
-    AppView.prototype.createWorkSquare = function() {
-        this.workView.createSquare();
+    AppView.prototype.createWorkLayoutView = function() {
+        this.workView.createLayoutView();
     };
 
     AppView.prototype.toggleHeader = function() {
@@ -49,6 +49,7 @@ define(function(require, exports, module) {
         this.workView = new WorkView();
         this.workModifier = new StateModifier();
         this.add(this.workModifier).add(this.workView);
+        window.work = this.workView;
     }
 
     function _setListeners() {
@@ -63,7 +64,7 @@ define(function(require, exports, module) {
                 this.workView.toggleFooter();
             },
             '⿲': function() {
-                this.workView.createSquare();
+                this.workView.createLayoutView();
             },
             '⿳': function() {
                 console.log('you clicked a thing');
