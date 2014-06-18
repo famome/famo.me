@@ -40,7 +40,8 @@ define(function(require, exports, module) {
     function _createMenuView() {
         this.menuView = new MenuView();
         this.menuModifier = new StateModifier({
-            size: [this.options.menuSize, undefined]
+            size: [this.options.menuSize, undefined],
+            origin: [1, 0]
         });
         this.add(this.menuModifier).add(this.menuView);
     }
@@ -53,9 +54,6 @@ define(function(require, exports, module) {
     }
 
     function _setListeners() {
-        // this.menuView.squareToolView.on('toolClick', this.createWorkSquare.bind(this));
-        // this.menuView.headerToolView.on('toolClick', this.toggleHeader.bind(this));
-        // this.menuView.toolView.on('toolClick', this.toggleFooter.bind(this));
         var events = {
             '⬒': function() {
                 this.workView.toggleHeader();
@@ -63,17 +61,22 @@ define(function(require, exports, module) {
             '⬓': function() {
                 this.workView.toggleFooter();
             },
-            '⿲': function() {
+            '▤': function() {
+                console.log('you clicked a row thing');
+            },
+            '▥': function() {
+                console.log('you clicked a column thing');
+            },
+            '□': function() {
                 this.workView.createLayoutView();
             },
-            '⿳': function() {
-                console.log('you clicked a thing');
+            '⿴': function() {
+                console.log('time to generate some JSON!');
             }
         };
 
         this.menuView.on('menu', function() {
             events[this.menuView.current].bind(this)();
-            console.log(this.menuView.current, 'ive been clicked! oh god ive been clicked!');
         }.bind(this));
 
         this.on('keydown', function(event) {
