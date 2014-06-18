@@ -169,7 +169,7 @@ define(function(require, exports, module) {
                 }
 
                 window.onkeydown = function(event) {
-                    //moveElement(event);
+                    moveElement(event);
                     console.log(event.keyIdentifier);
                     var key = event.keyIdentifier;
                     tx = currentMod._chain[0]._transformState._final[12];

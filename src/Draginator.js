@@ -18,6 +18,13 @@ define(function(require, exports, module) {
     var TouchSync = require('famous/inputs/TouchSync');
     GenericSync.register({'mouse': MouseSync, 'touch': TouchSync});
 
+    var keyMatrix = {
+        up: [0, -10],
+        down: [0, 10],
+        left: [-10, 0],
+        right: [10, 0]
+    }
+
     /**
      * Makes added render nodes responsive to drag beahvior.
      *   Emits events 'start', 'update', 'end'.
@@ -39,11 +46,7 @@ define(function(require, exports, module) {
 
         this._positionState = new Transitionable([0,0]);
         this._differential  = [0,0];
-        this._active = {
-            "draggable": true,
-            "resizeable": true,
-            "rotateable": false
-        };
+        this._active = true,
 
         this.sync = new GenericSync(['mouse', 'touch'], {scale : this.options.scale});
         this.eventOutput = new EventHandler();
@@ -92,32 +95,28 @@ define(function(require, exports, module) {
         return [tx, ty];
     }
 
-    function hasTrueProperty(obj) {
-        for (var key in obj) {
-            if (obj[key]) return true;
-        }
-
-        return false;
-    }
-
     function _handleStart() {
-        if (!hasTrueProperty(this._active)) return;
+        if (!this._active) return;
         if (this._positionState.isActive()) this._positionState.halt();
         this.eventOutput.emit('start', {position : this.getPosition()});
     }
 
     function _handleMove(event) {
-        if (!hasTrueProperty(this._active)) return;
-
-        if (window.event.altKey) {
-            this.activate('resizeable');
-        } else {
-            this.activate('draggable');
-        }
+        if (!this._active) return;
 
         var options = this.options;
         this._differential = event.position;
         var newDifferential = _mapDifferential.call(this, this._differential);
+
+        //find the cols and rows offest...
+        var gridDifferential = [
+            newDifferential[0] / this.options.snapX,
+            newDifferential[1] / this.options.snapY
+        ];
+
+        //pipe that
+        this.eventOutput.emit('updateGridCoordinates', gridDifferential);
+        this.eventOutput.emit('resize', gridDifferential);
 
         //buffer the differential if snapping is set
         this._differential[0] -= newDifferential[0];
@@ -143,8 +142,25 @@ define(function(require, exports, module) {
         this.eventOutput.emit('update', {position : pos});
     }
 
+    function _handleKeyMove(event) {
+        console.log('^-^ ', event.keyIdentifier);
+        if (!this._active) return;
+
+        this._differential = keyMatrix[event.charCode];
+        this.newDifferential[0] = this._differential[0];
+        this.newDifferential[1] = this._differential[1];
+
+        var pos = this.getPosition();
+
+        //modify position, retain reference
+        pos[0] += newDifferential[0];
+        pos[1] += newDifferential[1];
+
+        this.eventOutput.emit('update', {position : pos});
+    }
+
     function _handleEnd() {
-        if (!hasTrueProperty(this._active)) return;
+        if (!this._active) return;
         this.eventOutput.emit('end', {position : this.getPosition()});
     }
 
@@ -152,6 +168,7 @@ define(function(require, exports, module) {
         this.sync.on('start', _handleStart.bind(this));
         this.sync.on('update', _handleMove.bind(this));
         this.sync.on('end', _handleEnd.bind(this));
+        this.on('keypress', _handleKeyMove.bind(this));
     }
 
     /**
@@ -234,12 +251,7 @@ define(function(require, exports, module) {
      *      Will deactivate other types of actions
      */
     Draginator.prototype.activate = function activate(type) {
-        for (var key in this._active) {
-            console.log('deactivating ', key);
-            this.deactivate(key);
-        }
-        console.log('activating ', type);
-        this._active[type] = true;
+        this._active = true;
     };
 
     /**
@@ -250,7 +262,7 @@ define(function(require, exports, module) {
      * @param {string} type of action to deactivate
      */
     Draginator.prototype.deactivate = function deactivate(type) {
-        this._active[type] = false;
+        this._activetype = false;
     };
 
     /**
@@ -269,13 +281,8 @@ define(function(require, exports, module) {
         var pos = this.getPosition();
         var transform;
 
-        if (this._active["draggable"])
+        if (this._active)
             transform = Transform.translate(pos[0], pos[1]);
-        // else if (this._active["resizeable"])
-        //     ;
-        // else if (this._active["rotateable"])
-        //     // Fix me Fix me Fix me
-        //     transform = Transform.identity();
         else
             return false;
 

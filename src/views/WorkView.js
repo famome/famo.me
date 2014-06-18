@@ -2,12 +2,13 @@ define(function(require, exports, module) {
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
+    var EventHandler  = require('famous/core/EventHandler');
     var ModifierChain = require('famous/modifiers/ModifierChain');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Draginator    = require('Draginator');
     var BasicLayout   = require('utils/BasicLayout');
     var RenderController = require('famous/views/RenderController');
-    var Keyhandling   = require('utils/Keyhandling');
+    // var Keyhandling   = require('utils/Keyhandling');
 
     function WorkView() {
         View.apply(this, arguments);
@@ -40,14 +41,15 @@ define(function(require, exports, module) {
       this.numLayoutViews++;
       console.log('creating layoutView', this.numLayoutViews);
 
-      var draginator = new Draginator();
-
-      var layoutView = new View({
-          size: [this.options.layoutViewSize, this.options.layoutViewSize]
+      var draginator = new Draginator({
+        // De-hardcode me!
+        snapX: 100,
+        snapY: 100
       });
 
+      var layoutView = new View();
+
       layoutView.surface = new Surface({
-          size: [this.options.layoutViewSize, this.options.layoutViewSize],
           properties: {
               backgroundColor: 'pink',
               cursor: '-webkit-grab'
@@ -56,22 +58,42 @@ define(function(require, exports, module) {
       layoutView.surface.pipe(layoutView);
       layoutView._eventInput.pipe(draginator);
 
-      var viewNode = layoutView.add(layoutView.surface);
+      draginator.eventOutput.pipe(layoutView._eventInput);
+
+      layoutView._eventInput.on('updateGridCoordinates', function(data){
+        console.log('burned, son... ', data);
+      });
+
+      layoutView._eventInput.on('emBiggen', function(data){
+        console.log('embiggened by embigulation... ', data);
+      });
 
       var layoutViewModifier = new StateModifier({
-          size: [this.options.layoutViewSize, this.options.layoutViewSize],
-          opacity: 1,
-          origin: [0.5, 0.5],
-          align: [0.5, 0.5]
+          size: [this.options.layoutViewSize, this.options.layoutViewSize]
+      });
+
+      layoutViewModifier.eventHandler = new EventHandler();
+      // layoutViewModifier.eventHandler.subscribe(layoutViewModifier);
+      draginator.eventOutput.pipe(layoutViewModifier.eventHandler);
+
+      layoutViewModifier.eventHandler.pipe(layoutView._eventInput);
+
+      layoutViewModifier.eventHandler.on('resize', function(data) {
+        console.log('layoutViewModifier resized ', data);
+        this.emit('emBiggen', data);
       });
 
       // draginator.subscribe(layoutView);
 
-      var renderController = new RenderController();
-      renderController.show(viewNode);
-      Keyhandling.enableKeymovement(layoutView, layoutViewModifier, renderController);
+      // var renderController = new RenderController();
+      // renderController.show(viewNode);
+      //Keyhandling.enableKeymovement(layoutView.surface, layoutViewModifier, renderController);
+      // window.onkeydown = function(event) {
+      //   console.log(this);
+      // };
 
-      var node = this.add(layoutViewModifier).add(draginator).add(renderController);
+      layoutView.add(draginator).add(layoutViewModifier).add(layoutView.surface);
+      this.add(layoutView);
 
       layoutView.on('dblclick', function() {
           layoutView.setContent('click?');
@@ -80,7 +102,7 @@ define(function(require, exports, module) {
           });
       }.bind(this));
 
-      this.layoutViews['layoutView' + this.numLayoutViews] = node;
+      this.layoutViews['layoutView' + this.numLayoutViews] = layoutView;
     };
 
     WorkView.DEFAULT_OPTIONS = {
