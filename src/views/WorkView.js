@@ -2,17 +2,18 @@ define(function(require, exports, module) {
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
+    var EventHandler  = require('famous/core/EventHandler');
     var ModifierChain = require('famous/modifiers/ModifierChain');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Draginator    = require('Draginator');
     var BasicLayout   = require('utils/BasicLayout');
     var RenderController = require('famous/views/RenderController');
-    var Keyhandling   = require('utils/Keyhandling');
+    // var Keyhandling   = require('utils/Keyhandling');
 
     function WorkView() {
         View.apply(this, arguments);
-        this.squares = {};
-        this.numSquares = 0;
+        this.layoutViews = {};
+        this.numLayoutViews = 0;
 
         this.renderController = new RenderController();
         this.add(this.renderController);
@@ -36,51 +37,76 @@ define(function(require, exports, module) {
         BasicLayout.render.call(this);
     };
 
-    WorkView.prototype.createSquare = function() {
-      this.numSquares++;
-      console.log('creating square', this.numSquares);
+    WorkView.prototype.createLayoutView = function() {
+      this.numLayoutViews++;
+      console.log('creating layoutView', this.numLayoutViews);
 
-      var draginator = new Draginator();
+      var draginator = new Draginator({
+        // De-hardcode me!
+        snapX: 100,
+        snapY: 100
+      });
 
-      var square = new Surface({
-          size: [this.options.squareSize, this.options.squareSize],
+      var layoutView = new View();
+
+      layoutView.surface = new Surface({
           properties: {
               backgroundColor: 'pink',
               cursor: '-webkit-grab'
           },
       });
+      layoutView.surface.pipe(layoutView);
+      layoutView._eventInput.pipe(draginator);
 
-      var squareModifier = new StateModifier({
-          size: [this.options.squareSize, this.options.squareSize],
-          opacity: 1,
-          origin: [0.5, 0.5],
-          align: [0.5, 0.5]
+      draginator.eventOutput.pipe(layoutView._eventInput);
+
+      layoutView._eventInput.on('updateGridCoordinates', function(data){
+        console.log('burned, son... ', data);
       });
 
-      var squareModifierChain = new ModifierChain();
-      squareModifierChain.addModifier(squareModifier);
+      layoutView._eventInput.on('emBiggen', function(data){
+        console.log('embiggened by embigulation... ', data);
+      });
 
+      var layoutViewModifier = new StateModifier({
+          size: [this.options.layoutViewSize, this.options.layoutViewSize]
+      });
 
-      draginator.subscribe(square);
-      var renderController = new RenderController();
-      renderController.show(square);
-      Keyhandling.enableKeymovement(square, squareModifierChain, renderController);
+      layoutViewModifier.eventHandler = new EventHandler();
+      // layoutViewModifier.eventHandler.subscribe(layoutViewModifier);
+      draginator.eventOutput.pipe(layoutViewModifier.eventHandler);
 
-      var node = this.add(squareModifierChain).add(draginator).add(renderController);
+      layoutViewModifier.eventHandler.pipe(layoutView._eventInput);
 
-      square.on('dblclick', function() {
-          square.setContent('click?');
-          square.setProperties({
+      layoutViewModifier.eventHandler.on('resize', function(data) {
+        console.log('layoutViewModifier resized ', data);
+        this.emit('emBiggen', data);
+      });
+
+      // draginator.subscribe(layoutView);
+
+      // var renderController = new RenderController();
+      // renderController.show(viewNode);
+      //Keyhandling.enableKeymovement(layoutView.surface, layoutViewModifier, renderController);
+      // window.onkeydown = function(event) {
+      //   console.log(this);
+      // };
+
+      layoutView.add(draginator).add(layoutViewModifier).add(layoutView.surface);
+      this.add(layoutView);
+
+      layoutView.on('dblclick', function() {
+          layoutView.setContent('click?');
+          layoutView.setProperties({
               textAlign: 'center'
           });
       }.bind(this));
 
-
-      this.squares['square'+this.numSquares] = node;
+      this.layoutViews['layoutView' + this.numLayoutViews] = layoutView;
     };
 
     WorkView.DEFAULT_OPTIONS = {
-        squareSize: 50
+        layoutViewSize: 50
     };
 
     module.exports = WorkView;
