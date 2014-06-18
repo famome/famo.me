@@ -73,7 +73,6 @@ define(function(require, exports, module) {
       });
 
       layoutViewModifier.eventHandler = new EventHandler();
-      // layoutViewModifier.eventHandler.subscribe(layoutViewModifier);
       draginator.eventOutput.pipe(layoutViewModifier.eventHandler);
 
       layoutViewModifier.eventHandler.pipe(layoutView._eventInput);

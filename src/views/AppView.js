@@ -76,17 +76,17 @@ define(function(require, exports, module) {
             console.log(this.menuView.current, 'ive been clicked! oh god ive been clicked!');
         }.bind(this));
 
-        this.on('keydown', function(event) {
-            if (event.altKey) {
-                console.log('keydown');
-            }
-        }, false);
+        // this.on('keydown', function(event) {
+        //     if (event.altKey) {
+        //         console.log('keydown');
+        //     }
+        // }, false);
 
-        this.on('keyup', function(event) {
-            if (!event.altKey) {
-                console.log('keydown with option-key');
-            }
-        }, false);
+        // this.on('keyup', function(event) {
+        //     if (!event.altKey) {
+        //         console.log('keydown with option-key');
+        //     }
+        // }, false);
     }
 
 
