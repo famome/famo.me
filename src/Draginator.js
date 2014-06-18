@@ -18,13 +18,6 @@ define(function(require, exports, module) {
     var TouchSync = require('famous/inputs/TouchSync');
     GenericSync.register({'mouse': MouseSync, 'touch': TouchSync});
 
-    var keyMatrix = {
-        up: [0, -10],
-        down: [0, 10],
-        left: [-10, 0],
-        right: [10, 0]
-    }
-
     /**
      * Makes added render nodes responsive to drag beahvior.
      *   Emits events 'start', 'update', 'end'.
@@ -143,14 +136,23 @@ define(function(require, exports, module) {
     }
 
     function _handleKeyMove(event) {
+        var keyMatrix = {
+            Up: [0, -100],
+            Down: [0, 100],
+            Left: [-100, 0],
+            Right: [100, 0]
+        }
         console.log('^-^ ', event.keyIdentifier);
-        if (!this._active) return;
+        //if (!this._active) return;
 
-        this._differential = keyMatrix[event.charCode];
-        this.newDifferential[0] = this._differential[0];
-        this.newDifferential[1] = this._differential[1];
-
+        this._differential = keyMatrix[event.keyIdentifier];
+        console.log('new differential', this.newDifferential);
+        console.log('differential', this._differential);
+        var newDifferential = [this._differential[0], this._differential[1]];
+        console.log('inside hkm', this);
         var pos = this.getPosition();
+        console.log('pos', pos);
+        console.log('newDifferential', newDifferential[0], newDifferential[1]);
 
         //modify position, retain reference
         pos[0] += newDifferential[0];
@@ -168,7 +170,7 @@ define(function(require, exports, module) {
         this.sync.on('start', _handleStart.bind(this));
         this.sync.on('update', _handleMove.bind(this));
         this.sync.on('end', _handleEnd.bind(this));
-        this.on('keypress', _handleKeyMove.bind(this));
+        window.onkeydown = _handleKeyMove.bind(this);
     }
 
     /**
