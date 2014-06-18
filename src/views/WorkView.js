@@ -48,6 +48,10 @@ define(function(require, exports, module) {
       });
 
       var layoutView = new View();
+      layoutView.gridProperties = {
+        offset: [0, 0],
+        dimension: [1, 1]
+      };
 
       layoutView.surface = new Surface({
           properties: {
@@ -60,12 +64,15 @@ define(function(require, exports, module) {
 
       draginator.eventOutput.pipe(layoutView._eventInput);
 
+// Handle these events in a helper utility!
       layoutView._eventInput.on('updateGridCoordinates', function(data){
-        console.log('burned, son... ', data);
+        layoutView.gridProperties.offset[0] += data[0];
+        layoutView.gridProperties.offset[1] += data[1];
       });
 
       layoutView._eventInput.on('emBiggen', function(data){
-        console.log('embiggened by embigulation... ', data);
+        layoutView.gridProperties.dimension[0] += data[0];
+        layoutView.gridProperties.dimension[1] += data[1];
       });
 
       var layoutViewModifier = new StateModifier({
@@ -73,15 +80,17 @@ define(function(require, exports, module) {
       });
 
       layoutViewModifier.eventHandler = new EventHandler();
-      // layoutViewModifier.eventHandler.subscribe(layoutViewModifier);
       draginator.eventOutput.pipe(layoutViewModifier.eventHandler);
 
       layoutViewModifier.eventHandler.pipe(layoutView._eventInput);
 
-      layoutViewModifier.eventHandler.on('resize', function(data) {
-        console.log('layoutViewModifier resized ', data);
-        this.emit('emBiggen', data);
-      });
+      // This should be in Draginator, with logic to direct flow depending on if we're
+      //  resizing or moving
+      // layoutViewModifier.eventHandler.on('resize', function(data) {
+      //   this.emit('emBiggen', data);
+      // });
+
+// !ytilitu repleh a ni stneve eseht eldnaH
 
       // draginator.subscribe(layoutView);
 
