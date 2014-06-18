@@ -108,7 +108,7 @@ define(function(require, exports, module) {
         ];
 
         //pipe that
-        this.eventOutput.emit('updateGridCoordinates', gridDifferential);
+        this.eventOutput.emit('translate', gridDifferential);
         this.eventOutput.emit('resize', gridDifferential);
 
         //buffer the differential if snapping is set

@@ -7,6 +7,7 @@ define(function(require, exports, module) {
     var StateModifier = require('famous/modifiers/StateModifier');
     var Draginator    = require('Draginator');
     var BasicLayout   = require('utils/BasicLayout');
+    var LayoutView    = require('views/LayoutView');
     var RenderController = require('famous/views/RenderController');
     // var Keyhandling   = require('utils/Keyhandling');
 
@@ -40,83 +41,14 @@ define(function(require, exports, module) {
     WorkView.prototype.createLayoutView = function() {
       this.numLayoutViews++;
       console.log('creating layoutView', this.numLayoutViews);
-
-      var draginator = new Draginator({
-        // De-hardcode me!
-        snapX: 100,
-        snapY: 100
-      });
-
-      var layoutView = new View();
-      layoutView.gridProperties = {
-        offset: [0, 0],
-        dimension: [1, 1]
-      };
-
-      layoutView.surface = new Surface({
-          properties: {
-              backgroundColor: 'pink',
-              cursor: '-webkit-grab'
-          },
-      });
-      layoutView.surface.pipe(layoutView);
-      layoutView._eventInput.pipe(draginator);
-
-      draginator.eventOutput.pipe(layoutView._eventInput);
-
-// Handle these events in a helper utility!
-      layoutView._eventInput.on('updateGridCoordinates', function(data){
-        layoutView.gridProperties.offset[0] += data[0];
-        layoutView.gridProperties.offset[1] += data[1];
-      });
-
-      layoutView._eventInput.on('emBiggen', function(data){
-        layoutView.gridProperties.dimension[0] += data[0];
-        layoutView.gridProperties.dimension[1] += data[1];
-      });
-
-      var layoutViewModifier = new StateModifier({
-          size: [this.options.layoutViewSize, this.options.layoutViewSize]
-      });
-
-      layoutViewModifier.eventHandler = new EventHandler();
-      draginator.eventOutput.pipe(layoutViewModifier.eventHandler);
-
-      layoutViewModifier.eventHandler.pipe(layoutView._eventInput);
-
-      // This should be in Draginator, with logic to direct flow depending on if we're
-      //  resizing or moving
-      // layoutViewModifier.eventHandler.on('resize', function(data) {
-      //   this.emit('emBiggen', data);
-      // });
-
-// !ytilitu repleh a ni stneve eseht eldnaH
-
-      // draginator.subscribe(layoutView);
-
-      // var renderController = new RenderController();
-      // renderController.show(viewNode);
-      //Keyhandling.enableKeymovement(layoutView.surface, layoutViewModifier, renderController);
-      // window.onkeydown = function(event) {
-      //   console.log(this);
-      // };
-
-      layoutView.add(draginator).add(layoutViewModifier).add(layoutView.surface);
+      var layoutView = new LayoutView();
+      
       this.add(layoutView);
-
-      layoutView.on('dblclick', function() {
-          layoutView.setContent('click?');
-          layoutView.setProperties({
-              textAlign: 'center'
-          });
-      }.bind(this));
-
+      
       this.layoutViews['layoutView' + this.numLayoutViews] = layoutView;
     };
 
-    WorkView.DEFAULT_OPTIONS = {
-        layoutViewSize: 50
-    };
+    WorkView.DEFAULT_OPTIONS = {};
 
     module.exports = WorkView;
 });
