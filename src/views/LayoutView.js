@@ -99,8 +99,10 @@ define(function(require, exports, module) {
             edge += 'w';
         if (this.options.snapY * this.options.dimension[0] - event.offsetX < this.options.edgeDetectSize)
             edge += 'e';
+            
+        this.draggable = edge === '';
 
-        if (edges[edge] && !this.surface.properties.grabbed)
+        if (edges[edge] && !this.dragging)
             this.surface.setProperties(edges[edge]);
     };
 
@@ -109,11 +111,15 @@ define(function(require, exports, module) {
     };
 
     function _grab(event) {
-        this.surface.setProperties({grabbed: true});
+        this.dragging = true;
+        if (this.draggable)
+            this.surface.setProperties({cursor: '-webkit-grabbing'});
     };
 
     function _ungrab(event) {
-        this.surface.setProperties({grabbed: false});
+        this.dragging = false;
+        if (this.draggable)
+            this.surface.setProperties({cursor: '-webkit-grab'});
     };
 
     function _setListeners() {
@@ -132,8 +138,9 @@ define(function(require, exports, module) {
 
         this._eventInput.on('mousemove', _setEdges.bind(this));
         this._eventInput.on('mouseleave', _removeEdges.bind(this));
-        this._eventInput.on('mousedown', _grab.bind(this));
-        this._eventInput.on('mouseup', _ungrab.bind(this));
+        this.draginator.eventOutput.on('start', _grab.bind(this));
+        this.draginator.eventOutput.on('update', _grab.bind(this));
+        this.draginator.eventOutput.on('end', _ungrab.bind(this));
 
         // view listens for resize from draggable
         this._eventInput.on('resize', function(data) {
