@@ -76,7 +76,7 @@ define(function(require, exports, module) {
     }
 
     function _setEdges(event) {
-
+        this.surface.setProperties({mouseInside: true});
         var edge = '';
 
         var edges = {
@@ -108,6 +108,8 @@ define(function(require, exports, module) {
 
     function _removeEdges(event) {
         this.surface.setProperties({cursor: '-webkit-grab'});
+        if (this.surface.properties.mouseInside && !this.surface.properties.grabbed)
+            this.surface.setProperties({mouseInside: false});
     };
 
     function _grab(event) {
@@ -120,6 +122,7 @@ define(function(require, exports, module) {
         this.dragging = false;
         if (this.draggable)
             this.surface.setProperties({cursor: '-webkit-grab'});
+
     };
 
     function _setListeners() {
