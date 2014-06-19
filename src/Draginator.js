@@ -142,17 +142,30 @@ define(function(require, exports, module) {
             Left: [-100, 0],
             Right: [100, 0]
         }
-        console.log('^-^ ', event.keyIdentifier);
+        // console.log('^-^ ', event.keyIdentifier);
         //if (!this._active) return;
+        
+        
 
         this._differential = keyMatrix[event.keyIdentifier];
-        console.log('new differential', this.newDifferential);
-        console.log('differential', this._differential);
-        var newDifferential = [this._differential[0], this._differential[1]];
-        console.log('inside hkm', this);
+        var newDifferential = [this._differential[0], this._differential[1]];        
+        
+        //find the cols and rows offest...
+        var gridDifferential = [
+            newDifferential[0] / this.options.snapX,
+            newDifferential[1] / this.options.snapY
+        ];
+
+        //pipe that
+        this.eventOutput.emit('translate', gridDifferential);
+        this.eventOutput.emit('resize', gridDifferential);
+
+        //buffer the differential if snapping is set
+        this._differential[0] -= newDifferential[0];
+        this._differential[1] -= newDifferential[1];
+        
+        
         var pos = this.getPosition();
-        console.log('pos', pos);
-        console.log('newDifferential', newDifferential[0], newDifferential[1]);
 
         //modify position, retain reference
         pos[0] += newDifferential[0];

@@ -9,12 +9,9 @@ define(function(require, exports, module) {
     var BasicLayout   = require('utils/BasicLayout');
     var LayoutView    = require('views/LayoutView');
     var RenderController = require('famous/views/RenderController');
-    // var Keyhandling   = require('utils/Keyhandling');
 
     function WorkView() {
         View.apply(this, arguments);
-        this.layoutViews = {};
-        this.numLayoutViews = 0;
 
         this.renderController = new RenderController();
         this.add(this.renderController);
@@ -39,13 +36,8 @@ define(function(require, exports, module) {
     };
 
     WorkView.prototype.createLayoutView = function() {
-      this.numLayoutViews++;
-      console.log('creating layoutView', this.numLayoutViews);
       var layoutView = new LayoutView();
-      
-      this.add(layoutView);
-      
-      this.layoutViews['layoutView' + this.numLayoutViews] = layoutView;
+      this.add(layoutView);      
     };
 
     WorkView.DEFAULT_OPTIONS = {};
