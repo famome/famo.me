@@ -6,13 +6,25 @@
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-        <link rel="stylesheet" type="text/css" href="src/famous/core/famous.css" />
-        <link rel="stylesheet" type="text/css" href="css/app.css" />
-        <link rel="stylesheet" type="text/css" href="css/famous-styles.css" />
-        <script type="text/javascript" src="src/lib/functionPrototypeBind.js"></script>
-        <script type="text/javascript" src="src/lib/classList.js"></script>
-        <script type="text/javascript" src="src/lib/requestAnimationFrame.js"></script>
-        <script type="text/javascript" src="src/lib/require.js" data-main="src/main"></script>
+
+        <!-- shims for backwards compatibility -->
+        <script type="text/javascript" src="http://code.famo.us/lib/functionPrototypeBind.js"></script>
+        <script type="text/javascript" src="http://code.famo.us/lib/classList.js"></script>
+        <script type="text/javascript" src="http://code.famo.us/lib/requestAnimationFrame.js"></script>
+
+        <!-- module loader -->
+        <script type="text/javascript" src="http://code.famo.us/lib/require.js"></script>
+
+        <!-- famous -->
+        <link rel="stylesheet" type="text/css" href="http://code.famo.us/famous/0.2/famous.css" />
+        <script type="text/javascript" src="http://code.famo.us/famous/0.2/famous.min.js"></script>
+
+        <!-- app code -->
+        <link rel="stylesheet" type="text/css" href="http://code.famo.us/assets/famous_styles.css" />
+        <script type="text/javascript">
+            require.config({baseUrl: 'src/'});
+            require(['main']);
+        </script>
     </head>
     <body></body>
 </html>
