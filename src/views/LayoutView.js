@@ -33,7 +33,8 @@ define(function(require, exports, module) {
         offset: [0, 0],
         dimension: [1, 1],
         color: 'pink',
-        size: 50
+        size: 100,
+        edgeDetectSize: 10
     };
     
     function _createLayoutDraginator() {
@@ -57,6 +58,34 @@ define(function(require, exports, module) {
             }
         });
     }
+
+    // layoutView._eventInput.on('mousemove', function(event) {
+    function _setEdges(event) {
+        var edge = '';
+
+        var edges = {
+          n : { properties: { cursor: 'ns-resize'} },
+          nw: { properties: { cursor: 'nwse-resize'} },
+          w : { properties: { cursor: 'ew-resize'} },
+          sw: { properties: { cursor: 'nesw-resize'} },
+          s : { properties: { cursor: 'ns-resize'} },
+          se: { properties: { cursor: 'nwse-resize'} },
+          e : { properties: { cursor: 'ew-resize'} },
+          ne: { properties: { cursor: 'nesw-resize'} }
+        };
+
+        if (event.offsetY < this.options.edgeDetectSize)
+            edge = 'n';
+        if (this.options.snapY * this.options.dimension[1] - event.offsetY < this.options.edgeDetectSize)
+            edge = 's';
+        if (event.offsetX < this.options.edgeDetectSize)
+            edge += 'w';
+        if (this.options.snapY * this.options.dimension[0] - event.offsetX < this.options.edgeDetectSize)
+            edge += 'e';
+
+        console.log('detected! ', edge);
+        this.setOptions({properties: {cursor: 'ns-resize'}})
+    };
     
     function _setListeners() {
         // initialize eventing linkages
@@ -73,6 +102,8 @@ define(function(require, exports, module) {
             this.yOffset += data[1];
             console.log(data, this.getOffset());
         }.bind(this));
+
+        this._eventInput.on('mousemove', _setEdges.bind(this));
         
         // view listens for resize from draggable
         this.modifier.eventHandler.on('resize', function(data) {

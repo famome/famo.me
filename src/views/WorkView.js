@@ -50,5 +50,6 @@ define(function(require, exports, module) {
 
     WorkView.DEFAULT_OPTIONS = {};
 
+
     module.exports = WorkView;
 });
