@@ -34,7 +34,7 @@ define(function(require, exports, module) {
         dimension: [1, 1],
         color: 'pink',
         size: 100,
-        edgeDetectSize: 10
+        edgeDetectSize: 20
     };
     
     function _createLayoutDraginator() {
@@ -53,25 +53,27 @@ define(function(require, exports, module) {
     function _createLayoutSurface() {
         this.surface = new Surface({
             properties: {
+                border: '0px solid purple',
                 backgroundColor: this.options.color,
                 cursor: '-webkit-grab'
             }
         });
     }
 
-    // layoutView._eventInput.on('mousemove', function(event) {
     function _setEdges(event) {
+
         var edge = '';
 
         var edges = {
-          n : { properties: { cursor: 'ns-resize'} },
-          nw: { properties: { cursor: 'nwse-resize'} },
-          w : { properties: { cursor: 'ew-resize'} },
-          sw: { properties: { cursor: 'nesw-resize'} },
-          s : { properties: { cursor: 'ns-resize'} },
-          se: { properties: { cursor: 'nwse-resize'} },
-          e : { properties: { cursor: 'ew-resize'} },
-          ne: { properties: { cursor: 'nesw-resize'} }
+          'n' : { cursor: 'ns-resize' },
+          'nw': { cursor: 'nwse-resize' },
+          'w' : { cursor: 'ew-resize' },
+          'sw': { cursor: 'nesw-resize' },
+          's' : { cursor: 'ns-resize' },
+          'se': { cursor: 'nwse-resize' },
+          'e' : { cursor: 'ew-resize' },
+          'ne': { cursor: 'nesw-resize' },
+          ''  : { cursor: '-webkit-grab' }
         };
 
         if (event.offsetY < this.options.edgeDetectSize)
@@ -83,10 +85,22 @@ define(function(require, exports, module) {
         if (this.options.snapY * this.options.dimension[0] - event.offsetX < this.options.edgeDetectSize)
             edge += 'e';
 
-        console.log('detected! ', edge);
-        this.setOptions({properties: {cursor: 'ns-resize'}})
+        if (edges[edge] && !this.surface.properties.grabbed)
+            this.surface.setProperties(edges[edge]);
     };
-    
+
+    function _removeEdges(event) {
+        this.surface.setProperties({cursor: '-webkit-grab'});
+    };
+
+    function _grab(event) {
+        this.surface.setProperties({grabbed: true});
+    };
+
+    function _ungrab(event) {
+        this.surface.setProperties({grabbed: false});
+    };
+
     function _setListeners() {
         // initialize eventing linkages
         this.modifier.eventHandler = new EventHandler();
@@ -104,7 +118,10 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this._eventInput.on('mousemove', _setEdges.bind(this));
-        
+        this._eventInput.on('mouseleave', _removeEdges.bind(this));
+        this._eventInput.on('mousedown', _grab.bind(this));
+        this._eventInput.on('mouseup', _ungrab.bind(this));
+
         // view listens for resize from draggable
         this.modifier.eventHandler.on('resize', function(data) {
             // this.emit('enlarge', data);
