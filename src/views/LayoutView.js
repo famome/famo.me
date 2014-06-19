@@ -5,12 +5,21 @@ define(function(require, exports, module) {
     var StateModifier = require('famous/modifiers/StateModifier');
     var EventHandler  = require('famous/core/EventHandler');
     var Draginator    = require('Draginator');
+    var JSONifier     = require('utils/JSONifier');
+    
+    // layout tracker
+    var numLayouts = 0;
+    var layouts = {};
 
     function LayoutView() {
         View.apply(this, arguments);
         
+        numLayouts++;
+        this.id = 'LayoutView'+numLayouts;
         this.xOffset = 0;
         this.yOffset = 0;
+        this.width = this.options.size;
+        this.height = this.options.size;
         
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
@@ -23,8 +32,14 @@ define(function(require, exports, module) {
 
     LayoutView.prototype = Object.create(View.prototype);
     LayoutView.prototype.constructor = LayoutView;
+    LayoutView.prototype.getId = function() {
+        return this.id;
+    };
     LayoutView.prototype.getOffset = function() {
-      return [this.xOffset, this.yOffset];  
+        return [this.xOffset, this.yOffset];
+    };
+    LayoutView.prototype.getSize = function() {
+        return [this.width, this.height];  
     };
 
     LayoutView.DEFAULT_OPTIONS = {
@@ -104,17 +119,15 @@ define(function(require, exports, module) {
     function _setListeners() {
         // initialize eventing linkages
         this.modifier.eventHandler = new EventHandler();
-        this.draginator.eventOutput.pipe(this.modifier.eventHandler);
         this.modifier.eventHandler.pipe(this._eventInput);
+        this.draginator.eventOutput.pipe(this._eventInput);
         this.surface.pipe(this);
         this._eventInput.pipe(this.draginator);
-        this.draginator.eventOutput.pipe(this._eventInput);
 
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
             this.xOffset += data[0];
             this.yOffset += data[1];
-            console.log(data, this.getOffset());
         }.bind(this));
 
         this._eventInput.on('mousemove', _setEdges.bind(this));
@@ -123,22 +136,16 @@ define(function(require, exports, module) {
         this._eventInput.on('mouseup', _ungrab.bind(this));
 
         // view listens for resize from draggable
-        this.modifier.eventHandler.on('resize', function(data) {
-            // this.emit('enlarge', data);
+        this._eventInput.on('resize', function(data) {
+            console.log('resize')
         }.bind(this));
 
-        // // view listens for enbiggen from modifier
-        // this._eventInput.on('enlarge', function(data){
-        //   this.xOffset += data[0];
-        //   this.yOffset += data[1];
-        // });
 
         this.surface.on('dblclick', function() {
-            this.setContent('click?');
-            this.setProperties({
-                textAlign: 'center'
-            });
-        });
+            console.log(JSONifier.JSONify(this).id);
+            console.log('layout view offset', JSONifier.JSONify(this).offset);
+            console.log('layout view size', JSONifier.JSONify(this).size);
+        }.bind(this));
     }
 
     module.exports = LayoutView;
