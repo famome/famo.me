@@ -5,7 +5,6 @@ define(function(require, exports, module) {
     var StateModifier = require('famous/modifiers/StateModifier');
     var EventHandler  = require('famous/core/EventHandler');
     var Draginator    = require('Draginator');
-    var JSONifier     = require('utils/JSONifier');
 
     // layout tracker
     var numLayouts = 0;

@@ -7,6 +7,7 @@ define(function(require, exports, module) {
 
     var MenuView = require('views/MenuView');
     var WorkView = require('views/WorkView');
+    var generate = require('utils/Generator');
 
     function AppView() {
         View.apply(this, arguments);
@@ -71,7 +72,14 @@ define(function(require, exports, module) {
                 this.workView.createLayoutView();
             },
             '⿴': function() {
-                console.log('time to generate some JSON!');
+                var data = generate.sceneData(this.workView.getLayouts(), 100);
+                var scene = generate.scene(data.scene);
+
+                for (var surface in data.surfaces) {
+                    scene.id[surface].add(data.surfaces[surface]);
+                }
+
+                this.add(scene);
             }
         };
 
