@@ -14,6 +14,7 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
         this.numLayouts = 0;
         this.layouts = {};
+        this.currentView = null;
 
         this.renderController = new RenderController();
         this.add(this.renderController);
@@ -38,13 +39,23 @@ define(function(require, exports, module) {
     };
 
     WorkView.prototype.createLayoutView = function() {
-      this.numLayouts++;
+        this.numLayouts++;
 
-      var layoutView = new LayoutView();
-      layoutView.linkTo(this.layouts, this.numLayouts);
-      layoutView.addLayout();
+        var layoutView = new LayoutView(this.currentView);
+        layoutView.linkTo(this.layouts, this.numLayouts);
+        layoutView.addLayout();
 
-      this.add(layoutView);      
+        this.add(layoutView);
+
+        this._eventOutput.pipe(layoutView._eventInput);
+        layoutView._eventOutput.pipe(this._eventInput);
+
+        this._eventOutput.emit('deselect');
+        this._eventOutput.emit('select', layoutView);
+
+        this._eventInput.on('deselectRest', function() {
+            this._eventOutput.emit('deselect');
+        }.bind(this));
     };
 
     WorkView.prototype.getLayouts = function() {

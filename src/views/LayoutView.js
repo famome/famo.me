@@ -190,17 +190,29 @@ define(function(require, exports, module) {
             }
         }.bind(this));
 
-        this.surface.on('click', function() {
-            this.draginator.activate();
-            console.log('activated');
-        });
-
         this.surface.on('dblclick', function() {
             console.log(this.id, this.getLayouts()[this.id]);
         }.bind(this));
 
         this._eventInput.on('delete', function() {
             this.removeLayout();
+        }.bind(this));
+
+        this.surface.draginator = this.draginator;
+
+        this._eventInput.on('select', function(selectedView) {
+            if(this === selectedView) {
+                this.draginator.select();
+            }
+        }.bind(this));
+
+        this._eventInput.on('deselect', function() {
+            this.draginator.deselect();
+        }.bind(this));
+
+        this.surface.on('click', function() {
+            this._eventOutput.emit('deselectRest');
+            this.draginator.select();
         }.bind(this));
     }
 
