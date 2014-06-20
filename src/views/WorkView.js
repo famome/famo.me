@@ -12,6 +12,8 @@ define(function(require, exports, module) {
 
     function WorkView() {
         View.apply(this, arguments);
+        this.numLayouts = 0;
+        this.layouts = {};
 
         this.renderController = new RenderController();
         this.add(this.renderController);
@@ -36,7 +38,12 @@ define(function(require, exports, module) {
     };
 
     WorkView.prototype.createLayoutView = function() {
+      this.numLayouts++;
+
       var layoutView = new LayoutView();
+      layoutView.linkTo(this.layouts, this.numLayouts);
+      layoutView.addLayout();
+
       this.add(layoutView);      
     };
 
