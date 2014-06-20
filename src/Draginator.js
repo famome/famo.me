@@ -39,7 +39,8 @@ define(function(require, exports, module) {
 
         this._positionState = new Transitionable([0,0]);
         this._differential  = [0,0];
-        this._active = true,
+        this._active = true;
+        this._selected = false;
 
         this.sync = new GenericSync(['mouse', 'touch'], {scale : this.options.scale});
         this.eventOutput = new EventHandler();
@@ -113,18 +114,11 @@ define(function(require, exports, module) {
         console.log('generate JSON');
     }
 
-    function _refresh(event) {
-        if (event.metaKey) {
-            location.reload();
-        }
-    }
-
     function _handleMove(event) {
         if (!this._active) return;
+        if (!this._selected) return;
 
         var options = this.options;
-        console.log(event);
-        console.log(event.keyIdentifier);
         if (event.keyIdentifier) {
             var keyMatrix = {
                 Up: [0, -100],
@@ -137,8 +131,7 @@ define(function(require, exports, module) {
                 'U+0008': _deleteElement.bind(this), // delete
                 'U+004E': _createElement, // 'n'
                 'U+0009': _switchElement, // tab
-                Enter: _generateJSON,
-                'U+0052': _refresh // 'r' (and event.metaKey)
+                Enter: _generateJSON
             };
 
             if (commandMatrix[event.keyIdentifier]) {
@@ -175,7 +168,6 @@ define(function(require, exports, module) {
         //pipe that
         if (this.dragging) {
             console.log('dragging in draginator');
-            console.log(gridDifferential);
             this.eventOutput.emit('resize', gridDifferential);
         } else {
             //modify position, retain reference
@@ -208,11 +200,6 @@ define(function(require, exports, module) {
         this.sync.on('start', _handleStart.bind(this));
         this.sync.on('update', _handleMove.bind(this));
         this.sync.on('end', _handleEnd.bind(this));
-        // window.onkeydown = _handleKeyMove.bind(this);
-        window.onkeydown = function(event) {
-            event.preventDefault();
-            return _handleMove.call(this, event);
-        }.bind(this);
     }
 
     /**
@@ -333,6 +320,29 @@ define(function(require, exports, module) {
 
     Draginator.prototype.startDragging = function startDragging() {
         this.dragging = true;
+    }
+
+    Draginator.prototype.select = function select() {
+        this._selected = true;
+
+        // there can only be one active window.onkeydown function available at a time
+        window.onkeydown = function(event) {
+            if (event.metaKey && event.keyIdentifier === 'Left'
+                || event.metaKey && event.keyIdentifier === 'Right') {
+                event.preventDefault();
+            }
+
+            if ((!event.metaKey && event.keyIdentifier !== 'U+0052') // refresh
+                || (!event.metaKey && !event.altKey && event.keyIdentifier !== 'U+004A')) { // dev console
+                console.log('preventing default');
+                event.preventDefault();
+            }
+            return _handleMove.call(this, event);
+        }.bind(this);
+    }
+
+    Draginator.prototype.deselect = function deselect() {
+        this._selected = false;
     }
 
     module.exports = Draginator;
