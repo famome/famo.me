@@ -9,6 +9,8 @@ define(function(require, exports, module) {
     var WorkView = require('views/WorkView');
     var generate = require('utils/Generator');
 
+    var SceneGrid = require('views/SceneGrid');
+
     function AppView() {
         View.apply(this, arguments);
 
