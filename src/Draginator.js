@@ -116,7 +116,6 @@ define(function(require, exports, module) {
 
     function _handleMove(event) {
         if (!this._active) return;
-        if (!this._selected) return;
 
         var options = this.options;
         if (event.keyIdentifier) {
