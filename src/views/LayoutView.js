@@ -104,26 +104,25 @@ define(function(require, exports, module) {
 
         if (edges[edge] && !this.dragging)
             this.surface.setProperties(edges[edge]);
-    };
+    }
 
     function _removeEdges(event) {
         this.surface.setProperties({cursor: '-webkit-grab'});
         if (this.surface.properties.mouseInside && !this.surface.properties.grabbed)
             this.surface.setProperties({mouseInside: false});
-    };
+    }
 
     function _grab(event) {
         this.dragging = true;
         if (this.draggable)
             this.surface.setProperties({cursor: '-webkit-grabbing'});
-    };
+    }
 
     function _ungrab(event) {
         this.dragging = false;
         if (this.draggable)
             this.surface.setProperties({cursor: '-webkit-grab'});
-
-    };
+    }
 
     function _setListeners() {
         // initialize eventing linkages
@@ -147,7 +146,7 @@ define(function(require, exports, module) {
 
         // view listens for resize from draggable
         this._eventInput.on('resize', function(data) {
-            console.log('resize')
+            console.log('resize');
         }.bind(this));
 
 

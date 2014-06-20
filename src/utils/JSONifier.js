@@ -1,5 +1,6 @@
 define(function(require, exports, module) {
-
+    'use strict';
+    
     var JSONifier = {
         JSONify: function(view) {
             return {
@@ -7,7 +8,7 @@ define(function(require, exports, module) {
                 id: view.getId(),
                 size: view.getSize(),
                 offset: view.getOffset()
-            }
+            };
         }
     };
 
