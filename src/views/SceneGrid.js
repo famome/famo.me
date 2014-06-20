@@ -3,21 +3,24 @@ define(function(require, exports, module) {
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
     var EventHandler  = require('famous/core/EventHandler');
-    var ModifierChain = require('famous/modifiers/ModifierChain');
-    var StateModifier = require('famous/modifiers/StateModifier');
-    var Draginator    = require('Draginator');
-    var BasicLayout   = require('utils/BasicLayout');
-    var LayoutView    = require('views/LayoutView');
-    var RenderController = require('famous/views/RenderController');
+    var GridLayout    = require('famous/views/GridLayout');
+
+    var sceneGrid = new GridLayout();
 
     function SceneGrid() {
         View.apply(this, arguments);
+
+        _createGrid();
     }
 
     SceneGrid.prototype = Object.create(View.prototype);
     SceneGrid.prototype.constructor = SceneGrid;
 
     SceneGrid.DEFAULT_OPTIONS = {};
+
+    function _createGrid() {
+        
+    }
 
     module.exports = SceneGrid;
 });
