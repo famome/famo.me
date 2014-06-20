@@ -7,22 +7,26 @@ define(function(require, exports, module) {
     var Draginator    = require('Draginator');
     var JSONifier     = require('utils/JSONifier');
 
+    // layout tracker
+    var numLayouts = 0;
+    var layouts = {};
 
     function LayoutView() {
         View.apply(this, arguments);
-        
-        this.id = 'LayoutView';
+
+        numLayouts++;
+        this.id = 'LayoutView'+numLayouts;
         this.xOffset = 0;
         this.yOffset = 0;
         this.width = this.options.size;
         this.height = this.options.size;
-        
+
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
         _createLayoutSurface.call(this);
-        
+
         _setListeners.call(this);
-        
+
         this.add(this.draginator).add(this.modifier).add(this.surface);
     }
 
@@ -35,7 +39,7 @@ define(function(require, exports, module) {
         return [this.xOffset, this.yOffset];
     };
     LayoutView.prototype.getSize = function() {
-        return [this.width, this.height];  
+        return [this.width, this.height];
     };
     LayoutView.prototype.addLayout = function() {
         this.layouts[this.id+this.numLayouts] = {
@@ -63,14 +67,14 @@ define(function(require, exports, module) {
         size: 100,
         edgeDetectSize: 20
     };
-    
+
     function _createLayoutDraginator() {
         this.draginator = new Draginator({
           snapX: this.options.snapX,
           snapY: this.options.snapY
         });
     }
-    
+
     function _createLayoutModifier() {
         this.modifier = new StateModifier({
             size: [this.options.size, this.options.size]
@@ -92,14 +96,14 @@ define(function(require, exports, module) {
         var edge = '';
 
         var edges = {
-          'n' : { cursor: 'ns-resize' },
-          'nw': { cursor: 'nwse-resize' },
-          'w' : { cursor: 'ew-resize' },
-          'sw': { cursor: 'nesw-resize' },
+          // 'n' : { cursor: 'ns-resize' },
+          // 'nw': { cursor: 'nwse-resize' },
+          // 'w' : { cursor: 'ew-resize' },
+          // 'sw': { cursor: 'nesw-resize' },
           's' : { cursor: 'ns-resize' },
           'se': { cursor: 'nwse-resize' },
           'e' : { cursor: 'ew-resize' },
-          'ne': { cursor: 'nesw-resize' },
+          // 'ne': { cursor: 'nesw-resize' },
           ''  : { cursor: '-webkit-grab' }
         };
 
@@ -111,7 +115,7 @@ define(function(require, exports, module) {
             edge += 'w';
         if (this.options.snapY * this.options.dimension[0] - event.offsetX < this.options.edgeDetectSize)
             edge += 'e';
-            
+
         this.draggable = edge === '';
 
         if (edges[edge] && !this.dragging)
@@ -125,10 +129,16 @@ define(function(require, exports, module) {
     }
 
     function _grab(event) {
+        var cursor = this.surface.properties.cursor;
+
         this.dragging = true;
-        if (this.draggable)
+        if (this.draggable) {
             this.surface.setProperties({cursor: '-webkit-grabbing'});
-    }
+        }
+        if (cursor === 'nwse-resize' || cursor === 'ns-resize' || cursor === 'ew-resize') {
+            this.draginator.startDragging();
+        }
+    };
 
     function _ungrab(event) {
         this.dragging = false;
@@ -146,6 +156,7 @@ define(function(require, exports, module) {
 
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
+            console.log('translating');
             this.xOffset += data[0];
             this.yOffset += data[1];
 
@@ -153,17 +164,33 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this._eventInput.on('mousemove', _setEdges.bind(this));
-        this._eventInput.on('mouseleave', _removeEdges.bind(this));
+        // this._eventInput.on('mouseleave', _removeEdges.bind(this));
         this.draginator.eventOutput.on('start', _grab.bind(this));
         this.draginator.eventOutput.on('update', _grab.bind(this));
         this.draginator.eventOutput.on('end', _ungrab.bind(this));
 
         // view listens for resize from draggable
         this._eventInput.on('resize', function(data) {
-            if (!this.draggable && !this.dragging)
-                console.log('resize');
+            console.log('resizing');
+            var cursor = this.surface.properties.cursor;
+            var currentSize = this.modifier.getSize();
+            var currentDimension = this.options.dimension;
+
+            if (this.dragging && (currentSize[0] + data[0] * this.options.snapX > 0)
+                && (currentSize[1] + data[1] * this.options.snapY)) {
+                this.options.dimension[0] = currentDimension[0] + data[0];
+                this.options.dimension[1] = currentDimension[1] + data[1];
+
+                this.modifier.setSize(
+                    [currentSize[0] + data[0] * this.options.snapX,
+                    currentSize[1] + data[1] * this.options.snapY]);
+            }
         }.bind(this));
 
+        this.surface.on('click', function() {
+            this.draginator.activate();
+            console.log('activated');
+        });
 
         this.surface.on('dblclick', function() {
             console.log(this.id+this.numLayouts, this.getLayouts()[this.id+this.numLayouts]);
