@@ -14,7 +14,7 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         numLayouts++;
-        this.id = 'LayoutView'+numLayouts;
+        this.id = 'LayoutView';
         this.xOffset = 0;
         this.yOffset = 0;
         this.width = this.options.size;
@@ -183,6 +183,11 @@ define(function(require, exports, module) {
                 this.modifier.setSize(
                     [currentSize[0] + data[0] * this.options.snapX,
                     currentSize[1] + data[1] * this.options.snapY]);
+
+                this.layouts[this.id+this.numLayouts].size = [
+                    currentSize[0] + data[0] * this.options.snapX,
+                    currentSize[1] + data[1] * this.options.snapY
+                ];
             }
         }.bind(this));
 
