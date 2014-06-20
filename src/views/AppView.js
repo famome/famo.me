@@ -39,11 +39,14 @@ define(function(require, exports, module) {
 
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150,
-        gridDimensions: [12, 4]
+        grid: {
+            width: 1170,
+            dimensions: [12, 4]
+        }
     };
 
     function _createGrid() {
-        this.add(new SceneGrid(this.options.gridDimensions));
+        this.add(new SceneGrid(this.options.grid));
     }
 
     function _createMenuView() {
@@ -95,17 +98,6 @@ define(function(require, exports, module) {
             events[this.menuView.current].bind(this)();
         }.bind(this));
 
-        // this.on('keydown', function(event) {
-        //     if (event.altKey) {
-        //         console.log('keydown');
-        //     }
-        // }, false);
-
-        // this.on('keyup', function(event) {
-        //     if (!event.altKey) {
-        //         console.log('keydown with option-key');
-        //     }
-        // }, false);
     }
 
 
