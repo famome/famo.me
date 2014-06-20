@@ -94,11 +94,11 @@ define(function(require, exports, module) {
         this.eventOutput.emit('start', {position : this.getPosition()});
     }
 
-    function _deleteElement(event, draginator) {
+    function _deleteElement(event) {
         console.log('delete the current element');
-        console.log(draginator);
-        draginator.deactivate();
 
+        this.eventOutput.emit('delete');
+        this.deactivate();
     }
 
     function _createElement() {
@@ -134,7 +134,7 @@ define(function(require, exports, module) {
             };
 
             var commandMatrix = {
-                'U+0008': _deleteElement, // delete
+                'U+0008': _deleteElement.bind(this), // delete
                 'U+004E': _createElement, // 'n'
                 'U+0009': _switchElement, // tab
                 Enter: _generateJSON,

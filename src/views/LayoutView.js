@@ -6,14 +6,9 @@ define(function(require, exports, module) {
     var EventHandler  = require('famous/core/EventHandler');
     var Draginator    = require('Draginator');
 
-    // layout tracker
-    var numLayouts = 0;
-    var layouts = {};
-
     function LayoutView() {
         View.apply(this, arguments);
 
-        numLayouts++;
         this.id = 'LayoutView';
         this.xOffset = 0;
         this.yOffset = 0;
@@ -41,7 +36,7 @@ define(function(require, exports, module) {
         return [this.width, this.height];
     };
     LayoutView.prototype.addLayout = function() {
-        this.layouts[this.id+this.numLayouts] = {
+        this.layouts[this.id] = {
             offset: [this.xOffset, this.yOffset],
             size: [this.width, this.height]
         };
@@ -49,9 +44,13 @@ define(function(require, exports, module) {
     LayoutView.prototype.linkTo = function(layouts, numLayouts) {
         this.layouts = layouts;
         this.numLayouts = numLayouts;
+
+        this.id += ' ' + this.numLayouts;
     };
     LayoutView.prototype.removeLayout = function() {
+        console.log('before',this.id, this.layouts[this.id]);
         delete this.layouts[this.id];
+        console.log('after', this.layouts, this.layouts[this.id]);
     };
     LayoutView.prototype.getLayouts = function() {
         return this.layouts;
@@ -159,7 +158,7 @@ define(function(require, exports, module) {
             this.xOffset += data[0];
             this.yOffset += data[1];
 
-            this.layouts[this.id+this.numLayouts].offset = [this.xOffset, this.yOffset];
+            this.layouts[this.id].offset = [this.xOffset, this.yOffset];
         }.bind(this));
 
         this._eventInput.on('mousemove', _setEdges.bind(this));
@@ -184,7 +183,7 @@ define(function(require, exports, module) {
                     [currentSize[0] + data[0] * this.options.snapX,
                     currentSize[1] + data[1] * this.options.snapY]);
 
-                this.layouts[this.id+this.numLayouts].size = [
+                this.layouts[this.id].size = [
                     currentSize[0] + data[0] * this.options.snapX,
                     currentSize[1] + data[1] * this.options.snapY
                 ];
@@ -197,7 +196,11 @@ define(function(require, exports, module) {
         });
 
         this.surface.on('dblclick', function() {
-            console.log(this.id+this.numLayouts, this.getLayouts()[this.id+this.numLayouts]);
+            console.log(this.id, this.getLayouts()[this.id]);
+        }.bind(this));
+
+        this._eventInput.on('delete', function() {
+            this.removeLayout();
         }.bind(this));
     }
 
