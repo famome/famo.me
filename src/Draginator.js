@@ -94,8 +94,11 @@ define(function(require, exports, module) {
         this.eventOutput.emit('start', {position : this.getPosition()});
     }
 
-    function _deleteElement() {
+    function _deleteElement(event, draginator) {
         console.log('delete the current element');
+        console.log(draginator);
+        draginator.deactivate();
+
     }
 
     function _createElement() {
@@ -139,7 +142,7 @@ define(function(require, exports, module) {
             };
 
             if (commandMatrix[event.keyIdentifier]) {
-                commandMatrix[event.keyIdentifier](event);
+                commandMatrix[event.keyIdentifier](event, this);
             }
 
             if (keyMatrix[event.keyIdentifier]) {
@@ -287,9 +290,6 @@ define(function(require, exports, module) {
      * Set this draginator to respond to user input for the particular types of actions passed.
      *
      * @method activate
-     *
-     * @param {string} type of action to activate [e.g., "drag", "resize", etc.]
-     *      Will deactivate other types of actions
      */
     Draginator.prototype.activate = function activate(type) {
         this._active = true;
@@ -299,11 +299,9 @@ define(function(require, exports, module) {
      * Set this draginator to ignore user input.
      *
      * @method deactivate
-     *
-     * @param {string} type of action to deactivate
      */
-    Draginator.prototype.deactivate = function deactivate(type) {
-        this._activetype = false;
+    Draginator.prototype.deactivate = function deactivate() {
+        this._active = false;
     };
 
     /**

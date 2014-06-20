@@ -187,6 +187,10 @@ define(function(require, exports, module) {
             }
         }.bind(this));
 
+        this.surface.on('click', function() {
+            this.draginator.activate();
+            console.log('activated');
+        });
 
         this.surface.on('dblclick', function() {
             console.log(this.id+this.numLayouts, this.getLayouts()[this.id+this.numLayouts]);
