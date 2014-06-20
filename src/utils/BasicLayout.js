@@ -13,7 +13,8 @@ define(function(require, exports, module) {
                 properties: {
                     lineHeight: '150px',
                     textAlign: "center",
-                    zIndex: -1
+                    zIndex: -1,
+                    background: "url(http://www.thepetcollective.tv/wp-content/uploads/2013/10/psychedelic-cat-gifs.png)"
                 }
             });
 

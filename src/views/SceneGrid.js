@@ -7,10 +7,10 @@ define(function(require, exports, module) {
 
     var sceneGrid = new GridLayout();
 
-    function SceneGrid() {
+    function SceneGrid(dimensions) {
         View.apply(this, arguments);
 
-        _createGrid();
+        return _createGrid(dimensions);
     }
 
     SceneGrid.prototype = Object.create(View.prototype);
@@ -18,8 +18,28 @@ define(function(require, exports, module) {
 
     SceneGrid.DEFAULT_OPTIONS = {};
 
-    function _createGrid() {
-        
+    function _createGrid(dimensions) {
+        var grid = new GridLayout({
+                dimensions: dimensions
+            });
+
+        var surfaces = [];
+        grid.sequenceFrom(surfaces);
+
+        for(var i = 0; i < 48; i++) {
+            surfaces.push(new Surface({
+              content: 'hi' + (i + 1),
+              size: [undefined, undefined],
+              properties: {
+                backgroundColor: "hsl(" + (i * 360 / 8) + ", 100%, 50%)",
+                backgroundBlendMode: "multiply",
+                color: "#404040",
+                textAlign: 'center'
+              }
+            }));
+        }
+
+        return grid;
     }
 
     module.exports = SceneGrid;

@@ -16,6 +16,7 @@ define(function(require, exports, module) {
 
         this.menuToggle = false;
 
+        _createGrid.call(this);
         _createMenuView.call(this);
         _createWorkView.call(this);
         _setListeners.call(this);
@@ -37,8 +38,13 @@ define(function(require, exports, module) {
     };
 
     AppView.DEFAULT_OPTIONS = {
-        menuSize: 150
+        menuSize: 150,
+        gridDimensions: [12, 4]
     };
+
+    function _createGrid() {
+        this.add(new SceneGrid(this.options.gridDimensions));
+    }
 
     function _createMenuView() {
         this.menuView = new MenuView();
