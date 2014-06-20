@@ -6,16 +6,12 @@ define(function(require, exports, module) {
     var EventHandler  = require('famous/core/EventHandler');
     var Draginator    = require('Draginator');
     var JSONifier     = require('utils/JSONifier');
-    
-    // layout tracker
-    var numLayouts = 0;
-    var layouts = {};
+
 
     function LayoutView() {
         View.apply(this, arguments);
         
-        numLayouts++;
-        this.id = 'LayoutView'+numLayouts;
+        this.id = 'LayoutView';
         this.xOffset = 0;
         this.yOffset = 0;
         this.width = this.options.size;
@@ -40,6 +36,22 @@ define(function(require, exports, module) {
     };
     LayoutView.prototype.getSize = function() {
         return [this.width, this.height];  
+    };
+    LayoutView.prototype.addLayout = function() {
+        this.layouts[this.id+this.numLayouts] = {
+            offset: [this.xOffset, this.yOffset],
+            size: [this.width, this.height]
+        };
+    };
+    LayoutView.prototype.linkTo = function(layouts, numLayouts) {
+        this.layouts = layouts;
+        this.numLayouts = numLayouts;
+    };
+    LayoutView.prototype.removeLayout = function() {
+        delete this.layouts[this.id];
+    };
+    LayoutView.prototype.getLayouts = function() {
+        return this.layouts;
     };
 
     LayoutView.DEFAULT_OPTIONS = {
@@ -104,26 +116,25 @@ define(function(require, exports, module) {
 
         if (edges[edge] && !this.dragging)
             this.surface.setProperties(edges[edge]);
-    };
+    }
 
     function _removeEdges(event) {
         this.surface.setProperties({cursor: '-webkit-grab'});
         if (this.surface.properties.mouseInside && !this.surface.properties.grabbed)
             this.surface.setProperties({mouseInside: false});
-    };
+    }
 
     function _grab(event) {
         this.dragging = true;
         if (this.draggable)
             this.surface.setProperties({cursor: '-webkit-grabbing'});
-    };
+    }
 
     function _ungrab(event) {
         this.dragging = false;
         if (this.draggable)
             this.surface.setProperties({cursor: '-webkit-grab'});
-
-    };
+    }
 
     function _setListeners() {
         // initialize eventing linkages
@@ -137,6 +148,8 @@ define(function(require, exports, module) {
         this._eventInput.on('translate', function(data){
             this.xOffset += data[0];
             this.yOffset += data[1];
+
+            this.layouts[this.id+this.numLayouts].offset = [this.xOffset, this.yOffset];
         }.bind(this));
 
         this._eventInput.on('mousemove', _setEdges.bind(this));
@@ -147,14 +160,13 @@ define(function(require, exports, module) {
 
         // view listens for resize from draggable
         this._eventInput.on('resize', function(data) {
-            console.log('resize')
+            if (!this.draggable && !this.dragging)
+                console.log('resize');
         }.bind(this));
 
 
         this.surface.on('dblclick', function() {
-            console.log(JSONifier.JSONify(this).id);
-            console.log('layout view offset', JSONifier.JSONify(this).offset);
-            console.log('layout view size', JSONifier.JSONify(this).size);
+            console.log(this.id+this.numLayouts, this.getLayouts()[this.id+this.numLayouts]);
         }.bind(this));
     }
 
