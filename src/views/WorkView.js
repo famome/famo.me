@@ -47,6 +47,10 @@ define(function(require, exports, module) {
       this.add(layoutView);      
     };
 
+    WorkView.prototype.getLayouts = function() {
+        return this.layouts;
+    };
+
     WorkView.DEFAULT_OPTIONS = {};
 
 
