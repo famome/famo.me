@@ -94,11 +94,67 @@ define(function(require, exports, module) {
         this.eventOutput.emit('start', {position : this.getPosition()});
     }
 
+    function _deleteElement() {
+        console.log('delete the current element');
+    }
+
+    function _createElement() {
+        console.log('create a new element');
+    }
+
+    function _switchElement() {
+        console.log('switch to another element');
+    }
+
+    function _generateJSON() {
+        console.log('generate JSON');
+    }
+
+    function _refresh(event) {
+        if (event.metaKey) {
+            location.reload();
+        }
+    }
+
     function _handleMove(event) {
         if (!this._active) return;
 
         var options = this.options;
-        this._differential = event.position;
+        console.log(event);
+        console.log(event.keyIdentifier);
+        if (event.keyIdentifier) {
+            var keyMatrix = {
+                Up: [0, -100],
+                Down: [0, 100],
+                Left: [-100, 0],
+                Right: [100, 0]
+            };
+
+            var commandMatrix = {
+                'U+0008': _deleteElement, // delete
+                'U+004E': _createElement, // 'n'
+                'U+0009': _switchElement, // tab
+                Enter: _generateJSON,
+                'U+0052': _refresh // 'r' (and event.metaKey)
+            };
+
+            if (commandMatrix[event.keyIdentifier]) {
+                commandMatrix[event.keyIdentifier](event);
+            }
+
+            if (keyMatrix[event.keyIdentifier]) {
+                if (event.metaKey) {
+                    this.dragging = true;
+                } else {
+                    this.dragging = false;
+                }
+                this._differential = keyMatrix[event.keyIdentifier];
+            }
+        } else {
+            this._differential = event.position;
+        }
+
+
         var newDifferential = _mapDifferential.call(this, this._differential);
 
         //find the cols and rows offest...
@@ -107,75 +163,41 @@ define(function(require, exports, module) {
             newDifferential[1] / this.options.snapY
         ];
 
-        //pipe that
-        this.eventOutput.emit('translate', gridDifferential);
-        this.eventOutput.emit('resize', gridDifferential);
-
         //buffer the differential if snapping is set
         this._differential[0] -= newDifferential[0];
         this._differential[1] -= newDifferential[1];
 
         var pos = this.getPosition();
 
-        //modify position, retain reference
-        pos[0] += newDifferential[0];
-        pos[1] += newDifferential[1];
-
-        //handle bounding box
-        if (options.xRange){
-            var xRange = [options.xRange[0] + 0.5 * options.snapX, options.xRange[1] - 0.5 * options.snapX];
-            pos[0] = _clamp(pos[0], xRange);
-        }
-
-        if (options.yRange){
-            var yRange = [options.yRange[0] + 0.5 * options.snapY, options.yRange[1] - 0.5 * options.snapY];
-            pos[1] = _clamp(pos[1], yRange);
-        }
-
-        this.eventOutput.emit('update', {position : pos});
-    }
-
-    function _handleKeyMove(event) {
-        var keyMatrix = {
-            Up: [0, -100],
-            Down: [0, 100],
-            Left: [-100, 0],
-            Right: [100, 0]
-        }
-        // console.log('^-^ ', event.keyIdentifier);
-        //if (!this._active) return;
-        
-        
-
-        this._differential = keyMatrix[event.keyIdentifier];
-        var newDifferential = [this._differential[0], this._differential[1]];        
-        
-        //find the cols and rows offest...
-        var gridDifferential = [
-            newDifferential[0] / this.options.snapX,
-            newDifferential[1] / this.options.snapY
-        ];
-
         //pipe that
-        this.eventOutput.emit('translate', gridDifferential);
-        this.eventOutput.emit('resize', gridDifferential);
+        if (this.dragging) {
+            console.log('dragging in draginator');
+            console.log(gridDifferential);
+            this.eventOutput.emit('resize', gridDifferential);
+        } else {
+            //modify position, retain reference
+            pos[0] += newDifferential[0];
+            pos[1] += newDifferential[1];
 
-        //buffer the differential if snapping is set
-        this._differential[0] -= newDifferential[0];
-        this._differential[1] -= newDifferential[1];
-        
-        
-        var pos = this.getPosition();
+            //handle bounding box
+            if (options.xRange){
+                var xRange = [options.xRange[0] + 0.5 * options.snapX, options.xRange[1] - 0.5 * options.snapX];
+                pos[0] = _clamp(pos[0], xRange);
+            }
 
-        //modify position, retain reference
-        pos[0] += newDifferential[0];
-        pos[1] += newDifferential[1];
-
-        this.eventOutput.emit('update', {position : pos});
+            if (options.yRange){
+                var yRange = [options.yRange[0] + 0.5 * options.snapY, options.yRange[1] - 0.5 * options.snapY];
+                pos[1] = _clamp(pos[1], yRange);
+            }
+            console.log('translating in draginator');
+            this.eventOutput.emit('translate', gridDifferential);
+            this.eventOutput.emit('update', {position : pos});
+        }
     }
 
     function _handleEnd() {
         if (!this._active) return;
+        this.dragging = false;
         this.eventOutput.emit('end', {position : this.getPosition()});
     }
 
@@ -183,7 +205,11 @@ define(function(require, exports, module) {
         this.sync.on('start', _handleStart.bind(this));
         this.sync.on('update', _handleMove.bind(this));
         this.sync.on('end', _handleEnd.bind(this));
-        window.onkeydown = _handleKeyMove.bind(this);
+        // window.onkeydown = _handleKeyMove.bind(this);
+        window.onkeydown = function(event) {
+            event.preventDefault();
+            return _handleMove.call(this, event);
+        }.bind(this);
     }
 
     /**
@@ -306,6 +332,10 @@ define(function(require, exports, module) {
             target: target
         };
     };
+
+    Draginator.prototype.startDragging = function startDragging() {
+        this.dragging = true;
+    }
 
     module.exports = Draginator;
 });

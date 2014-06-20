@@ -16,7 +16,7 @@ define(function(require, exports, module) {
         var draggable = new Draggable();
 
         _createToolMenu.call(this, draggable);
-_createButtons.call(this, draggable);
+        _createButtons.call(this, draggable);
     }
 
     MenuView.prototype = Object.create(View.prototype);
