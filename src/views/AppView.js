@@ -40,13 +40,20 @@ define(function(require, exports, module) {
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150,
         grid: {
-            width: 1170,
-            dimensions: [12, 4]
+            width: 960,
+            dimensions: [6, 4],
+            // cellSize: [192, 60]
         }
     };
 
     function _createGrid() {
-        this.add(new SceneGrid(this.options.grid));
+        this.grid = new SceneGrid(this.options.grid);
+        this.gridModifier = new StateModifier({
+            origin: [0.5, 0.5],
+            align: [0.5, 0.5],
+            size: [this.options.grid.width, undefined]
+        });
+        this.add(this.gridModifier).add(this.grid);
     }
 
     function _createMenuView() {

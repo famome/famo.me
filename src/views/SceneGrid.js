@@ -3,7 +3,8 @@ define(function(require, exports, module) {
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
     var EventHandler  = require('famous/core/EventHandler');
-    var GridLayout    = require('famous/views/GridLayout');
+    
+    var GridLayout    = require('views/GridLayoutCellSized');
 
     var sceneGrid = new GridLayout();
 
@@ -19,17 +20,18 @@ define(function(require, exports, module) {
     SceneGrid.DEFAULT_OPTIONS = {};
 
     function _createGrid(properties) {
-        var cellSize = [properties.width / properties.dimensions[0], undefined];
+        // var cellSize = [properties.width / properties.dimensions[0], undefined];
+        // var numCells;
 
         var grid = new GridLayout({
                 dimensions: properties.dimensions,
-                cellSize: [10, 10]
+                cellSize: properties.cellSize
             });
 
         var surfaces = [];
         grid.sequenceFrom(surfaces);
 
-        for(var i = 0; i < 48; i++) {
+        for(var i = 0; i < 100; i++) {
             var surface = new Surface({
               content: 'hi' + (i + 1),
               size: [undefined, undefined],
