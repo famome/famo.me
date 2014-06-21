@@ -21,6 +21,12 @@ define(function(require, exports, module) {
 
         BasicLayout.createContent.call(this);
 
+        window.onkeydown = function(event) {
+            if (event.keyIdentifier === 'U+004E') {
+                this.createLayoutView();
+            };
+        }.bind(this);
+
         this._eventInput.on('createNewLayout', function() {
             console.log('creating a new layout');
             console.log(this);
