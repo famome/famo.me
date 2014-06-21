@@ -100,6 +100,8 @@ define(function(require, exports, module) {
 
         this.eventOutput.emit('delete');
         this.deactivate();
+
+        this.eventOutput.emit('allowCreate');
     }
 
     function _createElement() {
