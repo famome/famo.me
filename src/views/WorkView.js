@@ -9,14 +9,11 @@ define(function(require, exports, module) {
     var LayoutView    = require('views/LayoutView');
     var RenderController = require('famous/views/RenderController');
 
-    var SceneGrid = require('views/SceneGrid');
-
     function WorkView() {
         View.apply(this, arguments);
         this.numLayouts = 0;
         this.layouts = {};
 
-        _createGrid.call(this);
         _createRenderController.call(this);
         _setListeners.call(this);
     }
@@ -70,8 +67,8 @@ define(function(require, exports, module) {
         //     align: [0.5, 0.5],
         //     size: [this.options.grid.width, this.options.grid.height]
         // });
-        
-        // this.gridNode = this.add(this.gridModifier).add(this.grid);        
+
+        // this.gridNode = this.add(this.gridModifier).add(this.grid);
         this.add(this.grid);
     }
 
@@ -92,7 +89,7 @@ define(function(require, exports, module) {
             origin: this.options.center,
             align: this.options.center
         });
-        
+
         this.add(workSurfaceModifier).add(workSurface);
     }
 
@@ -113,9 +110,19 @@ define(function(require, exports, module) {
             this.createLayoutView();
         }.bind(this));
 
-        this._eventInput.on('deselectRest', function() {
-            this._eventOutput.emit('deselect');
+        this._eventInput.on('allowCreation', function() {
+            window.onkeydown = function(event) {
+                if (event.keyIdentifier === 'U+004E') {
+                    this.createLayoutView();
+                };
+            }.bind(this);
         }.bind(this));
+
+        window.onkeydown = function(event) {
+            if (event.keyIdentifier === 'U+004E') {
+                this.createLayoutView();
+            };
+        }.bind(this);
     }
 
     module.exports = WorkView;
