@@ -18,19 +18,10 @@ define(function(require, exports, module) {
         this.layouts = {};
         this.currentView = null;
 
-<<<<<<< HEAD
-        
-
-        // this.renderController = new RenderController();
-        // this.add(this.renderController);
-
-        
-=======
         _createGrid.call(this);
         _createRenderController.call(this);
         // _createWorkSurface.call(this);
         _setListeners.call(this);
->>>>>>> adds new tool
     }
 
     WorkView.prototype = Object.create(View.prototype);
@@ -56,7 +47,7 @@ define(function(require, exports, module) {
         layoutView.linkTo(this.layouts, this.numLayouts);
         layoutView.addLayout();
 
-        this.grid.surfaces.unshift(layoutView);
+        this.add(layoutView);
 
         this._eventOutput.pipe(layoutView._eventInput);
         layoutView._eventOutput.pipe(this._eventInput);
@@ -90,7 +81,7 @@ define(function(require, exports, module) {
         });
         
         this.gridNode = this.add(this.gridModifier).add(this.grid);        
-    };
+    }
 
     function _createRenderController() {
         var renderController = new RenderController();
@@ -114,12 +105,6 @@ define(function(require, exports, module) {
     }
 
     function _setListeners() {
-        this._eventInput.on('createNewLayout', function() {
-            console.log('creating a new layout');
-            console.log(this);
-            this.createLayoutView();
-        }.bind(this));
-
         this._eventInput.on('deselectRest', function() {
             this._eventOutput.emit('deselect');
         }.bind(this));
@@ -127,7 +112,7 @@ define(function(require, exports, module) {
         window.onkeydown = function(event) {
             if (event.keyIdentifier === 'U+004E') {
                 this.createLayoutView();
-            };
+            }
         }.bind(this);
 
         this._eventInput.on('createNewLayout', function() {
@@ -139,12 +124,6 @@ define(function(require, exports, module) {
         this._eventInput.on('deselectRest', function() {
             this._eventOutput.emit('deselect');
         }.bind(this));
-
-        window.onkeydown = function(event) {
-            if (event.keyIdentifier === 'U+004E') {
-                this.createLayoutView();
-            };
-        }.bind(this);
     }
 
     module.exports = WorkView;
