@@ -20,6 +20,16 @@ define(function(require, exports, module) {
         this.add(this.renderController);
 
         BasicLayout.createContent.call(this);
+
+        this._eventInput.on('createNewLayout', function() {
+            console.log('creating a new layout');
+            console.log(this);
+            this.createLayoutView();
+        }.bind(this));
+
+        this._eventInput.on('deselectRest', function() {
+            this._eventOutput.emit('deselect');
+        }.bind(this));
     }
 
     WorkView.prototype = Object.create(View.prototype);
@@ -52,10 +62,6 @@ define(function(require, exports, module) {
 
         this._eventOutput.emit('deselect');
         this._eventOutput.emit('select', layoutView);
-
-        this._eventInput.on('deselectRest', function() {
-            this._eventOutput.emit('deselect');
-        }.bind(this));
     };
 
     WorkView.prototype.getLayouts = function() {

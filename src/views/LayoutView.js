@@ -198,6 +198,11 @@ define(function(require, exports, module) {
             this.removeLayout();
         }.bind(this));
 
+        this._eventInput.on('create', function() {
+            console.log('intermediary');
+            this._eventOutput.emit('createNewLayout');
+        }.bind(this));
+
         this.surface.draginator = this.draginator;
 
         this._eventInput.on('select', function(selectedView) {
