@@ -104,6 +104,7 @@ define(function(require, exports, module) {
 
     function _createElement() {
         console.log('create a new element');
+        this.eventOutput.emit('create');
     }
 
     function _switchElement() {
@@ -128,7 +129,7 @@ define(function(require, exports, module) {
 
             var commandMatrix = {
                 'U+0008': _deleteElement.bind(this), // delete
-                'U+004E': _createElement, // 'n'
+                'U+004E': _createElement.bind(this), // 'n'
                 'U+0009': _switchElement, // tab
                 Enter: _generateJSON
             };
@@ -326,8 +327,8 @@ define(function(require, exports, module) {
 
         // there can only be one active window.onkeydown function available at a time
         window.onkeydown = function(event) {
-            if (event.metaKey && event.keyIdentifier === 'Left'
-                || event.metaKey && event.keyIdentifier === 'Right') {
+            if (event.metaKey && event.keyIdentifier === 'Left' // brower back
+                || event.metaKey && event.keyIdentifier === 'Right') { // browser forward
                 event.preventDefault();
             }
 
