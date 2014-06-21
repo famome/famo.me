@@ -65,7 +65,7 @@ define(function(require, exports, module) {
         layoutView.linkTo(this.layouts, this.numLayouts);
         layoutView.addLayout();
 
-        this.grid.surfaces.unshift(layoutView);
+        this.add(layoutView);
 
         this._eventOutput.pipe(layoutView._eventInput);
         layoutView._eventOutput.pipe(this._eventInput);
