@@ -14,6 +14,7 @@ define(function(require, exports, module) {
 
         this.menuToggle = false;
 
+        _createWorkView.call(this);
         _createBackground.call(this);
         _createMenuView.call(this);
         _setListeners.call(this);
@@ -81,7 +82,7 @@ define(function(require, exports, module) {
             },
             '⎚': function() {
                 console.log('you clicked a row thing');
-                _createWorkView.call(this);
+                
             },
             '▥': function() {
                 console.log('you clicked a column thing');

@@ -28,7 +28,7 @@ define(function(require, exports, module) {
 =======
         _createGrid.call(this);
         _createRenderController.call(this);
-        _createWorkSurface.call(this);
+        // _createWorkSurface.call(this);
         _setListeners.call(this);
 >>>>>>> adds new tool
     }
