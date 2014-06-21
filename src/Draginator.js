@@ -121,10 +121,10 @@ define(function(require, exports, module) {
         var options = this.options;
         if (event.keyIdentifier) {
             var keyMatrix = {
-                Up: [0, -100],
-                Down: [0, 100],
-                Left: [-100, 0],
-                Right: [100, 0]
+                Up: [0, -this.options.snapY],
+                Down: [0, this.options.snapY],
+                Left: [-this.options.snapX, 0],
+                Right: [this.options.snapX, 0]
             };
 
             var commandMatrix = {
@@ -145,9 +145,11 @@ define(function(require, exports, module) {
                     this.dragging = false;
                 }
                 this._differential = keyMatrix[event.keyIdentifier];
+                console.log('keybo ', this._differential);
             }
         } else {
             this._differential = event.position;
+            console.log('mouse ', this._differential);
         }
 
 

@@ -14,8 +14,9 @@ define(function(require, exports, module) {
 
         this.menuToggle = false;
 
-        _createMenuView.call(this);
         _createWorkView.call(this);
+        _createBackground.call(this);
+        _createMenuView.call(this);
         _setListeners.call(this);
     }
 
@@ -53,6 +54,24 @@ define(function(require, exports, module) {
         this.add(this.workModifier).add(this.workView);
     }
 
+    function _createBackground() {
+        var background = new Surface({
+            size: [undefined, undefined],
+            classes: ['grey-bg'],
+            properties: {
+                lineHeight: '150px',
+                textAlign: 'center',
+                zIndex: -1
+            }
+        });
+
+        var backgroundModifier = new StateModifier({
+            transform: Transform.translate(0, 0, -1)
+        });
+
+        this.add(backgroundModifier).add(background);
+    }
+
     function _setListeners() {
         var events = {
             '⬒': function() {
@@ -61,8 +80,9 @@ define(function(require, exports, module) {
             '⬓': function() {
                 this.workView.toggleFooter();
             },
-            '▤': function() {
+            '⎚': function() {
                 console.log('you clicked a row thing');
+                
             },
             '▥': function() {
                 console.log('you clicked a column thing');
@@ -85,9 +105,7 @@ define(function(require, exports, module) {
         this.menuView.on('menu', function() {
             events[this.menuView.current].bind(this)();
         }.bind(this));
-
     }
-
 
     module.exports = AppView;
 });

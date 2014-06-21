@@ -6,24 +6,6 @@ define(function(require, exports, module) {
 
 
     var BasicLayout = {
-        createContent: function() {
-            var background = new Surface({
-                size: [undefined, undefined],
-                classes: ["grey-bg"],
-                properties: {
-                    lineHeight: '150px',
-                    textAlign: "center",
-                    zIndex: -1,
-                }
-            });
-
-            var backgroundModifier = new StateModifier({
-                transform: Transform.translate(0, 0, -1)
-            });
-
-            this.add(backgroundModifier).add(background);
-        },
-
         createHeader: function() {
             var header = new Surface({
                 size: [undefined, 100],
