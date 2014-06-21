@@ -9,14 +9,11 @@ define(function(require, exports, module) {
     var WorkView = require('views/WorkView');
     var generate = require('utils/Generator');
 
-    var SceneGrid = require('views/SceneGrid');
-
     function AppView() {
         View.apply(this, arguments);
 
         this.menuToggle = false;
 
-        _createGrid.call(this);
         _createMenuView.call(this);
         _createWorkView.call(this);
         _setListeners.call(this);
@@ -38,23 +35,8 @@ define(function(require, exports, module) {
     };
 
     AppView.DEFAULT_OPTIONS = {
-        menuSize: 150,
-        grid: {
-            width: 960,
-            dimensions: [6, 4],
-            cellSize: [96, 100]
-        }
-    };
-
-    function _createGrid() {
-        this.grid = new SceneGrid(this.options.grid);
-        this.gridModifier = new StateModifier({
-            origin: [0.5, 0.5],
-            align: [0.5, 0.5],
-            size: [this.options.grid.width, undefined]
-        });
-        this.add(this.gridModifier).add(this.grid);
-    }
+        menuSize: 150
+    };  
 
     function _createMenuView() {
         this.menuView = new MenuView();

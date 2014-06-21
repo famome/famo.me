@@ -20,18 +20,19 @@ define(function(require, exports, module) {
     SceneGrid.DEFAULT_OPTIONS = {};
 
     function _createGrid(properties) {
-        var cellSize = properties.cellSize || [properties.width / properties.dimensions[0], undefined];
+        // var cellSize = properties.cellSize || [properties.width / properties.dimensions[0], undefined];
         // var numCells;
+        cellSize = properties.cellSize || undefined;
 
         var grid = new GridLayout({
                 dimensions: properties.dimensions,
                 cellSize: cellSize
             });
 
-        var surfaces = [];
-        grid.sequenceFrom(surfaces);
+        grid.surfaces = [];
+        grid.sequenceFrom(grid.surfaces);
 
-        for(var i = 0; i < 100; i++) {
+        for(var i = 0; i < 4; i++) {
             var surface = new Surface({
               content: 'hi' + (i + 1),
               size: [undefined, undefined],
@@ -56,7 +57,7 @@ define(function(require, exports, module) {
                     boxShadow: "inset 0 0 20px rgba(255, 192, 203, .125)"
                 })
             });
-            surfaces.push(surface);
+            grid.surfaces.push(surface);
         }
 
         return grid;

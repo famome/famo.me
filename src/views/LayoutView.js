@@ -12,8 +12,8 @@ define(function(require, exports, module) {
         this.id = 'LayoutView';
         this.xOffset = 0;
         this.yOffset = 0;
-        this.width = this.options.size;
-        this.height = this.options.size;
+        this.width = this.options.size.width;
+        this.height = this.options.size.height;
 
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
@@ -62,8 +62,12 @@ define(function(require, exports, module) {
         offset: [0, 0],
         dimension: [1, 1],
         color: 'pink',
-        size: 100,
-        edgeDetectSize: 20
+        size: {
+            width: 192,
+            height: 300
+        },
+        edgeDetectSize: 20,
+        zIndex: 9
     };
 
     function _createLayoutDraginator() {
@@ -75,7 +79,7 @@ define(function(require, exports, module) {
 
     function _createLayoutModifier() {
         this.modifier = new StateModifier({
-            size: [this.options.size, this.options.size]
+            size: [this.options.size.width, this.options.size.height]
         });
     }
 
