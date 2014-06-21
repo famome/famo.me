@@ -13,7 +13,7 @@ define(function(require, exports, module) {
                 properties: {
                     lineHeight: '150px',
                     textAlign: "center",
-                    zIndex: -1
+                    zIndex: -1,
                 }
             });
 
@@ -62,14 +62,14 @@ define(function(require, exports, module) {
             this.layout.footer.add(footerModifier).add(footer);
         },
 
-        render: function() {
-            this.layout = new HeaderFooterLayout();
-            if (this.header) BasicLayout.createHeader.call(this);
-            if (this.footer) BasicLayout.createFooter.call(this);
+        // render: function() {
+        //     this.layout = new HeaderFooterLayout();
+        //     if (this.header) BasicLayout.createHeader.call(this);
+        //     if (this.footer) BasicLayout.createFooter.call(this);
 
-            if (this.header || this.footer) this.renderController.show(this.layout);
-            else this.renderController.hide(this.layout);
-        }
+        //     if (this.header || this.footer) this.renderController.show(this.layout);
+        //     else this.renderController.hide(this.layout);
+        // }
     };
 
     module.exports = BasicLayout;

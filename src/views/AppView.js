@@ -36,7 +36,7 @@ define(function(require, exports, module) {
 
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150
-    };
+    };  
 
     function _createMenuView() {
         this.menuView = new MenuView();
@@ -51,7 +51,6 @@ define(function(require, exports, module) {
         this.workView = new WorkView();
         this.workModifier = new StateModifier();
         this.add(this.workModifier).add(this.workView);
-        window.work = this.workView;
     }
 
     function _setListeners() {
@@ -87,17 +86,6 @@ define(function(require, exports, module) {
             events[this.menuView.current].bind(this)();
         }.bind(this));
 
-        // this.on('keydown', function(event) {
-        //     if (event.altKey) {
-        //         console.log('keydown');
-        //     }
-        // }, false);
-
-        // this.on('keyup', function(event) {
-        //     if (!event.altKey) {
-        //         console.log('keydown with option-key');
-        //     }
-        // }, false);
     }
 
 

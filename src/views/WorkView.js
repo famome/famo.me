@@ -10,14 +10,18 @@ define(function(require, exports, module) {
     var LayoutView    = require('views/LayoutView');
     var RenderController = require('famous/views/RenderController');
 
+    var SceneGrid = require('views/SceneGrid');
+
     function WorkView() {
         View.apply(this, arguments);
         this.numLayouts = 0;
         this.layouts = {};
         this.currentView = null;
 
-        this.renderController = new RenderController();
-        this.add(this.renderController);
+        _createGrid.call(this);
+
+        // this.renderController = new RenderController();
+        // this.add(this.renderController);
 
         BasicLayout.createContent.call(this);
 
@@ -61,7 +65,7 @@ define(function(require, exports, module) {
         layoutView.linkTo(this.layouts, this.numLayouts);
         layoutView.addLayout();
 
-        this.add(layoutView);
+        this.grid.surfaces.unshift(layoutView);
 
         this._eventOutput.pipe(layoutView._eventInput);
         layoutView._eventOutput.pipe(this._eventInput);
@@ -74,8 +78,24 @@ define(function(require, exports, module) {
         return this.layouts;
     };
 
-    WorkView.DEFAULT_OPTIONS = {};
+    WorkView.DEFAULT_OPTIONS = {
+        grid: {
+            width: 960,
+            height: 600,
+            dimensions: [6, 8],
+            cellSize: [120, 120]
+        }
+    };
 
+    function _createGrid() {
+        this.grid = new SceneGrid(this.options.grid);
+        this.gridModifier = new StateModifier({
+            origin: [0.5, 0.5],
+            align: [0.5, 0.5],
+            size: [this.options.grid.width, this.options.grid.height]
+        });
+        this.gridNode = this.add(this.gridModifier).add(this.grid);
+    }
 
     module.exports = WorkView;
 });
