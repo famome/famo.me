@@ -20,12 +20,12 @@ define(function(require, exports, module) {
     SceneGrid.DEFAULT_OPTIONS = {};
 
     function _createGrid(properties) {
-        // var cellSize = [properties.width / properties.dimensions[0], undefined];
+        var cellSize = properties.cellSize || [properties.width / properties.dimensions[0], undefined];
         // var numCells;
 
         var grid = new GridLayout({
                 dimensions: properties.dimensions,
-                cellSize: properties.cellSize
+                cellSize: cellSize
             });
 
         var surfaces = [];

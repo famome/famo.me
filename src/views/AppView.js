@@ -42,7 +42,7 @@ define(function(require, exports, module) {
         grid: {
             width: 960,
             dimensions: [6, 4],
-            // cellSize: [192, 60]
+            cellSize: [96, 100]
         }
     };
 
@@ -69,7 +69,6 @@ define(function(require, exports, module) {
         this.workView = new WorkView();
         this.workModifier = new StateModifier();
         this.add(this.workModifier).add(this.workView);
-        window.work = this.workView;
     }
 
     function _setListeners() {
