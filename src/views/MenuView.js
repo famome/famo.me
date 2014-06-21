@@ -34,7 +34,7 @@ define(function(require, exports, module) {
             properties: {
                 backgroundColor: '#FFFFF5',
                 zIndex: 1,
-                boxShadow: "5px 5px 15px rgba(50, 50, 50, .5)",
+                boxShadow: '5px 5px 15px rgba(50, 50, 50, .5)',
                 height: this.options.topOffset
             }
         });
@@ -59,6 +59,11 @@ define(function(require, exports, module) {
         grid.sequenceFrom(tools);
         var icons = ['⬒', '⬓', '▤', '▥', '□', '⿴'];
 
+        var menuEvent = function() {
+            this.menu.current = this.content;
+            this.menu._eventOutput.emit('menu');
+        };
+
         for (var i = 0; i < 6; i++) {
             var toolView = new ToolView();
             toolView.tool.setOptions({
@@ -77,18 +82,14 @@ define(function(require, exports, module) {
 
             toolView.tool.menu = this;
 
-            toolView.tool.on('click', function() {
-                this.menu.current = this.content;
-                this.menu._eventOutput.emit('menu');
-            });
+            toolView.tool.on('click', menuEvent);
 
             tools.push(toolView.tool);
         }
 
-
         var gridModifier = new StateModifier({
             size: [125, 187.5],
-            origin: [.5, .25],
+            origin: [0.5, 0.25],
             transform: Transform.translate(0, 0, 1),
             properties: {
                 zIndex: 1
