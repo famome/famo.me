@@ -57,7 +57,7 @@ define(function(require, exports, module) {
 
         var tools = [];
         grid.sequenceFrom(tools);
-        var icons = ['⬒', '⬓', '▤', '▥', '□', '⿴'];
+        var icons = ['⬒', '⬓', '⎚', '▥', '□', '⿴'];
 
         var menuEvent = function() {
             this.menu.current = this.content;

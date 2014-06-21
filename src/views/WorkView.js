@@ -18,26 +18,19 @@ define(function(require, exports, module) {
         this.layouts = {};
         this.currentView = null;
 
-        _createGrid.call(this);
+<<<<<<< HEAD
+        
 
         // this.renderController = new RenderController();
         // this.add(this.renderController);
 
-        window.onkeydown = function(event) {
-            if (event.keyIdentifier === 'U+004E') {
-                this.createLayoutView();
-            };
-        }.bind(this);
-
-        this._eventInput.on('createNewLayout', function() {
-            console.log('creating a new layout');
-            console.log(this);
-            this.createLayoutView();
-        }.bind(this));
-
-        this._eventInput.on('deselectRest', function() {
-            this._eventOutput.emit('deselect');
-        }.bind(this));
+        
+=======
+        _createGrid.call(this);
+        _createRenderController.call(this);
+        _createWorkSurface.call(this);
+        _setListeners.call(this);
+>>>>>>> adds new tool
     }
 
     WorkView.prototype = Object.create(View.prototype);
@@ -77,6 +70,9 @@ define(function(require, exports, module) {
     };
 
     WorkView.DEFAULT_OPTIONS = {
+        center: [0.5, 0.5],
+        dimensions: [100, 200],
+        color: '#FFFFF5',
         grid: {
             width: 960,
             height: 600,
@@ -92,7 +88,63 @@ define(function(require, exports, module) {
             align: [0.5, 0.5],
             size: [this.options.grid.width, this.options.grid.height]
         });
-        this.gridNode = this.add(this.gridModifier).add(this.grid);
+        
+        this.gridNode = this.add(this.gridModifier).add(this.grid);        
+    };
+
+    function _createRenderController() {
+        var renderController = new RenderController();
+        this.add(renderController);
+    }
+
+    function _createWorkSurface() {
+        var workSurface = new Surface({
+            size: this.options.dimensions,
+            properties: {
+                backgroundColor: this.options.color
+            }
+        });
+
+        var workSurfaceModifier = new StateModifier({
+            origin: this.options.center,
+            align: this.options.center
+        });
+        
+        this.add(workSurfaceModifier).add(workSurface);
+    }
+
+    function _setListeners() {
+        this._eventInput.on('createNewLayout', function() {
+            console.log('creating a new layout');
+            console.log(this);
+            this.createLayoutView();
+        }.bind(this));
+
+        this._eventInput.on('deselectRest', function() {
+            this._eventOutput.emit('deselect');
+        }.bind(this));
+
+        window.onkeydown = function(event) {
+            if (event.keyIdentifier === 'U+004E') {
+                this.createLayoutView();
+            };
+        }.bind(this);
+
+        this._eventInput.on('createNewLayout', function() {
+            console.log('creating a new layout');
+            console.log(this);
+            this.createLayoutView();
+        }.bind(this));
+
+        this._eventInput.on('deselectRest', function() {
+            this._eventOutput.emit('deselect');
+        }.bind(this));
+
+        window.onkeydown = function(event) {
+            if (event.keyIdentifier === 'U+004E') {
+                this.createLayoutView();
+            };
+        }.bind(this);
     }
 
     module.exports = WorkView;

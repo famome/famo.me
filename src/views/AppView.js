@@ -16,7 +16,6 @@ define(function(require, exports, module) {
 
         _createBackground.call(this);
         _createMenuView.call(this);
-        _createWorkView.call(this);
         _setListeners.call(this);
     }
 
@@ -57,7 +56,7 @@ define(function(require, exports, module) {
     function _createBackground() {
         var background = new Surface({
             size: [undefined, undefined],
-            classes: ["grey-bg"],
+            classes: ['grey-bg'],
             properties: {
                 lineHeight: '150px',
                 textAlign: 'center',
@@ -80,8 +79,9 @@ define(function(require, exports, module) {
             '⬓': function() {
                 this.workView.toggleFooter();
             },
-            '▤': function() {
+            '⎚': function() {
                 console.log('you clicked a row thing');
+                _createWorkView.call(this);
             },
             '▥': function() {
                 console.log('you clicked a column thing');
@@ -105,7 +105,6 @@ define(function(require, exports, module) {
             events[this.menuView.current].bind(this)();
         }.bind(this));
     }
-
 
     module.exports = AppView;
 });
