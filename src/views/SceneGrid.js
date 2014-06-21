@@ -32,7 +32,7 @@ define(function(require, exports, module) {
         grid.surfaces = [];
         grid.sequenceFrom(grid.surfaces);
 
-        for(var i = 0; i < 4; i++) {
+        for(var i = 0; i < 48; i++) {
             var surface = new Surface({
               content: 'hi' + (i + 1),
               size: [undefined, undefined],

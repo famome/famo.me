@@ -82,8 +82,8 @@ define(function(require, exports, module) {
         grid: {
             width: 960,
             height: 600,
-            dimensions: [6, 4],
-            cellSize: [192, 240]
+            dimensions: [6, 8],
+            cellSize: [120, 120]
         }
     };
 
