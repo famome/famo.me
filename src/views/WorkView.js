@@ -6,7 +6,6 @@ define(function(require, exports, module) {
     var ModifierChain = require('famous/modifiers/ModifierChain');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Draginator    = require('Draginator');
-    var BasicLayout   = require('utils/BasicLayout');
     var LayoutView    = require('views/LayoutView');
     var RenderController = require('famous/views/RenderController');
 
@@ -20,7 +19,6 @@ define(function(require, exports, module) {
 
         _createGrid.call(this);
         _createRenderController.call(this);
-        // _createWorkSurface.call(this);
         _setListeners.call(this);
     }
 
@@ -28,16 +26,10 @@ define(function(require, exports, module) {
     WorkView.prototype.constructor = WorkView;
     WorkView.prototype.toggleHeader = function() {
         this.header = !this.header;
-        this.createHeaderFooter();
     };
 
     WorkView.prototype.toggleFooter = function() {
         this.footer = !this.footer;
-        this.createHeaderFooter();
-    };
-
-    WorkView.prototype.createHeaderFooter = function() {
-        BasicLayout.render.call(this);
     };
 
     WorkView.prototype.createLayoutView = function() {
@@ -74,13 +66,14 @@ define(function(require, exports, module) {
 
     function _createGrid() {
         this.grid = new SceneGrid(this.options.grid);
-        this.gridModifier = new StateModifier({
-            origin: [0.5, 0.5],
-            align: [0.5, 0.5],
-            size: [this.options.grid.width, this.options.grid.height]
-        });
+        // this.gridModifier = new StateModifier({
+        //     origin: [0.5, 0.5],
+        //     align: [0.5, 0.5],
+        //     size: [this.options.grid.width, this.options.grid.height]
+        // });
         
-        this.gridNode = this.add(this.gridModifier).add(this.grid);        
+        // this.gridNode = this.add(this.gridModifier).add(this.grid);        
+        this.add(this.grid);
     }
 
     function _createRenderController() {
