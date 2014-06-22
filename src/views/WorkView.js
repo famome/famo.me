@@ -117,12 +117,6 @@ define(function(require, exports, module) {
                 };
             }.bind(this);
         }.bind(this));
-
-        window.onkeydown = function(event) {
-            if (event.keyIdentifier === 'U+004E') {
-                this.createLayoutView();
-            };
-        }.bind(this);
     }
 
     module.exports = WorkView;
