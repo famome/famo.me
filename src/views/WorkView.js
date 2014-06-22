@@ -15,7 +15,6 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
         this.numLayouts = 0;
         this.layouts = {};
-        this.currentView = null;
 
         _createGrid.call(this);
         _createRenderController.call(this);
@@ -35,7 +34,7 @@ define(function(require, exports, module) {
     WorkView.prototype.createLayoutView = function() {
         this.numLayouts++;
 
-        var layoutView = new LayoutView(this.currentView);
+        var layoutView = new LayoutView();
         layoutView.linkTo(this.layouts, this.numLayouts);
         layoutView.addLayout();
 
@@ -53,15 +52,15 @@ define(function(require, exports, module) {
     };
 
     WorkView.DEFAULT_OPTIONS = {
-        center: [0.5, 0.5],
-        dimensions: [100, 200],
-        color: '#FFFFF5',
-        grid: {
-            width: 960,
-            height: 600,
-            dimensions: [6, 8],
-            cellSize: [120, 120]
-        }
+        // center: [0.5, 0.5],
+        // dimensions: [100, 200],
+        // color: '#FFFFF5',
+        // grid: {
+        //     width: 960,
+        //     height: 600,
+        //     dimensions: [6, 8],
+        //     cellSize: [120, 120] // Dominates dimensions
+        // }
     };
 
     function _createGrid() {

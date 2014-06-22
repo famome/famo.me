@@ -58,7 +58,7 @@ define(function(require, exports, module) {
     }
 
     function _createWorkView() {
-        this.workView = new WorkView();
+        this.workView = new WorkView(this.options);
         this.workModifier = new StateModifier({
             origin: [0.5, 0.5],
             align: [0.5, 0.5],
