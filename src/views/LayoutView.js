@@ -206,6 +206,7 @@ define(function(require, exports, module) {
 
         this._eventInput.on('delete', function() {
             this.removeLayout();
+            this._eventOutput.emit('allowCreation');
         }.bind(this));
 
         this._eventInput.on('allowCreate', function() {

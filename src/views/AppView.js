@@ -39,6 +39,9 @@ define(function(require, exports, module) {
 
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150,
+        center: [0.5, 0.5],
+        dimensions: [100, 200],
+        color: '#FFFFF5',
         grid: {
             width: 960,
             height: 600,
@@ -57,9 +60,11 @@ define(function(require, exports, module) {
     }
 
     function _createWorkView() {
-        this.workView = new WorkView();
+        this.workView = new WorkView(this.options);
         this.workModifier = new StateModifier({
-            size: [800, 600]
+            origin: [0.5, 0.5],
+            align: [0.5, 0.5],
+            size: [this.options.grid.width, this.options.grid.height]
         });
         this.add(this.workModifier).add(this.workView);
     }
