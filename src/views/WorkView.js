@@ -70,8 +70,8 @@ define(function(require, exports, module) {
         //     align: [0.5, 0.5],
         //     size: [this.options.grid.width, this.options.grid.height]
         // });
-        
-        // this.gridNode = this.add(this.gridModifier).add(this.grid);        
+
+        // this.gridNode = this.add(this.gridModifier).add(this.grid);
         this.add(this.grid);
     }
 
@@ -92,7 +92,7 @@ define(function(require, exports, module) {
             origin: this.options.center,
             align: this.options.center
         });
-        
+
         this.add(workSurfaceModifier).add(workSurface);
     }
 
@@ -115,6 +115,14 @@ define(function(require, exports, module) {
 
         this._eventInput.on('deselectRest', function() {
             this._eventOutput.emit('deselect');
+        }.bind(this));
+
+        this._eventInput.on('allowCreation', function() {
+            window.onkeydown = function(event) {
+                if (event.keyIdentifier === 'U+004E') {
+                    this.createLayoutView();
+                };
+            }.bind(this);
         }.bind(this));
     }
 
