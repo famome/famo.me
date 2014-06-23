@@ -74,8 +74,10 @@ define(function(require, exports, module) {
 
     function _createLayoutDraginator() {
         this.draginator = new Draginator({
-          snapX: this.options.snapX,
-          snapY: this.options.snapY
+            snapX: this.options.snapX,
+            snapY: this.options.snapY,
+            // xRange: [0, this.options.size.width],
+            // yRange: [0, this.options.size.height]
         });
     }
 
@@ -175,9 +177,9 @@ define(function(require, exports, module) {
         this.draginator.eventOutput.on('start', _grab.bind(this));
         this.draginator.eventOutput.on('update', function() {
             if (this.draginator.keybinding) {
-                return _ungrab.bind(this);
+                return _ungrab.call(this);
             } else {
-                return _grab.bind(this);
+                return _grab.call(this);
             }
         }.bind(this));
         this.draginator.eventOutput.on('end', _ungrab.bind(this));
