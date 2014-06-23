@@ -117,6 +117,11 @@ define(function(require, exports, module) {
         console.log('generate JSON');
     }
 
+    function _editPropertiesOfSelected() {
+        console.log('_editPropertiesOfSelected');
+        this.eventOutput.emit('editPropertiesOfSelected');
+    }
+
     function _handleMove(event) {
         if (!this._active) return;
 
@@ -134,6 +139,7 @@ define(function(require, exports, module) {
                 'U+0008': _deleteElement.bind(this), // delete
                 'U+004E': _createElement.bind(this), // 'n'
                 'U+0009': _switchElement, // tab
+                'U+001B': _editPropertiesOfSelected.bind(this), // ESC
                 Enter: _generateJSON
             };
 

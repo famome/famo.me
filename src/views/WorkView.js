@@ -13,7 +13,8 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
         this.numLayouts = 0;
         this.layouts = {};
-
+        this.selectedLayout = undefined;
+window.wv = this; // testing only
         _createRenderController.call(this);
         _setListeners.call(this);
     }
@@ -40,8 +41,12 @@ define(function(require, exports, module) {
         this._eventOutput.pipe(layoutView._eventInput);
         layoutView._eventOutput.pipe(this._eventInput);
 
+        layoutView.draginator.eventOutput.pipe(this);
+
         this._eventOutput.emit('deselect');
         this._eventOutput.emit('select', layoutView);
+
+        this.selectedLayout = layoutView;
     };
 
     WorkView.prototype.getLayouts = function() {
@@ -94,13 +99,21 @@ define(function(require, exports, module) {
     }
 
     function _setListeners() {
-        this._eventInput.on('deselectRest', function() {
+        this._eventInput.on('deselectRest', function(selectedLayout) {
+            this.selectedLayout = selectedLayout;
             this._eventOutput.emit('deselect');
         }.bind(this));
 
         window.onkeydown = function(event) {
             if (event.keyIdentifier === 'U+004E') {
+                console.log('U+004E!!!');
                 this.createLayoutView();
+            }
+
+            // ESC key edits properties of selected view
+            if (event.keyCode === 27) {
+                console.log('ESC!');
+                _editProperties.call(this, this.selectedLayout);
             }
         }.bind(this);
 
@@ -117,6 +130,20 @@ define(function(require, exports, module) {
                 };
             }.bind(this);
         }.bind(this));
+
+        this._eventInput.on('editMyProperties', function(layoutView) {
+            console.log('heard event editMyProperties');
+            _editProperties.call(this, layoutView);
+        }.bind(this));
+
+        this._eventInput.on('editPropertiesOfSelected', function() {
+            console.log('heard event editPropertiesOfSelected');
+            _editProperties.call(this, this.selectedLayout);
+        }.bind(this));
+    }
+
+    function _editProperties(layoutView) {
+        console.log('this: ', this, ' will edit properties of ', layoutView);
     }
 
     module.exports = WorkView;
