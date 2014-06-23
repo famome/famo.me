@@ -100,6 +100,8 @@ define(function(require, exports, module) {
 
         this.eventOutput.emit('delete');
         this.deactivate();
+
+        this.eventOutput.emit('allowCreate');
     }
 
     function _createElement() {
@@ -120,6 +122,7 @@ define(function(require, exports, module) {
 
         var options = this.options;
         if (event.keyIdentifier) {
+            this.keybinding = true;
             var keyMatrix = {
                 Up: [0, -this.options.snapY],
                 Down: [0, this.options.snapY],
@@ -148,6 +151,7 @@ define(function(require, exports, module) {
                 console.log('keybo ', this._differential);
             }
         } else {
+            this.keybinding = false;
             this._differential = event.position;
             console.log('mouse ', this._differential);
         }

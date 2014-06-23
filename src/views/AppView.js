@@ -7,6 +7,7 @@ define(function(require, exports, module) {
 
     var MenuView = require('views/MenuView');
     var WorkView = require('views/WorkView');
+    var SceneGrid = require('views/SceneGrid');
     var generate = require('utils/Generator');
 
     function AppView() {
@@ -16,6 +17,7 @@ define(function(require, exports, module) {
 
         _createWorkView.call(this);
         _createBackground.call(this);
+        _createGrid.call(this);
         _createMenuView.call(this);
         _setListeners.call(this);
     }
@@ -46,7 +48,7 @@ define(function(require, exports, module) {
             dimensions: [6, 8],
             cellSize: [120, 120]
         }
-    };  
+    };
 
     function _createMenuView() {
         this.menuView = new MenuView();
@@ -85,6 +87,19 @@ define(function(require, exports, module) {
         this.add(backgroundModifier).add(background);
     }
 
+
+
+    function _createGrid() {
+        this.grid = new SceneGrid(this.options.grid);
+        this.gridModifier = new StateModifier({
+            origin: [0.5, 0.5],
+            align: [0.5, 0.5],
+            size: [this.options.grid.width, this.options.grid.height]
+        });
+
+        this.gridNode = this.add(this.gridModifier).add(this.grid);
+    }
+
     function _setListeners() {
         var events = {
             '⬒': function() {
@@ -95,7 +110,7 @@ define(function(require, exports, module) {
             },
             '⎚': function() {
                 console.log('you clicked a row thing');
-                
+
             },
             '▥': function() {
                 console.log('you clicked a column thing');

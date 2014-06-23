@@ -15,6 +15,8 @@ define(function(require, exports, module) {
         this.width = this.options.size.width;
         this.height = this.options.size.height;
 
+        this.options.dimension = [1, 1];
+
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
         _createLayoutSurface.call(this);
@@ -72,8 +74,10 @@ define(function(require, exports, module) {
 
     function _createLayoutDraginator() {
         this.draginator = new Draginator({
-          snapX: this.options.snapX,
-          snapY: this.options.snapY
+            snapX: this.options.snapX,
+            snapY: this.options.snapY,
+            // xRange: [0, this.options.size.width],
+            // yRange: [0, this.options.size.height]
         });
     }
 
@@ -158,6 +162,8 @@ define(function(require, exports, module) {
 
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
+            var currentDimension = this.options.dimension;
+            console.log('current dimension', currentDimension);
             console.log('translating');
             this.xOffset += data[0];
             this.yOffset += data[1];
@@ -166,9 +172,16 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this._eventInput.on('mousemove', _setEdges.bind(this));
-        // this._eventInput.on('mouseleave', _removeEdges.bind(this));
+        this._eventInput.on('mouseenter', _setEdges.bind(this));
+        this._eventInput.on('mouseleave', _removeEdges.bind(this));
         this.draginator.eventOutput.on('start', _grab.bind(this));
-        this.draginator.eventOutput.on('update', _grab.bind(this));
+        this.draginator.eventOutput.on('update', function() {
+            if (this.draginator.keybinding) {
+                return _ungrab.call(this);
+            } else {
+                return _grab.call(this);
+            }
+        }.bind(this));
         this.draginator.eventOutput.on('end', _ungrab.bind(this));
 
         // view listens for resize from draggable
@@ -177,8 +190,9 @@ define(function(require, exports, module) {
             var cursor = this.surface.properties.cursor;
             var currentSize = this.modifier.getSize();
             var currentDimension = this.options.dimension;
+            console.log('current dimension', currentDimension);
 
-            if (this.dragging && (currentSize[0] + data[0] * this.options.snapX > 0)
+            if ((currentSize[0] + data[0] * this.options.snapX > 0)
                 && (currentSize[1] + data[1] * this.options.snapY)) {
                 this.options.dimension[0] = currentDimension[0] + data[0];
                 this.options.dimension[1] = currentDimension[1] + data[1];
@@ -200,6 +214,12 @@ define(function(require, exports, module) {
 
         this._eventInput.on('delete', function() {
             this.removeLayout();
+            this._eventOutput.emit('allowCreation');
+        }.bind(this));
+
+        this._eventInput.on('allowCreate', function() {
+            console.log('creation allowed with n key');
+            this._eventOutput.emit('allowCreation');
         }.bind(this));
 
         this._eventInput.on('create', function() {
