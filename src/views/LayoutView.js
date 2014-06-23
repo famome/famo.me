@@ -231,18 +231,35 @@ define(function(require, exports, module) {
 
         this._eventInput.on('select', function(selectedView) {
             if(this === selectedView) {
-                this.draginator.select();
+                console.log('going to selectSurface ', this);
+                _selectSurface.call(this);
             }
         }.bind(this));
 
         this._eventInput.on('deselect', function() {
+                this.surface.setProperties({
+                    boxShadow: 'none',
+                    backgroundColor: 'pink',
+                    zIndex: 1
+                })
             this.draginator.deselect();
         }.bind(this));
 
         this.surface.on('click', function() {
             this._eventOutput.emit('deselectRest');
             this.draginator.select();
+            _selectSurface.call(this);
         }.bind(this));
+    }
+
+    function _selectSurface() {
+        console.log('selectSurface ', this);
+        this.surface.setProperties({
+            boxShadow: '0 0 18px rgba(0, 0, 0, .5)',
+            backgroundColor: 'rgba(200, 50, 50, 1)',
+            zIndex: 999
+        });
+        this.draginator.select();
     }
 
     module.exports = LayoutView;
