@@ -78,10 +78,11 @@ define(function(require, exports, module) {
         this.draginator = new Draginator({
             snapX: this.options.snapX,
             snapY: this.options.snapY,
-            // snapX: 1,
-            // snapY: 1,
             xRange: [0, 960 - this.options.snapX],
             yRange: [0, 600 - this.options.snapY]
+            transition  : {duration : 500, curve: "easeIn"}
+            // xRange: [0, this.options.size.width],
+            // yRange: [0, this.options.size.height]
         });
     }
 
