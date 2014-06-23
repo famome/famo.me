@@ -76,8 +76,10 @@ define(function(require, exports, module) {
         this.draginator = new Draginator({
             snapX: this.options.snapX,
             snapY: this.options.snapY,
-            // xRange: [0, this.options.size.width],
-            // yRange: [0, this.options.size.height]
+            // snapX: 1,
+            // snapY: 1,
+            xRange: [0, 960 - this.options.snapX],
+            yRange: [0, 600 - this.options.snapY]
         });
     }
 
@@ -192,14 +194,19 @@ define(function(require, exports, module) {
             var currentDimension = this.options.dimension;
             console.log('current dimension', currentDimension);
 
-            if ((currentSize[0] + data[0] * this.options.snapX > 0)
-                && (currentSize[1] + data[1] * this.options.snapY)) {
+            if ((currentSize[0] + data[0] * this.options.snapX)
+                && (currentSize[1] + data[1] * this.options.snapY)
+                && (this.xOffset * this.options.snapX + currentSize[0] + data[0] * this.options.snapX <= 960)
+                && (this.yOffset * this.options.snapY + currentSize[1] + data[1] * this.options.snapY <= 600)) {
                 this.options.dimension[0] = currentDimension[0] + data[0];
                 this.options.dimension[1] = currentDimension[1] + data[1];
 
                 this.modifier.setSize(
                     [currentSize[0] + data[0] * this.options.snapX,
                     currentSize[1] + data[1] * this.options.snapY]);
+
+                this.draginator.options.xRange[1] -= data[0] * this.options.snapX;
+                this.draginator.options.yRange[1] -= data[1] * this.options.snapY;
 
                 this.layouts[this.id].size = [
                     currentSize[0] + data[0] * this.options.snapX,
@@ -218,12 +225,10 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this._eventInput.on('allowCreate', function() {
-            console.log('creation allowed with n key');
             this._eventOutput.emit('allowCreation');
         }.bind(this));
 
         this._eventInput.on('create', function() {
-            console.log('intermediary');
             this._eventOutput.emit('createNewLayout');
         }.bind(this));
 

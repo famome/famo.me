@@ -154,7 +154,6 @@ define(function(require, exports, module) {
                     this.dragging = false;
                 }
                 this._differential = keyMatrix[event.keyIdentifier];
-                console.log('keybo ', this._differential);
             }
         } else {
             this.keybinding = false;
@@ -176,6 +175,7 @@ define(function(require, exports, module) {
         this._differential[1] -= newDifferential[1];
 
         var pos = this.getPosition();
+        var originalPos = pos.slice();
 
         //pipe that
         if (this.dragging) {
@@ -188,16 +188,21 @@ define(function(require, exports, module) {
 
             //handle bounding box
             if (options.xRange){
-                var xRange = [options.xRange[0] + 0.5 * options.snapX, options.xRange[1] - 0.5 * options.snapX];
-                pos[0] = _clamp(pos[0], xRange);
+                // var xRange = [options.xRange[0] + 0.5 * options.snapX, options.xRange[1] - 0.5 * options.snapX];
+                // pos[0] = _clamp(pos[0], xRange);
+                pos[0] = _clamp(pos[0], options.xRange);
             }
 
             if (options.yRange){
-                var yRange = [options.yRange[0] + 0.5 * options.snapY, options.yRange[1] - 0.5 * options.snapY];
-                pos[1] = _clamp(pos[1], yRange);
+                // var yRange = [options.yRange[0] + 0.5 * options.snapY, options.yRange[1] - 0.5 * options.snapY];
+                // pos[1] = _clamp(pos[1], yRange);
+                pos[1] = _clamp(pos[1], options.yRange);
             }
-            console.log('translating in draginator');
-            this.eventOutput.emit('translate', gridDifferential);
+
+            if (pos[0] !== originalPos[0] || pos[1] !== originalPos[1]) {
+                console.log('translating in draginator');
+                this.eventOutput.emit('translate', gridDifferential);
+            }
             this.eventOutput.emit('update', {position : pos});
         }
     }
@@ -346,7 +351,6 @@ define(function(require, exports, module) {
 
             if ((!event.metaKey && event.keyIdentifier !== 'U+0052') // refresh
                 || (!event.metaKey && !event.altKey && event.keyIdentifier !== 'U+004A')) { // dev console
-                console.log('preventing default');
                 event.preventDefault();
             }
             return _handleMove.call(this, event);
