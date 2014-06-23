@@ -99,7 +99,7 @@ define(function(require, exports, module) {
         console.log('delete the current element');
 
         this.eventOutput.emit('delete');
-        this.deactivate();
+        // this.deactivate();
 
         this.eventOutput.emit('allowCreate');
     }

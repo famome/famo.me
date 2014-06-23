@@ -5,6 +5,7 @@ define(function(require, exports, module) {
     var StateModifier = require('famous/modifiers/StateModifier');
     var EventHandler  = require('famous/core/EventHandler');
     var Draginator    = require('Draginator');
+    var RenderController = require('famous/views/RenderController');
 
     function LayoutView() {
         View.apply(this, arguments);
@@ -23,7 +24,8 @@ define(function(require, exports, module) {
 
         _setListeners.call(this);
 
-        this.add(this.draginator).add(this.modifier).add(this.surface);
+        // this.add(this.draginator).add(this.modifier).add(this.surface);
+        this.add(this.draginator).add(this.modifier).add(this.renderController);
     }
 
     LayoutView.prototype = Object.create(View.prototype);
@@ -97,6 +99,8 @@ define(function(require, exports, module) {
                 cursor: '-webkit-grab'
             }
         });
+        this.renderController = new RenderController();
+        this.renderController.show(this.surface);
     }
 
     function _setEdges(event) {
@@ -220,6 +224,7 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this._eventInput.on('delete', function() {
+            this.renderController.hide(this.surface);
             this.removeLayout();
             this._eventOutput.emit('allowCreation');
         }.bind(this));
