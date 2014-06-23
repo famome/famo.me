@@ -7,6 +7,7 @@ define(function(require, exports, module) {
 
     var MenuView = require('views/MenuView');
     var WorkView = require('views/WorkView');
+    var ModalOverlay = require('views/ModalOverlay')
     var SceneGrid = require('views/SceneGrid');
     var generate = require('utils/Generator');
 
@@ -17,6 +18,7 @@ define(function(require, exports, module) {
 
         _createWorkView.call(this);
         _createBackground.call(this);
+        _createModalOverlay.call(this);
         _createGrid.call(this);
         _createMenuView.call(this);
         _setListeners.call(this);
@@ -81,13 +83,16 @@ define(function(require, exports, module) {
         });
 
         var backgroundModifier = new StateModifier({
-            transform: Transform.translate(0, 0, -1)
+            transform: Transform.translate(0, 0, -2)
         });
 
         this.add(backgroundModifier).add(background);
     }
 
-
+    function _createModalOverlay() {
+        var modalOverlay = new ModalOverlay();
+        this. add(modalOverlay);
+    }
 
     function _createGrid() {
         this.grid = new SceneGrid(this.options.grid);

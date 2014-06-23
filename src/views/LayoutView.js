@@ -246,7 +246,7 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.surface.on('click', function() {
-            this._eventOutput.emit('deselectRest');
+            this._eventOutput.emit('deselectRest', this);
             this.draginator.select();
             _selectSurface.call(this);
         }.bind(this));

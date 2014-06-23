@@ -14,7 +14,7 @@ define(function(require, exports, module) {
         this.numLayouts = 0;
         this.layouts = {};
         this.selectedLayout = undefined;
-
+window.wv = this; // testing only
         _createRenderController.call(this);
         _setListeners.call(this);
     }
