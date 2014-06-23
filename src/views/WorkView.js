@@ -118,7 +118,6 @@ window.wv = this; // testing only
         }.bind(this);
 
         this._eventInput.on('createNewLayout', function() {
-            console.log('creating a new layout');
             console.log(this);
             this.createLayoutView();
         }.bind(this));
