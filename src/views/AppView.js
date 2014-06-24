@@ -114,15 +114,8 @@ define(function(require, exports, module) {
             '⿴': function() {
                 var layouts = this.workView.getLayouts();
                 var data = generate.sceneData(layouts, this.options.size);
-                // var scene = generate.scene(data.scene);
-
-                // for (var surface in data.surfaces) {
-                //     scene.id[surface].add(data.surfaces[surface]);
-                // }
 
                 console.log(generate.output(data.scene, layouts));
-
-                // this.add(scene);
             }
         };
 
