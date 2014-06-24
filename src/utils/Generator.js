@@ -65,7 +65,7 @@ define(function(require, exports, module) {
                          '});\n\n' +
                          '' + _generateSurfaceStrings(layouts) + '\n\n';
 
-            string = string.replace(/\"transform\"\:\ \[\n\W+/g, '"transform": [').replace(/^\W+(\d+)\,\n/gm,'$1, ').replace(/\,\W+(\d+)/g,', $1').replace(/\n\W+\]/g,']');
+            string = string.replace(/\"transform\"\:\ \[\n\W+/g, '"transform": [').replace(/^\W+(\d+)\,\n/gm,'$1, ').replace(/\,\W+(\d+)/g,', $1').replace(/\n\W+?\]\,/g,'],');
             return string;
         },
         
