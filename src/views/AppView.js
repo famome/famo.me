@@ -40,7 +40,7 @@ define(function(require, exports, module) {
     };
 
     AppView.DEFAULT_OPTIONS = {
-        menuSize: 150,
+        menuSize: 60,
         center: [0.5, 0.5],
         dimensions: [100, 200],
         color: '#FFFFF5',

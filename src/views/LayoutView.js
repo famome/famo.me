@@ -77,14 +77,14 @@ define(function(require, exports, module) {
     };
 
     LayoutView.DEFAULT_OPTIONS = {
-        snapX: 120,
-        snapY: 120,
+        snapX: 60,
+        snapY: 60,
         offset: [0, 0],
         dimension: [1, 1],
         color: 'pink',
         size: {
-            width: 120,
-            height: 120
+            width: 60,
+            height: 60
         },
         edgeDetectSize: 20,
         zIndex: 9
