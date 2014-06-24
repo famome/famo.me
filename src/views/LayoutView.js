@@ -79,7 +79,7 @@ define(function(require, exports, module) {
             snapX: this.options.snapX,
             snapY: this.options.snapY,
             xRange: [0, 960 - this.options.snapX],
-            yRange: [0, 600 - this.options.snapY]
+            yRange: [0, 600 - this.options.snapY],
             transition  : {duration : 500, curve: "easeIn"}
             // xRange: [0, this.options.size.width],
             // yRange: [0, this.options.size.height]
@@ -266,7 +266,7 @@ define(function(require, exports, module) {
     function _selectSurface() {
         console.log('selectSurface ', this);
         this.surface.setProperties({
-            boxShadow: '0 0 18px rgba(0, 0, 0, .5)',
+            boxShadow: '0 0 50px rgba(0, 0, 0, .85)',
             backgroundColor: 'rgba(200, 50, 50, 1)',
             zIndex: 999
         });
