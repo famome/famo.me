@@ -49,7 +49,7 @@ define(function(require, exports, module) {
         this.layouts = layouts;
         this.numLayouts = numLayouts;
 
-        this.id += ' ' + this.numLayouts;
+        this.id += this.numLayouts;
     };
     LayoutView.prototype.removeLayout = function() {
         console.log('before',this.id, this.layouts[this.id]);

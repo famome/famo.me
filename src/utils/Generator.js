@@ -36,7 +36,38 @@ define(function(require, exports, module) {
             });
 
             return scene;
-        }
+        },
+        output: function(sceneJSON, layouts) {
+            var _generateSurfaceString = function(layout, layouts) {
+                return  'scene.id[\'' + layout + '\'].add(new Surface({\n' +
+                            '\tcontent:\'' + layout + '\',\n' +
+                            '\tclasses: [\'red-bg\'],\n' +
+                            '\tsize:[' + layouts[layout].size + '],\n' +
+                            '\tproperties: {\n' +
+                                '\t\ttextAlign: \'center\'\n' +
+                            '\t}\n' +
+                        '}));\n';
+            };
+
+            var _generateSurfaceStrings = function(layouts) {
+                var string = '';
+                for (var layout in layouts) {
+                    string += _generateSurfaceString(layout, layouts);
+                }
+    
+                return string;
+            };
+
+            var string = 'var scene = new Scene({\n' +
+                         '\tid: \'root\',\n' +
+                         '\topacity: 1,\n' +
+                         '\ttarget: ' + JSON.stringify(sceneJSON, null, '\t') + '\n' +
+                         '});\n\n' +
+                         '' + _generateSurfaceStrings(layouts) + '\n\n';
+
+            return string;
+        },
+        
     };
 
     module.exports = generator;

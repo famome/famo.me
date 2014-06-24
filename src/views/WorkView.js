@@ -126,7 +126,7 @@ window.wv = this; // testing only
             window.onkeydown = function(event) {
                 if (event.keyIdentifier === 'U+004E') {
                     this.createLayoutView();
-                };
+                }
             }.bind(this);
         }.bind(this));
 
