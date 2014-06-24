@@ -6,6 +6,7 @@ define(function(require, exports, module) {
     var StateModifier = require('famous/modifiers/StateModifier');
 
     var GridLayout    = require('views/GridLayoutCellSized');
+    var Flipper       = require('famous/views/Flipper');
 
     var sceneGrid = new GridLayout();
 
@@ -26,12 +27,12 @@ define(function(require, exports, module) {
     function _createGrid(properties) {
         // var cellSize = properties.cellSize || [properties.width / properties.dimensions[0], undefined];
         // var numCells;
-        cellSize = properties.cellSize || undefined;
+        var cellSize = properties.cellSize || undefined;
 
         var grid = new GridLayout({
-                dimensions: properties.dimensions,
-                cellSize: cellSize
-            });
+            dimensions: properties.dimensions,
+            cellSize: cellSize
+        });
 
         grid.surfaces = [];
         grid.sequenceFrom(grid.surfaces);
