@@ -123,6 +123,11 @@ window.wv = this; // testing only
             }
         }.bind(this));
 
+        this._eventInput.on('generate', function() {
+            console.log('generating?');
+            this._eventOutput.emit('activate', '⿴');
+        }.bind(this));
+
         window.onkeydown = function(event) {
             if (event.keyIdentifier === 'U+004E') {
                 console.log('U+004E!!!');
