@@ -48,7 +48,7 @@ define(function(require, exports, module) {
             width: 960,
             height: 600,
             dimensions: [6, 8],
-            cellSize: [120, 120]
+            cellSize: [60, 60]
         }
     };
 
@@ -146,10 +146,8 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.workView.on('editSelectedLayoutView' , function() {
-            console.log('AppView heard editSelectedLayoutView, will transform modal');
-            this.modalOverlay.modifier.setTransform(Transform.translate(0, 0, -3));
-            window.mod = this.modalOverlay;
-            console.log(this.modalOverlay.modifier._transformState);
+            this.modalOverlay.modifier.setTransform(Transform.translate(0, 0, 99));
+            this.modalOverlay.state = true;
         }.bind(this));
     }
 

@@ -31,8 +31,11 @@ define(function(require, exports, module) {
 
         grid.surfaces = [];
         grid.sequenceFrom(grid.surfaces);
+        var cols = properties.width / properties.cellSize[0];
+        var rows = properties.height / properties.cellSize[1];
+        var cells = rows * cols;
 
-        for(var i = 0; i < 48; i++) {
+        for(var i = 0; i < cells; i++) {
             var surface = new Surface({
               content: 'hi' + (i + 1),
               size: [undefined, undefined],
