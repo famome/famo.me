@@ -130,14 +130,19 @@ window.wv = this; // testing only
 
 
         var show = function() {
+            this.back.setContent('');
             Timer.setTimeout(function() {   // debounce doesn't work
                 this.renderController.show(this.grid, {duration: this.options.flipDelay/2});
             }.bind(this), this.options.flipDelay);
         };
 
+        var hide = function() {
+            this.renderController.hide({duration: 0});
+        };
+
         var toggle = false;
         this.flip = function(){
-            toggle ? show.call(this) : this.renderController.hide({duration: 0});
+            toggle ? show.call(this) : hide.call(this);
             var angle = toggle ? 0 : Math.PI;
             this.flipper.setAngle(angle, {curve : 'easeOutBounce', duration : this.options.flipDelay});
             toggle = !toggle;
