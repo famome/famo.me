@@ -122,7 +122,7 @@ define(function(require, exports, module) {
                     overflowY: 'scroll',
                     overflowX: 'hidden'
                 });
-                
+
                 this.workView.flip();
             }
         };
