@@ -72,7 +72,6 @@ define(function(require, exports, module) {
     LayoutView.prototype.selectSurface = function() {
         console.log('selectSurface ', this);
         this.surface.setProperties({
-            // boxShadow: '0 0 50px #FFFFA5',
             backgroundColor: 'pink',
             zIndex: 100
         });
