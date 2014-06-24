@@ -35,7 +35,7 @@ define(function(require, exports, module) {
 
     function _createSurface() {
         this.modifier = new StateModifier({
-            transform: Transform.translate(0, 0, 999)
+            transform: Transform.translate(0, 0, -2)
         });
         var renderController = new RenderController();
         this.surface = new Surface({
