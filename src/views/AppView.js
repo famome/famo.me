@@ -97,6 +97,7 @@ define(function(require, exports, module) {
 
     function _createGrid() {
         this.grid = new SceneGrid(this.options.grid);
+        this.grid.app = this;
         this.gridModifier = new StateModifier({
             origin: this.options.center,
             align: this.options.center,
@@ -121,6 +122,12 @@ define(function(require, exports, module) {
 
         this.subscribe(this.modalOverlay._eventOutput);
         this.subscribe(this.workView._eventOutput);
+        this.subscribe(this.grid._eventOutput);
+
+        this.grid.on('createNewSquare', function(data) {
+            console.log(data);
+            this.workView.createLayoutView([data % 16, Math.floor(data / 16)]);
+        }.bind(this));
 
         this.workView.on('activate', function(menuIcon) {
             events[menuIcon].bind(this)();

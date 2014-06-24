@@ -4,7 +4,7 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var EventHandler  = require('famous/core/EventHandler');
     var StateModifier = require('famous/modifiers/StateModifier');
-    
+
     var GridLayout    = require('views/GridLayoutCellSized');
 
     var sceneGrid = new GridLayout();
@@ -12,7 +12,7 @@ define(function(require, exports, module) {
     function SceneGrid(properties) {
         View.apply(this, arguments);
 
-        return _createGrid.call(this, properties);
+        _createGrid.call(this, properties);
     }
 
     SceneGrid.prototype = Object.create(View.prototype);
@@ -67,7 +67,7 @@ define(function(require, exports, module) {
                     background: this.options.dotColor,
                 }
             });
-            
+
             var topRightModifier = new StateModifier({
                 size: [this.options.dotSize, this.options.dotSize],
                 origin: [1, 0]
@@ -85,7 +85,7 @@ define(function(require, exports, module) {
                 size: [this.options.dotSize, this.options.dotSize],
                 origin: [0, 1]
             });
-            
+
             var bottomLeftCorner = new Surface({
                 properties: {
                     borderRadius: '0 100% 0 0',
@@ -98,7 +98,7 @@ define(function(require, exports, module) {
                 size: [this.options.dotSize, this.options.dotSize],
                 origin: [1, 1]
             });
-            
+
             var bottomRightCorner = new Surface({
                 properties: {
                     borderRadius: '100% 0 0 0',
@@ -106,6 +106,8 @@ define(function(require, exports, module) {
                     // position: 'absolute'
                 }
             });
+
+            this._eventInput.subscribe(surface);
 
             surface.on('mouseenter', function(e){
                 this.setProperties({
@@ -119,6 +121,11 @@ define(function(require, exports, module) {
                     // boxShadow: "inset 0 0 20px rgba(255, 192, 203, .125)"
                 });
             });
+            surface.on('click', function(){
+                var id = (this.id + 1) / 5 - 1;
+                this.emit('prepareForSquare', id);
+            });
+
             view.add(surface);
             view.add(topLeftModifier).add(topLeftCorner);
             view.add(topRightModifier).add(topRightCorner);
@@ -129,7 +136,12 @@ define(function(require, exports, module) {
             grid.surfaces.push(view);
         }
 
-        return grid;
+        this._eventInput.on('prepareForSquare', function(data) {
+            console.log(data);
+            this._eventOutput.emit('createNewSquare', data);
+        }.bind(this));
+
+        this.add(grid);
     }
 
     module.exports = SceneGrid;
