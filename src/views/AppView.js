@@ -124,12 +124,15 @@ define(function(require, exports, module) {
                 this.workView.createLayoutView();
             },
             '⿴': function() {
-                var data = generate.sceneData(this.workView.getLayouts(), 100);
+                var layouts = this.workView.getLayouts();
+                var data = generate.sceneData(layouts, 120);
                 var scene = generate.scene(data.scene);
 
                 for (var surface in data.surfaces) {
                     scene.id[surface].add(data.surfaces[surface]);
                 }
+
+                console.log(generate.output(data.scene, layouts));
 
                 this.add(scene);
             }
