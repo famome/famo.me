@@ -69,8 +69,8 @@ define(function(require, exports, module) {
     LayoutView.prototype.selectSurface = function() {
         console.log('selectSurface ', this);
         this.surface.setProperties({
-            boxShadow: '0 0 50px rgba(0, 0, 0, .85)',
-            backgroundColor: 'rgba(200, 50, 50, 1)',
+            boxShadow: '0 0 50px #FFFFA5',
+            backgroundColor: 'pink',
             zIndex: 999
         });
         this.draginator.select();
