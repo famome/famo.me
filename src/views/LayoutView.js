@@ -17,8 +17,6 @@ define(function(require, exports, module) {
         this.width = this.options.size.width;
         this.height = this.options.size.height;
 
-        this.options.dimension = [1, 1];
-
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
         _createLayoutSurface.call(this);
@@ -195,6 +193,7 @@ define(function(require, exports, module) {
                 this.yOffset += data[1];
 
                 this.layouts[this.id].offset = [this.xOffset, this.yOffset];
+                console.log(this.xOffset);
             }
         }.bind(this));
 
