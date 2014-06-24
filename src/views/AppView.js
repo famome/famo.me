@@ -141,6 +141,10 @@ define(function(require, exports, module) {
         this.subscribe(this.modalOverlay._eventOutput);
         this.subscribe(this.workView._eventOutput);
 
+        this.workView.on('activate', function(menuIcon) {
+            events[menuIcon].bind(this)();
+        }.bind(this));
+
         this.menuView.on('menu', function() {
             events[this.menuView.current].bind(this)();
         }.bind(this));

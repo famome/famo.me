@@ -116,6 +116,7 @@ define(function(require, exports, module) {
 
     function _generateJSON() {
         console.log('generate JSON');
+        this.eventOutput.emit('generate');
     }
 
     function _editPropertiesOfSelected() {
@@ -141,7 +142,7 @@ define(function(require, exports, module) {
                 'U+004E': _createElement.bind(this), // 'n'
                 'U+0009': _switchElement.bind(this), // tab
                 'U+001B': _editPropertiesOfSelected.bind(this), // ESC
-                Enter: _generateJSON
+                Enter: _generateJSON.bind(this)
             };
 
             if (commandMatrix[event.keyIdentifier]) {
