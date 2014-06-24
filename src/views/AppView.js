@@ -90,8 +90,8 @@ define(function(require, exports, module) {
     }
 
     function _createModalOverlay() {
-        var modalOverlay = new ModalOverlay();
-        this. add(modalOverlay);
+        this.modalOverlay = new ModalOverlay();
+        this.add(this.modalOverlay);
     }
 
     function _createGrid() {
@@ -135,8 +135,18 @@ define(function(require, exports, module) {
             }
         };
 
+        this.subscribe(this.modalOverlay._eventOutput);
+        this.subscribe(this.workView._eventOutput);
+
         this.menuView.on('menu', function() {
             events[this.menuView.current].bind(this)();
+        }.bind(this));
+
+        this.workView.on('editSelectedLayoutView' , function() {
+            console.log('AppView heard editSelectedLayoutView, will transform modal');
+            this.modalOverlay.modifier.setTransform(Transform.translate(0, 0, -3));
+            window.mod = this.modalOverlay;
+            console.log(this.modalOverlay.modifier._transformState);
         }.bind(this));
     }
 

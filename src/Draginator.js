@@ -69,7 +69,7 @@ define(function(require, exports, module) {
         yRange      : null,
         snapX       : 0,
         snapY       : 0,
-        transition  : {duration : 0}
+        transition  : {duration : 500}
     };
 
     function _mapDifferential(differential) {
