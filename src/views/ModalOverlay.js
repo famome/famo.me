@@ -34,8 +34,8 @@ define(function(require, exports, module) {
     };
 
     function _createSurface() {
-        var modifier = new StateModifier({
-            transform: Transform.translate(0, 0, -3)
+        this.modifier = new StateModifier({
+            transform: Transform.translate(0, 0, 999)
         });
         var renderController = new RenderController();
         this.surface = new Surface({
@@ -43,13 +43,13 @@ define(function(require, exports, module) {
             properties: {
                 lineHeight: '150px',
                 textAlign: 'center',
-                backgroundColor: 'rgba(0, 200, 0, .1)',
+                backgroundColor: 'rgba(0, 200, 0, .7)',
                 zIndex: -2
             }
         });
         // renderController.add(modifier).add(this.surface);
-        console.log(modifier, this.surface);
-        this.add(modifier).add(this.surface);
+        console.log(this.modifier, this.surface);
+        this.add(this.modifier).add(this.surface);
     }
 
     function _setListeners() {

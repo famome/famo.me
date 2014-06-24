@@ -142,7 +142,8 @@ window.wv = this; // testing only
     }
 
     function _editProperties(layoutView) {
-        console.log('this: ', this, ' will edit properties of ', layoutView);
+        console.log('edit lv properties');
+        this._eventOutput.emit('editSelectedLayoutView');
     }
 
     module.exports = WorkView;
