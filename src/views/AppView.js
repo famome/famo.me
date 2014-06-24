@@ -7,7 +7,7 @@ define(function(require, exports, module) {
 
     var MenuView = require('views/MenuView');
     var WorkView = require('views/WorkView');
-    var ModalOverlay = require('views/ModalOverlay')
+    var ModalOverlay = require('views/ModalOverlay');
     var SceneGrid = require('views/SceneGrid');
     var generate = require('utils/Generator');
 
@@ -40,10 +40,11 @@ define(function(require, exports, module) {
     };
 
     AppView.DEFAULT_OPTIONS = {
-        menuSize: 60,
+        menuSize: 150,
         center: [0.5, 0.5],
         dimensions: [100, 200],
         color: '#FFFFF5',
+        size: 60,
         grid: {
             width: 960,
             height: 600,
@@ -64,8 +65,8 @@ define(function(require, exports, module) {
     function _createWorkView() {
         this.workView = new WorkView(this.options);
         this.workModifier = new StateModifier({
-            origin: [0.5, 0.5],
-            align: [0.5, 0.5],
+            origin: this.options.center,
+            align: this.options.center,
             size: [this.options.grid.width, this.options.grid.height]
         });
         this.add(this.workModifier).add(this.workView);
@@ -97,8 +98,8 @@ define(function(require, exports, module) {
     function _createGrid() {
         this.grid = new SceneGrid(this.options.grid);
         this.gridModifier = new StateModifier({
-            origin: [0.5, 0.5],
-            align: [0.5, 0.5],
+            origin: this.options.center,
+            align: this.options.center,
             size: [this.options.grid.width, this.options.grid.height]
         });
 
@@ -107,34 +108,14 @@ define(function(require, exports, module) {
 
     function _setListeners() {
         var events = {
-            '⬒': function() {
-                this.workView.toggleHeader();
-            },
-            '⬓': function() {
-                this.workView.toggleFooter();
-            },
-            '⎚': function() {
-                console.log('you clicked a row thing');
-
-            },
-            '▥': function() {
-                console.log('you clicked a column thing');
-            },
             '□': function() {
                 this.workView.createLayoutView();
             },
             '⿴': function() {
                 var layouts = this.workView.getLayouts();
-                var data = generate.sceneData(layouts, 120);
-                var scene = generate.scene(data.scene);
-
-                for (var surface in data.surfaces) {
-                    scene.id[surface].add(data.surfaces[surface]);
-                }
+                var data = generate.sceneData(layouts, this.options.size);
 
                 console.log(generate.output(data.scene, layouts));
-
-                this.add(scene);
             }
         };
 
