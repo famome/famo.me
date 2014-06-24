@@ -51,20 +51,20 @@ define(function(require, exports, module) {
 
     function _createButtons(draggable) {
         var grid = new GridLayout({
-            dimensions: [2, 3],
+            dimensions: [2, 1],
             gutterSize: [5, 5]
         });
 
         var tools = [];
         grid.sequenceFrom(tools);
-        var icons = ['⬒', '⬓', '⎚', '▥', '□', '⿴'];
+        var icons = ['□', '⿴'];
 
         var menuEvent = function() {
             this.menu.current = this.content;
             this.menu._eventOutput.emit('menu');
         };
 
-        for (var i = 0; i < 6; i++) {
+        for (var i = 0; i < 2; i++) {
             var toolView = new ToolView();
             toolView.tool.setOptions({
                 content: icons[i],
@@ -88,7 +88,7 @@ define(function(require, exports, module) {
         }
 
         var gridModifier = new StateModifier({
-            size: [125, 187.5],
+            size: [125, 62.5],
             origin: [0.5, 0.25],
             transform: Transform.translate(0, 0, 1),
             properties: {
