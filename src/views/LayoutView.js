@@ -122,7 +122,6 @@ define(function(require, exports, module) {
     function _createLayoutSurface() {
         this.surface = new Surface({
             properties: {
-                border: '0px solid purple',
                 backgroundColor: this.options.color,
                 cursor: '-webkit-grab'
             }
