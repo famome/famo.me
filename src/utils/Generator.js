@@ -46,7 +46,7 @@ define(function(require, exports, module) {
                             '\tproperties: {\n' +
                                 '\t\ttextAlign: \'center\'\n' +
                             '\t}\n' +
-                        '}));\n';
+                        '}));\n\n';
             };
 
             var _generateSurfaceStrings = function(layouts) {

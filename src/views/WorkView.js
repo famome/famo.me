@@ -56,7 +56,7 @@ window.wv = this; // testing only
 
     WorkView.prototype.getLayoutsList = function() {
         return this.layoutsList;
-    }
+    };
 
     WorkView.DEFAULT_OPTIONS = {
         // center: [0.5, 0.5],
