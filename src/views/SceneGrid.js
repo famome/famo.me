@@ -4,7 +4,7 @@ define(function(require, exports, module) {
     var Transform     = require('famous/core/Transform');
     var EventHandler  = require('famous/core/EventHandler');
     var StateModifier = require('famous/modifiers/StateModifier');
-    
+
     var GridLayout    = require('views/GridLayoutCellSized');
 
     var sceneGrid = new GridLayout();
@@ -24,9 +24,7 @@ define(function(require, exports, module) {
     };
 
     function _createGrid(properties) {
-        // var cellSize = properties.cellSize || [properties.width / properties.dimensions[0], undefined];
-        // var numCells;
-        cellSize = properties.cellSize || undefined;
+        cellSize = properties.cellSize;
 
         var grid = new GridLayout({
                 dimensions: properties.dimensions,
@@ -42,71 +40,14 @@ define(function(require, exports, module) {
         for(var i = 0; i < cells; i++) {
             var view = new View();
             var surface = new Surface({
-              // content: 'hi' + (i + 1),
               size: [undefined, undefined],
               properties: {
                 backgroundColor: "#FFFFF5",
-                // backgroundBlendMode: "multiply",
-                // boxShadow: "inset 0 0 20px rgba(255, 192, 203, .125)",
-                // border: "1px dotted rgba(255, 192, 203, .5)",
-                // color: "#404040",
-                // textAlign: 'center'
               }
             });
             this._eventInput.subscribe(surface);
 
-            var topLeftModifier = new StateModifier({
-                size: [this.options.dotSize, this.options.dotSize],
-                origin: [0, 0]
-            });
-
-            var topLeftCorner = new Surface({
-                size: [this.options.dotSize, this.options.dotSize],
-                properties: {
-                    pos: [0, 0],
-                    borderRadius: '0 0 100% 0',
-                    background: this.options.dotColor,
-                }
-            });
-            
-            var topRightModifier = new StateModifier({
-                size: [this.options.dotSize, this.options.dotSize],
-                origin: [1, 0]
-            });
-
-            var topRightCorner = new Surface({
-                properties: {
-                    borderRadius: '0 0 0 100%',
-                    background: this.options.dotColor,
-                    // position: 'absolute'
-                }
-            });
-
-            var bottomLeftModifier = new StateModifier({
-                size: [this.options.dotSize, this.options.dotSize],
-                origin: [0, 1]
-            });
-            
-            var bottomLeftCorner = new Surface({
-                properties: {
-                    borderRadius: '0 100% 0 0',
-                    background: this.options.dotColor,
-                    // position: 'absolute'
-                }
-            });
-
-            var bottomRightModifier = new StateModifier({
-                size: [this.options.dotSize, this.options.dotSize],
-                origin: [1, 1]
-            });
-            
-            var bottomRightCorner = new Surface({
-                properties: {
-                    borderRadius: '100% 0 0 0',
-                    background: this.options.dotColor,
-                    // position: 'absolute'
-                }
-            });
+            this._eventInput.subscribe(surface);
 
             surface.on('mouseenter', function(e){
                 this.setProperties({
@@ -123,7 +64,6 @@ define(function(require, exports, module) {
                 this.emit('prepareForSquare', id);
             });
             grid.surfaces.push(surface);
-
         }
 
         this._eventInput.on('prepareForSquare', function(data) {

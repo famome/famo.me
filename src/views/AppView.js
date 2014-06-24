@@ -97,6 +97,7 @@ define(function(require, exports, module) {
 
     function _createGrid() {
         this.grid = new SceneGrid(this.options.grid);
+        this.grid.app = this;
         this.gridModifier = new StateModifier({
             origin: this.options.center,
             align: this.options.center,
