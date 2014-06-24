@@ -131,6 +131,9 @@ window.wv = this; // testing only
 
         var show = function() {
             this.back.setContent('');
+            this.back.setProperties({
+                backgroundColor: '#FFFFF5'
+            });
             Timer.setTimeout(function() {   // debounce doesn't work
                 this.renderController.show(this.grid, {duration: this.options.flipDelay/2});
             }.bind(this), this.options.flipDelay);
@@ -138,6 +141,9 @@ window.wv = this; // testing only
 
         var hide = function() {
             this.renderController.hide({duration: 0});
+            this.back.setProperties({
+                backgroundColor: '#B2F5D9'
+            });
         };
 
         var toggle = false;
