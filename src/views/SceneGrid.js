@@ -21,7 +21,7 @@ define(function(require, exports, module) {
 
     SceneGrid.DEFAULT_OPTIONS = {
         dotSize: 4,
-        dotColor: '#b2f5d9'
+        dotColor: '#B2F5D9'
     };
 
     function _createGrid(properties) {
