@@ -44,20 +44,36 @@ define(function(require, exports, module) {
             offset: [this.xOffset, this.yOffset],
             size: [this.width, this.height]
         };
+        this.layoutsList.push(this);
     };
-    LayoutView.prototype.linkTo = function(layouts, numLayouts) {
+    LayoutView.prototype.linkTo = function(layouts, layoutsList, numLayouts) {
         this.layouts = layouts;
         this.numLayouts = numLayouts;
+        this.layoutsList = layoutsList;
 
         this.id += this.numLayouts;
+        console.log('numLayouts', this.numLayouts);
+        console.log('layoutsList', this.layoutsList);
+        console.log('layouts', JSON.stringify(this.layouts));
     };
     LayoutView.prototype.removeLayout = function() {
-        console.log('before',this.id, this.layouts[this.id]);
+        var index = this.layoutsList.indexOf(this);
+        this._eventOutput.emit('cycleToNextLayout', index);
+        this.layoutsList.splice(index, 1);
         delete this.layouts[this.id];
-        console.log('after', this.layouts, this.layouts[this.id]);
     };
     LayoutView.prototype.getLayouts = function() {
         return this.layouts;
+    };
+
+    LayoutView.prototype.selectSurface = function() {
+        console.log('selectSurface ', this);
+        this.surface.setProperties({
+            boxShadow: '0 0 50px rgba(0, 0, 0, .85)',
+            backgroundColor: 'rgba(200, 50, 50, 1)',
+            zIndex: 999
+        });
+        this.draginator.select();
     };
 
     LayoutView.DEFAULT_OPTIONS = {
@@ -169,13 +185,15 @@ define(function(require, exports, module) {
 
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
-            var currentDimension = this.options.dimension;
-            console.log('current dimension', currentDimension);
-            console.log('translating');
-            this.xOffset += data[0];
-            this.yOffset += data[1];
+            if (this.layouts[this.id]) {
+                var currentDimension = this.options.dimension;
+                console.log('current dimension', currentDimension);
+                console.log('translating');
+                this.xOffset += data[0];
+                this.yOffset += data[1];
 
-            this.layouts[this.id].offset = [this.xOffset, this.yOffset];
+                this.layouts[this.id].offset = [this.xOffset, this.yOffset];
+            }
         }.bind(this));
 
         this._eventInput.on('mousemove', _setEdges.bind(this));
@@ -230,9 +248,9 @@ define(function(require, exports, module) {
             this._eventOutput.emit('allowCreation');
         }.bind(this));
 
-        this._eventInput.on('allowCreate', function() {
-            this._eventOutput.emit('allowCreation');
-        }.bind(this));
+        // this._eventInput.on('allowCreate', function() {
+        //     this._eventOutput.emit('allowCreation');
+        // }.bind(this));
 
         this._eventInput.on('create', function() {
             this._eventOutput.emit('createNewLayout');
@@ -240,10 +258,14 @@ define(function(require, exports, module) {
 
         this.surface.draginator = this.draginator;
 
+        this._eventInput.on('switch', function() {
+            this._eventOutput.emit('cycleToNextLayout', this.layoutsList.indexOf(this));
+        }.bind(this));
+
         this._eventInput.on('select', function(selectedView) {
             if(this === selectedView) {
                 console.log('going to selectSurface ', this);
-                _selectSurface.call(this);
+                this.selectSurface.call(this);
             }
         }.bind(this));
 
@@ -259,18 +281,8 @@ define(function(require, exports, module) {
         this.surface.on('click', function() {
             this._eventOutput.emit('deselectRest', this);
             this.draginator.select();
-            _selectSurface.call(this);
+            this.selectSurface.call(this);
         }.bind(this));
-    }
-
-    function _selectSurface() {
-        console.log('selectSurface ', this);
-        this.surface.setProperties({
-            boxShadow: '0 0 50px rgba(0, 0, 0, .85)',
-            backgroundColor: 'rgba(200, 50, 50, 1)',
-            zIndex: 999
-        });
-        this.draginator.select();
     }
 
     module.exports = LayoutView;
