@@ -95,6 +95,18 @@ define(function(require, exports, module) {
         this.add(this.modalOverlay);
     }
 
+    function _createGrid() {
+        this.grid = new SceneGrid(this.options.grid);
+        this.grid.app = this;
+        this.gridModifier = new StateModifier({
+            origin: this.options.center,
+            align: this.options.center,
+            size: [this.options.grid.width, this.options.grid.height]
+        });
+
+        this.gridNode = this.add(this.gridModifier).add(this.grid);
+    }
+
     function _setListeners() {
         var events = {
             '□': function() {
