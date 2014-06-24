@@ -13,6 +13,7 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
         this.numLayouts = 0;
         this.layouts = {};
+        this.layoutsList = [];
         this.selectedLayout = undefined;
 window.wv = this; // testing only
         _createRenderController.call(this);
@@ -33,7 +34,7 @@ window.wv = this; // testing only
         this.numLayouts++;
 
         var layoutView = new LayoutView();
-        layoutView.linkTo(this.layouts, this.numLayouts);
+        layoutView.linkTo(this.layouts, this.layoutsList, this.numLayouts);
         layoutView.addLayout();
 
         this.add(layoutView);
@@ -52,6 +53,10 @@ window.wv = this; // testing only
     WorkView.prototype.getLayouts = function() {
         return this.layouts;
     };
+
+    WorkView.prototype.getLayoutsList = function() {
+        return this.layoutsList;
+    }
 
     WorkView.DEFAULT_OPTIONS = {
         // center: [0.5, 0.5],
@@ -104,6 +109,20 @@ window.wv = this; // testing only
             this._eventOutput.emit('deselect');
         }.bind(this));
 
+        this._eventInput.on('cycleToNextLayout', function(index) {
+            console.log('cycling from', index);
+            this._eventOutput.emit('deselect');
+            if (index + 1 >= this.layoutsList.length) {
+                var nextLayout = this.layoutsList[0];
+                this.selectedLayout = nextLayout;
+                nextLayout.selectSurface();
+            } else {
+                var nextLayout = this.layoutsList[index + 1];
+                this.selectedLayout = nextLayout;
+                nextLayout.selectSurface();
+            }
+        }.bind(this));
+
         window.onkeydown = function(event) {
             if (event.keyIdentifier === 'U+004E') {
                 console.log('U+004E!!!');
@@ -122,13 +141,13 @@ window.wv = this; // testing only
             this.createLayoutView();
         }.bind(this));
 
-        this._eventInput.on('allowCreation', function() {
-            window.onkeydown = function(event) {
-                if (event.keyIdentifier === 'U+004E') {
-                    this.createLayoutView();
-                }
-            }.bind(this);
-        }.bind(this));
+        // this._eventInput.on('allowCreation', function() {
+        //     window.onkeydown = function(event) {
+        //         if (event.keyIdentifier === 'U+004E') {
+        //             this.createLayoutView();
+        //         }
+        //     }.bind(this);
+        // }.bind(this));
 
         this._eventInput.on('editMyProperties', function(layoutView) {
             console.log('heard event editMyProperties');

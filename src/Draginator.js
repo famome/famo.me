@@ -101,7 +101,7 @@ define(function(require, exports, module) {
         this.eventOutput.emit('delete');
         // this.deactivate();
 
-        this.eventOutput.emit('allowCreate');
+        // this.eventOutput.emit('allowCreate');
     }
 
     function _createElement() {
@@ -111,6 +111,7 @@ define(function(require, exports, module) {
 
     function _switchElement() {
         console.log('switch to another element');
+        this.eventOutput.emit('switch');
     }
 
     function _generateJSON() {
@@ -138,7 +139,7 @@ define(function(require, exports, module) {
             var commandMatrix = {
                 'U+0008': _deleteElement.bind(this), // delete
                 'U+004E': _createElement.bind(this), // 'n'
-                'U+0009': _switchElement, // tab
+                'U+0009': _switchElement.bind(this), // tab
                 'U+001B': _editPropertiesOfSelected.bind(this), // ESC
                 Enter: _generateJSON
             };
