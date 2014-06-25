@@ -106,6 +106,11 @@ define(function(require, exports, module) {
 
                 // refactor inline style
                 this.workView.back.setContent('<pre style="background-color: transparent">'+generate.output(data.scene, layouts)+'</pre>');
+                this.workView.back.setProperties({
+                    overflowY: 'scroll',
+                    overflowX: 'hidden'
+                });
+                
                 this.workView.flip();
             }
         };
