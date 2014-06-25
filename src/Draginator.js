@@ -96,7 +96,6 @@ define(function(require, exports, module) {
     }
 
     function _deleteElement(event) {
-        console.log('delete the current element');
 
         this.eventOutput.emit('delete');
         // this.deactivate();
@@ -105,27 +104,22 @@ define(function(require, exports, module) {
     }
 
     function _createElement() {
-        console.log('create a new element');
         this.eventOutput.emit('create');
     }
 
     function _switchElement() {
-        console.log('switch to another element');
         this.eventOutput.emit('switch');
     }
 
     function _generateJSON() {
-        console.log('generate JSON');
         this.eventOutput.emit('generate');
     }
 
     function _editPropertiesOfSelected() {
-        console.log('_editPropertiesOfSelected');
         this.eventOutput.emit('editPropertiesOfSelected');
     }
 
     function _snapToGrid() {
-        console.log('snapping to grid');
         var currentPosition = this.getPosition();
         var newPosition = [];
         var snap = {
@@ -134,6 +128,7 @@ define(function(require, exports, module) {
         }
 
         if (this.options.snapX === snap.min) {
+            console.log('moooooving');
             newPosition[0] = Math.round(currentPosition[0] / 60) * 60;
             newPosition[1] = Math.round(currentPosition[1] / 60) * 60;
             this.setPosition(newPosition);
@@ -151,7 +146,6 @@ define(function(require, exports, module) {
 
         var options = this.options;
         if (event.keyIdentifier) {
-            console.log(event.keyIdentifier);
             this.keybinding = true;
             var keyMatrix = {
                 Up: [0, -this.options.snapY],
@@ -180,22 +174,26 @@ define(function(require, exports, module) {
             }
 
             if (keyMatrix[event.keyIdentifier]) {
-                if (event.metaKey) {
-                    this.dragging = true;
-                } else if (event.shiftKey) {
-                    this.dragging = false;
+                if (event.shiftKey) {
+                    if (event.metaKey) {
+                        this.dragging = true;
+                    } else {
+                        this.dragging = false;
+                    }
                     this._differential = shiftKeyMatrix[event.keyIdentifier];
                 } else {
-                    this.dragging = false;
+                    if (event.metaKey) {
+                        this.dragging = true;
+                    } else {
+                        this.dragging = false;
+                    }
                     this._differential = keyMatrix[event.keyIdentifier];
                 }
             }
         } else {
             this.keybinding = false;
             this._differential = event.position;
-            console.log('mouse ', this._differential);
         }
-
 
         var newDifferential = _mapDifferential.call(this, this._differential);
 
@@ -208,7 +206,6 @@ define(function(require, exports, module) {
 
         //pipe that
         if (this.dragging) {
-            console.log('dragging in draginator');
             this.eventOutput.emit('resize', newDifferential);
         } else {
             //modify position, retain reference
@@ -229,7 +226,6 @@ define(function(require, exports, module) {
             }
 
             if (pos[0] !== originalPos[0] || pos[1] !== originalPos[1]) {
-                console.log('translating in draginator');
                 this.eventOutput.emit('translate', newDifferential);
             }
             this.eventOutput.emit('update', {position : pos});

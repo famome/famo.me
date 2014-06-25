@@ -41,7 +41,6 @@ define(function(require, exports, module) {
     };
     LayoutView.prototype.addLayout = function() {
         var currentSize = this.modifier.getSize();
-        console.log('addLayout');
         this.layouts[this.id] = {
             offset: [this.xOffset, this.yOffset],
             size: [currentSize[0], currentSize[1]]
@@ -54,9 +53,6 @@ define(function(require, exports, module) {
         this.layoutsList = layoutsList;
 
         this.id += this.numLayouts;
-        console.log('numLayouts', this.numLayouts);
-        console.log('layoutsList', this.layoutsList);
-        console.log('layouts', JSON.stringify(this.layouts));
     };
     LayoutView.prototype.removeLayout = function() {
         var index = this.layoutsList.indexOf(this);
@@ -69,7 +65,6 @@ define(function(require, exports, module) {
     };
 
     LayoutView.prototype.selectSurface = function() {
-        console.log('selectSurface ', this);
         this.surface.setProperties({
             backgroundColor: 'pink',
             zIndex: 100
@@ -194,7 +189,6 @@ define(function(require, exports, module) {
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
             if (this.layoutsList[this.layoutsList.indexOf(this)]) {
-                console.log('translating');
                 this.xOffset += data[0];
                 this.yOffset += data[1];
 
@@ -217,7 +211,6 @@ define(function(require, exports, module) {
 
         // view listens for resize from draggable
         this._eventInput.on('resize', function(data) {
-            console.log('resizing');
             var cursor = this.surface.properties.cursor;
             var currentSize = this.modifier.getSize();
             //var currentDimension = this.dimension;
@@ -262,7 +255,6 @@ define(function(require, exports, module) {
 
         this._eventInput.on('select', function(selectedView) {
             if(this === selectedView) {
-                console.log('going to selectSurface ', this);
                 this.selectSurface.call(this);
             }
         }.bind(this));
