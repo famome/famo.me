@@ -1,27 +1,27 @@
 define(function(require, exports, module) {
+<<<<<<< HEAD
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
+    var GridLayout    = require('views/GridLayoutCellSized');
     var EventHandler  = require('famous/core/EventHandler');
     var StateModifier = require('famous/modifiers/StateModifier');
-    var GridLayout    = require('views/GridLayoutCellSized');
     var Flipper       = require('famous/views/Flipper');
 
     var sceneGrid = new GridLayout();
 
+    // properties isn't a good pattern because view will be applied with arguments, which will include properties--refactor
     function SceneGrid(properties) {
         View.apply(this, arguments);
 
         _createGrid.call(this, properties);
+        _setListeners.call(this);
     }
 
     SceneGrid.prototype = Object.create(View.prototype);
     SceneGrid.prototype.constructor = SceneGrid;
 
-    SceneGrid.DEFAULT_OPTIONS = {
-        dotSize: 4,
-        dotColor: '#B2F5D9'
-    };
+    SceneGrid.DEFAULT_OPTIONS = {};
 
     function _createGrid(properties) {
         var cellSize = properties.cellSize;
@@ -31,8 +31,8 @@ define(function(require, exports, module) {
             cellSize: cellSize
         });
 
-        grid.surfaces = [];
-        grid.sequenceFrom(grid.surfaces);
+        var surfaces = [];
+        grid.sequenceFrom(surfaces);
         var cols = properties.width / properties.cellSize[0];
         var rows = properties.height / properties.cellSize[1];
         var cells = rows * cols;
@@ -40,40 +40,47 @@ define(function(require, exports, module) {
         for(var i = 0; i < cells; i++) {
             var view = new View();
             var surface = new Surface({
-              size: [undefined, undefined],
               properties: {
-                backgroundColor: "#FFFFF5",
+                backgroundColor: '#FFFFF5',
               }
             });
 
             this._eventInput.subscribe(surface);
 
-            this._eventInput.subscribe(surface);
+            _setCellListeners.call(this, surface);
 
-            surface.on('mouseenter', function(e){
-                this.setProperties({
-                    backgroundColor: "#FFFFA5",
-                });
-            });
-            surface.on('mouseleave', function(e){
-                this.setProperties({
-                    backgroundColor: "#FFFFF5",
-
-                });
-            });
-            surface.on('click', function(){
-                var id = this.id - 1;
-                this.emit('prepareForSquare', id);
-            });
-            grid.surfaces.push(surface);
+            view.add(surface);
+            surfaces.push(view);
         }
 
+        this.add(grid);
+    }
+
+    function _setCellListeners(surface) {
+        this._eventInput.subscribe(surface);
+
+        surface.on('mouseenter', function(){
+            this.setProperties({
+                backgroundColor: '#FFFFA5',
+            });
+        });
+
+        surface.on('mouseleave', function(){
+            this.setProperties({
+                backgroundColor: '#FFFFF5',
+            });
+        });
+
+        surface.on('click', function(){
+            var id = (this.id - 2) / 5;
+            this.emit('prepareForSquare', id);
+        });
+    }
+
+    function _setListeners() {
         this._eventInput.on('prepareForSquare', function(data) {
-            console.log(data);
             this._eventOutput.emit('createNewSquare', data);
         }.bind(this));
-
-        this.add(grid);
     }
 
     module.exports = SceneGrid;
