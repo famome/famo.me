@@ -163,11 +163,26 @@ window.wv = this; // testing only
             console.log('heard event editPropertiesOfSelected');
             _editProperties.call(this, this.selectedLayout);
         }.bind(this));
+    
+        this._eventInput.on('superSizeMe', function(layoutView) {
+            console.log('Imma supersize this ', layoutView);
+            _superSize.call(this, layoutView);
+        }.bind(this));
     }
 
     function _editProperties(layoutView) {
         console.log('edit lv properties');
         this._eventOutput.emit('editSelectedLayoutView');
+    }
+
+    function _superSize(layoutView) {
+        console.log('num layouts to compare to ', this.numLayouts);
+        var i;
+        var minX = minY = maxX = maxY = 0;
+        for (i = 0; i < this.layoutsList.length; i++) {
+            var dimension = this.layouts
+            
+        }
     }
 
     module.exports = WorkView;

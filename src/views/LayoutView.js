@@ -200,6 +200,8 @@ define(function(require, exports, module) {
                 console.log('translating');
                 this.xOffset += data[0];
                 this.yOffset += data[1];
+                console.log(this.xOffset, this.yOffset);
+
 
                 this.layouts[this.id].offset = [this.xOffset, this.yOffset];
                 console.log(this.xOffset);
@@ -231,25 +233,27 @@ define(function(require, exports, module) {
                 && (currentSize[1] + data[1] * this.options.snapY)
                 && (this.xOffset * this.options.snapX + currentSize[0] + data[0] * this.options.snapX <= 960)
                 && (this.yOffset * this.options.snapY + currentSize[1] + data[1] * this.options.snapY <= 600)) {
-                this.options.dimension[0] = currentDimension[0] + data[0];
-                this.options.dimension[1] = currentDimension[1] + data[1];
+                    this.options.dimension[0] = currentDimension[0] + data[0];
+                    this.options.dimension[1] = currentDimension[1] + data[1];
+                    console.log(this.xOffset, this.yOffset);
 
-                this.modifier.setSize(
-                    [currentSize[0] + data[0] * this.options.snapX,
-                    currentSize[1] + data[1] * this.options.snapY]);
+                    this.modifier.setSize(
+                        [currentSize[0] + data[0] * this.options.snapX,
+                        currentSize[1] + data[1] * this.options.snapY]);
 
-                this.draginator.options.xRange[1] -= data[0] * this.options.snapX;
-                this.draginator.options.yRange[1] -= data[1] * this.options.snapY;
+                    this.draginator.options.xRange[1] -= data[0] * this.options.snapX;
+                    this.draginator.options.yRange[1] -= data[1] * this.options.snapY;
 
-                this.layouts[this.id].size = [
-                    currentSize[0] + data[0] * this.options.snapX,
-                    currentSize[1] + data[1] * this.options.snapY
-                ];
+                    this.layouts[this.id].size = [
+                        currentSize[0] + data[0] * this.options.snapX,
+                        currentSize[1] + data[1] * this.options.snapY
+                    ];
             }
         }.bind(this));
 
         this.surface.on('dblclick', function() {
-            console.log(this.id, this.getLayouts()[this.id]);
+            // console.log(this.id, this.getLayouts()[this.id]);
+            this._eventOutput.emit('superSizeMe', this);
         }.bind(this));
 
         this._eventInput.on('delete', function() {
