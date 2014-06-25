@@ -13,6 +13,7 @@ define(function(require, exports, module) {
 
         this.id = 'LayoutView';
         this.options.offset = offset || this.options.offset;
+
         this.options.dimension = [1, 1];
         this.xOffset = this.options.offset[0];
         this.yOffset = this.options.offset[1];
@@ -71,7 +72,6 @@ define(function(require, exports, module) {
     LayoutView.prototype.selectSurface = function() {
         console.log('selectSurface ', this);
         this.surface.setProperties({
-            // boxShadow: '0 0 50px #FFFFA5',
             backgroundColor: 'pink',
             zIndex: 100
         });
