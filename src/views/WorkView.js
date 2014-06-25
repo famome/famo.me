@@ -30,10 +30,10 @@ window.wv = this; // testing only
         this.footer = !this.footer;
     };
 
-    WorkView.prototype.createLayoutView = function() {
+    WorkView.prototype.createLayoutView = function(offset) {
         this.numLayouts++;
 
-        var layoutView = new LayoutView();
+        var layoutView = new LayoutView(offset);
         layoutView.linkTo(this.layouts, this.layoutsList, this.numLayouts);
         layoutView.addLayout();
 
