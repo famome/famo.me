@@ -41,6 +41,7 @@ define(function(require, exports, module) {
         this._differential  = [0,0];
         this._active = true;
         this._selected = false;
+        this.snapped = false;
 
         this.sync = new GenericSync(['mouse', 'touch'], {scale : this.options.scale});
         this.eventOutput = new EventHandler();
@@ -128,14 +129,15 @@ define(function(require, exports, module) {
         }
 
         if (this.options.snapX === snap.min) {
-            console.log('moooooving');
+            this.snapped = true;
             newPosition[0] = Math.round(currentPosition[0] / 60) * 60;
             newPosition[1] = Math.round(currentPosition[1] / 60) * 60;
             this.setPosition(newPosition);
-            this.eventOutput.emit('translate', [newPosition[0] - currentPosition[0], newPosition[1] - currentPosition[1]]);
+            this.eventOutput.emit('translate', newPosition);
             this.options.snapX = snap.max;
             this.options.snapY = snap.max;
         } else {
+            this.snapped = false;
             this.options.snapX = snap.min;
             this.options.snapY = snap.min;
         }
@@ -226,7 +228,7 @@ define(function(require, exports, module) {
             }
 
             if (pos[0] !== originalPos[0] || pos[1] !== originalPos[1]) {
-                this.eventOutput.emit('translate', newDifferential);
+                this.eventOutput.emit('translate', pos);
             }
             this.eventOutput.emit('update', {position : pos});
         }

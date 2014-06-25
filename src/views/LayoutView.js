@@ -189,8 +189,8 @@ define(function(require, exports, module) {
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
             if (this.layoutsList[this.layoutsList.indexOf(this)]) {
-                this.xOffset += data[0];
-                this.yOffset += data[1];
+                this.xOffset = data[0];
+                this.yOffset = data[1];
 
                 this.layouts[this.id].offset = [this.xOffset, this.yOffset];
             }
