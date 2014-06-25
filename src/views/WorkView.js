@@ -16,7 +16,7 @@ define(function(require, exports, module) {
         this.layouts = {};
         this.layoutsList = [];
         this.selectedLayout = undefined;
-window.wv = this; // testing only
+        
         _createRenderController.call(this);
         _createGrid.call(this);
         _createFlipper.call(this);
@@ -65,13 +65,7 @@ window.wv = this; // testing only
         flipDelay: 1000,
         dimensions: [100, 200],
         surface: '#FFFFF5',
-        dotColor: '#B2F5D9',
-        grid: {
-            width: 960,
-            height: 600,
-            dimensions: [6, 8],
-            cellSize: [120, 120] // Dominates dimensions
-        }
+        dotColor: '#B2F5D9'
     };
 
     function _createRenderController() {
@@ -130,7 +124,7 @@ window.wv = this; // testing only
     }
 
     function _createGrid() {
-        this.grid = new SceneGrid(this.options.grid);
+        this.grid = new SceneGrid();
         this.gridModifier = new StateModifier({
             origin: [0.5, 0.5],
             size: [this.options.grid.width, this.options.grid.height]
