@@ -1,18 +1,13 @@
 define(function(require, exports, module) {
-    var View          = require('famous/core/View');
-    var Surface       = require('famous/core/Surface');
-    var Transform     = require('famous/core/Transform');
-    var EventHandler  = require('famous/core/EventHandler');
-    var ModifierChain = require('famous/modifiers/ModifierChain');
-    var StateModifier = require('famous/modifiers/StateModifier');
-    var Draginator    = require('Draginator');
-    var LayoutView    = require('views/LayoutView');
-    var Engine        = require('famous/core/Engine');
-    var Modifier      = require('famous/core/Modifier');
+    var View             = require('famous/core/View');
+    var Timer            = require('famous/utilities/Timer');
+    var Flipper          = require('famous/views/Flipper');
+    var Surface          = require('famous/core/Surface');
+    var Modifier         = require('famous/core/Modifier');
+    var SceneGrid        = require('views/SceneGrid');
+    var LayoutView       = require('views/LayoutView');
+    var StateModifier    = require('famous/modifiers/StateModifier');
     var RenderController = require('famous/views/RenderController');
-    var SceneGrid = require('views/SceneGrid');
-    var Flipper       = require('famous/views/Flipper');
-    var Timer             = require('famous/utilities/Timer');
 
 
     function WorkView() {

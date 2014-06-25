@@ -3,7 +3,6 @@ define(function(require, exports, module) {
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
-    var Easing        = require('famous/transitions/Easing');
 
     var MenuView = require('views/MenuView');
     var WorkView = require('views/WorkView');

@@ -1,16 +1,9 @@
 define(function(require, exports, module) {
-<<<<<<< HEAD
-    var View          = require('famous/core/View');
-    var Surface       = require('famous/core/Surface');
-    var Transform     = require('famous/core/Transform');
-    var GridLayout    = require('views/GridLayoutCellSized');
-    var EventHandler  = require('famous/core/EventHandler');
-    var StateModifier = require('famous/modifiers/StateModifier');
-    var Flipper       = require('famous/views/Flipper');
+    var View                = require('famous/core/View');
+    var Surface             = require('famous/core/Surface');
+    var GridLayoutCellSized = require('views/GridLayoutCellSized');
 
-    var sceneGrid = new GridLayout();
 
-    // properties isn't a good pattern because view will be applied with arguments, which will include properties--refactor
     function SceneGrid(properties) {
         View.apply(this, arguments);
 
@@ -26,7 +19,7 @@ define(function(require, exports, module) {
     function _createGrid(properties) {
         var cellSize = properties.cellSize;
 
-        var grid = new GridLayout({
+        var grid = new GridLayoutCellSized({
             dimensions: properties.dimensions,
             cellSize: cellSize
         });
@@ -72,8 +65,8 @@ define(function(require, exports, module) {
         });
 
         surface.on('click', function(){
-            var id = (this.id - 2) / 5;
-            this.emit('prepareForSquare', id);
+            // console.log('this.id:', this.id, 'id:', id);
+            this.emit('prepareForSquare', this.id-1);
         });
     }
 
