@@ -1,8 +1,3 @@
-// this.options.dimension and this.options.offset are in grid units
-// this.options.offset is vital to know where the top left of the layer starts
-// delete this.layouts
-// refactor to make options permanent attributs and this.whatever to be specific attributes to the layer
-
 define(function(require, exports, module) {
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
@@ -17,14 +12,13 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         this.id = 'LayoutView';
-        this.options.dimension = [1, 1];
-        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // Vital
-        this.xOffset = this.options.offset[0];
-        this.yOffset = this.options.offset[1];
-        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        this.width = this.options.size.width;
-        this.height = this.options.size.height;
+        this.dimension = this.options.dimension; // Grid Units, based off protoSize
+        this.xOffset = this.options.offset[0]; // Grid Units
+        this.yOffset = this.options.offset[1]; // Grid Units
+        this.width = this.options.size.width; // PX
+        this.height = this.options.size.height; // PX
+        this.snapX = this.options.snapX; // PX
+        this.snapY = this.options.snapY; // PX
 
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
@@ -32,12 +26,9 @@ define(function(require, exports, module) {
 
         _setListeners.call(this);
 
-        // this.add(this.draginator).add(this.modifier).add(this.surface);
         this.add(this.draginator).add(this.modifier).add(this.renderController);
-        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // Vital
-        this.draginator.setPosition([this.options.size.width * this.xOffset, this.options.size.height * this.yOffset]);
-        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        this.draginator.setPosition([this.options.protoSize.width * this.xOffset,
+            this.options.protoSize.height * this.yOffset]);
     }
 
     LayoutView.prototype = Object.create(View.prototype);
@@ -45,12 +36,9 @@ define(function(require, exports, module) {
     LayoutView.prototype.getId = function() {
         return this.id;
     };
-    // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Delete
     LayoutView.prototype.getOffset = function() {
         return [this.xOffset, this.yOffset];
     };
-    // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     LayoutView.prototype.getSize = function() {
         return [this.width, this.height];
     };
@@ -58,7 +46,8 @@ define(function(require, exports, module) {
         this.layouts[this.id] = {
             // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // Change to store pixels
-            offset: [this.xOffset, this.yOffset],
+            offset: [this.xOffset * this.options.protoSize.width, this.yOffset * this.options.protoSize.height],
+            // offset: [this.xOffset, this.yOffset],
             // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             size: [this.width, this.height]
         };
@@ -98,15 +87,20 @@ define(function(require, exports, module) {
         // snapY: 60,
         snapX: 1,
         snapY: 1,
-        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // Vital
         offset: [0, 0],
-        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         dimension: [1, 1],
         color: 'pink',
         size: {
             width: 60,
             height: 60
+        },
+        protoSize: {
+            width: 60,
+            height: 60
+        },
+        screen: {
+            width: 960,
+            height: 600
         },
         edgeDetectSize: 20,
         zIndex: 9
@@ -114,13 +108,10 @@ define(function(require, exports, module) {
 
     function _createLayoutDraginator() {
         this.draginator = new Draginator({
-            snapX: this.options.snapX,
-            snapY: this.options.snapY,
-            xRange: [0, 960 - this.options.size.width],
-            yRange: [0, 600 - this.options.size.height],
-            transition  : {duration : 500, curve: "easeIn"}
-            // xRange: [0, this.options.size.width],
-            // yRange: [0, this.options.size.height]
+            snapX: this.snapX,
+            snapY: this.snapY,
+            xRange: [0, this.options.screen.width - this.options.size.width],
+            yRange: [0, this.options.screen.height - this.options.size.height]
         });
     }
 
@@ -159,11 +150,11 @@ define(function(require, exports, module) {
 
         if (event.offsetY < this.options.edgeDetectSize)
             edge = 'n';
-        if (this.options.snapY * this.options.dimension[1] - event.offsetY < this.options.edgeDetectSize)
+        if (this.height - event.offsetY < this.options.edgeDetectSize)
             edge = 's';
         if (event.offsetX < this.options.edgeDetectSize)
             edge += 'w';
-        if (this.options.snapY * this.options.dimension[0] - event.offsetX < this.options.edgeDetectSize)
+        if (this.width - event.offsetX < this.options.edgeDetectSize)
             edge += 'e';
 
         this.draggable = edge === '';
@@ -207,16 +198,11 @@ define(function(require, exports, module) {
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
             if (this.layouts[this.id]) {
-                var currentDimension = this.options.dimension;
-                console.log('current dimension', currentDimension);
                 console.log('translating');
-                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // Change to store pixels
                 this.xOffset += data[0];
                 this.yOffset += data[1];
 
                 this.layouts[this.id].offset = [this.xOffset, this.yOffset];
-                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
         }.bind(this));
 
@@ -238,29 +224,27 @@ define(function(require, exports, module) {
             console.log('resizing');
             var cursor = this.surface.properties.cursor;
             var currentSize = this.modifier.getSize();
-            var currentDimension = this.options.dimension;
-            console.log('current dimension', currentDimension);
+            var currentDimension = this.dimension;
 
-            if ((currentSize[0] + data[0] * this.options.snapX)
-                && (currentSize[1] + data[1] * this.options.snapY)
+            if ((currentSize[0] + data[0] * this.snapX) // make sure box doesn't shrink to 0 width
+                && (currentSize[1] + data[1] * this.snapY) // make sure box doesn't shrink to 0 height
+                // Make sure right/bottom doesn't go past grid boundaries
+                && (this.xOffset * this.options.box.width + currentSize[0] + data[0] * this.snapX <= this.options.screen.width)
+                && (this.yOffset * this.options.box.height + currentSize[1] + data[1] * this.snapY <= this.options.screen.height)) {
                 // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // Change to make sure new right/bottom doesn't go past grid boundaries
-                && (this.xOffset * this.options.size.width + currentSize[0] + data[0] * this.options.snapX <= 960)
-                && (this.yOffset * this.options.size.height + currentSize[1] + data[1] * this.options.snapY <= 600)) {
-                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                this.options.dimension[0] = currentDimension[0] + data[0];
-                this.options.dimension[1] = currentDimension[1] + data[1];
+                this.dimension[0] = currentDimension[0] + data[0];
+                this.dimension[1] = currentDimension[1] + data[1];
 
                 this.modifier.setSize(
-                    [currentSize[0] + data[0] * this.options.snapX,
-                    currentSize[1] + data[1] * this.options.snapY]);
+                    [currentSize[0] + data[0] * this.snapX,
+                    currentSize[1] + data[1] * this.snapY]);
 
-                this.draginator.options.xRange[1] -= data[0] * this.options.snapX;
-                this.draginator.options.yRange[1] -= data[1] * this.options.snapY;
+                this.draginator.options.xRange[1] -= data[0] * this.snapX;
+                this.draginator.options.yRange[1] -= data[1] * this.snapY;
 
                 this.layouts[this.id].size = [
                     currentSize[0] + data[0] * this.options.snapX,
-                    currentSize[1] + data[1] * this.options.snapY
+                    currentSize[1] + data[1] * this.snapY
                 ];
             }
         }.bind(this));
@@ -274,10 +258,6 @@ define(function(require, exports, module) {
             this.removeLayout();
             this._eventOutput.emit('allowCreation');
         }.bind(this));
-
-        // this._eventInput.on('allowCreate', function() {
-        //     this._eventOutput.emit('allowCreation');
-        // }.bind(this));
 
         this._eventInput.on('create', function() {
             this._eventOutput.emit('createNewLayout');

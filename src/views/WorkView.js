@@ -87,8 +87,12 @@ define(function(require, exports, module) {
         },
         layout: {
             size: {
-            width: 60,
-            height: 60
+                width: 60,
+                height: 60
+            },
+            boxSize: {
+                width: 60,
+                height: 60
             },
             offset: [0, 0]
         }

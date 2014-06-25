@@ -127,7 +127,7 @@ define(function(require, exports, module) {
             }
         };
 
-        
+
 
         this.subscribe(this.modalOverlay._eventOutput);
         this.subscribe(this.workView._eventOutput);
