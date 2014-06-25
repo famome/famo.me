@@ -55,61 +55,7 @@ define(function(require, exports, module) {
               }
             });
 
-            var topLeftModifier = new StateModifier({
-                size: [this.options.dotSize, this.options.dotSize],
-                origin: [0, 0]
-            });
-
-            var topLeftCorner = new Surface({
-                size: [this.options.dotSize, this.options.dotSize],
-                properties: {
-                    pos: [0, 0],
-                    borderRadius: '0 0 100% 0',
-                    background: this.options.dotColor,
-                }
-            });
-
-            var topRightModifier = new StateModifier({
-                size: [this.options.dotSize, this.options.dotSize],
-                origin: [1, 0]
-            });
-
-            var topRightCorner = new Surface({
-                properties: {
-                    borderRadius: '0 0 0 100%',
-                    background: this.options.dotColor,
-                    // position: 'absolute'
-                }
-            });
-
-            var bottomLeftModifier = new StateModifier({
-                size: [this.options.dotSize, this.options.dotSize],
-                origin: [0, 1]
-            });
-
-            var bottomLeftCorner = new Surface({
-                properties: {
-                    borderRadius: '0 100% 0 0',
-                    background: this.options.dotColor,
-                    // position: 'absolute'
-                }
-            });
-
-            var bottomRightModifier = new StateModifier({
-                size: [this.options.dotSize, this.options.dotSize],
-                origin: [1, 1]
-            });
-
-            var bottomRightCorner = new Surface({
-                properties: {
-                    borderRadius: '100% 0 0 0',
-                    background: this.options.dotColor,
-                    // position: 'absolute'
-                }
-            });
-
             this._eventInput.subscribe(surface);
-
             surface.on('mouseenter', function(e){
                 this.setProperties({
                     backgroundColor: "#FFFFA5",
@@ -127,14 +73,12 @@ define(function(require, exports, module) {
                 this.emit('prepareForSquare', id);
             });
 
-            view.add(surface);
-            view.add(topLeftModifier).add(topLeftCorner);
-            view.add(topRightModifier).add(topRightCorner);
-            view.add(bottomLeftModifier).add(bottomLeftCorner);
-            view.add(bottomRightModifier).add(bottomRightCorner);
-
-            // view.add(topLeftCorner);
-            grid.surfaces.push(view);
+            surface.on('click', function(){
+                var id = this.id - 4;
+                console.log(this.id);
+                this.emit('prepareForSquare', id);
+            });
+            grid.surfaces.push(surface);
         }
 
         this._eventInput.on('prepareForSquare', function(data) {

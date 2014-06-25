@@ -13,6 +13,7 @@ define(function(require, exports, module) {
 
         this.id = 'LayoutView';
         this.options.offset = offset || this.options.offset;
+
         this.options.dimension = [1, 1];
         this.xOffset = this.options.offset[0];
         this.yOffset = this.options.offset[1];
