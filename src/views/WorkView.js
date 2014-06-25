@@ -146,6 +146,8 @@ window.wv = this; // testing only
     }
 
     function _setListeners() {
+
+
         this._eventInput.on('deselectRest', function(selectedLayout) {
             this.selectedLayout = selectedLayout;
             this._eventOutput.emit('deselect');
@@ -196,6 +198,13 @@ window.wv = this; // testing only
         this._eventInput.on('editPropertiesOfSelected', function() {
             console.log('heard event editPropertiesOfSelected');
             _editProperties.call(this, this.selectedLayout);
+        }.bind(this));
+
+        this.subscribe(this.grid._eventOutput);
+        
+        this.grid.on('createNewSquare', function(data) {
+            console.log(data);
+            this.createLayoutView([data % 16, Math.floor(data / 16)]);
         }.bind(this));
     }
 
