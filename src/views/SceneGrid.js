@@ -123,7 +123,7 @@ define(function(require, exports, module) {
                 });
             });
             surface.on('click', function(){
-                var id = (this.id + 1) / 5 - 1;
+                var id = (this.id - 2) / 5;
                 this.emit('prepareForSquare', id);
             });
 
