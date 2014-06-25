@@ -1,9 +1,11 @@
 define(function(require, exports, module) {
-    var View       = require('famous/core/View');
-    var Surface    = require('famous/core/Surface');
-    var GridLayout = require('views/GridLayoutCellSized');
+    var View                = require('famous/core/View');
+    var Surface             = require('famous/core/Surface');
+    var GridLayoutCellSized = require('views/GridLayoutCellSized');
 
-    // properties isn't a good pattern because view will be applied with arguments, which will include properties--refactor
+
+    
+
     function SceneGrid(properties) {
         View.apply(this, arguments);
 
@@ -17,9 +19,9 @@ define(function(require, exports, module) {
     SceneGrid.DEFAULT_OPTIONS = {};
 
     function _createGrid(properties) {
-        cellSize = properties.cellSize;
+        var cellSize = properties.cellSize;
 
-        var grid = new GridLayout({
+        var grid = new GridLayoutCellSized({
             dimensions: properties.dimensions,
             cellSize: cellSize
         });
@@ -63,8 +65,8 @@ define(function(require, exports, module) {
         });
 
         surface.on('click', function(){
-            var id = (this.id - 2) / 5;
-            this.emit('prepareForSquare', id);
+            // console.log('this.id:', this.id, 'id:', id);
+            this.emit('prepareForSquare', this.id-1);
         });
     }
 
