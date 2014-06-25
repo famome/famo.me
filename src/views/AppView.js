@@ -95,18 +95,6 @@ define(function(require, exports, module) {
         this.add(this.modalOverlay);
     }
 
-    function _createGrid() {
-        this.grid = new SceneGrid(this.options.grid);
-        this.grid.app = this;
-        this.gridModifier = new StateModifier({
-            origin: this.options.center,
-            align: this.options.center,
-            size: [this.options.grid.width, this.options.grid.height]
-        });
-
-        this.gridNode = this.add(this.gridModifier).add(this.grid);
-    }
-
     function _setListeners() {
         var events = {
             '□': function() {
@@ -122,18 +110,13 @@ define(function(require, exports, module) {
                     overflowY: 'scroll',
                     overflowX: 'hidden'
                 });
+                
                 this.workView.flip();
             }
         };
 
         this.subscribe(this.modalOverlay._eventOutput);
         this.subscribe(this.workView._eventOutput);
-        this.subscribe(this.grid._eventOutput);
-
-        this.grid.on('createNewSquare', function(data) {
-            console.log(data);
-            this.workView.createLayoutView([data % 16, Math.floor(data / 16)]);
-        }.bind(this));
 
         this.workView.on('activate', function(menuIcon) {
             events[menuIcon].bind(this)();
