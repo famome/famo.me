@@ -23,24 +23,23 @@ define(function(require, exports, module) {
     };
 
     SceneGrid.DEFAULT_OPTIONS = {
-        width: 960,
+        width: 600,
         height: 600,
-        dimensions: [6, 8],
+        cols: 10,
+        rows: 10,
         cellSize: [60, 60]
     };
 
     function _createGrid() {
         var grid = new GridLayoutCellSized({
-            dimensions: this.options.dimensions,
+            dimensions: [this.options.width, this.options.height],
             cellSize: this.options.cellSize
         });
 
         var surfaces = [];
         grid.sequenceFrom(surfaces);
 
-        var cols = this.options.width / this.options.cellSize[0];
-        var rows = this.options.height / this.options.cellSize[1];
-        var cells = rows * cols;
+        var cells = this.options.rows * this.options.cols;
 
         for(var i = 0; i < cells; i++) {
             var view = new View();

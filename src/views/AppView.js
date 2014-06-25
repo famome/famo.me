@@ -83,7 +83,9 @@ define(function(require, exports, module) {
     function _createWorkView() {
         this.workView = new WorkView({
             width: this.options.width,
-            height: this.options.height
+            height: this.options.height,
+            cols: this.options.cols,
+            rows: this.options.rows
         });
 
         this.workModifier = new StateModifier({
@@ -116,24 +118,6 @@ define(function(require, exports, module) {
     function _createModalOverlay() {
         this.modalOverlay = new ModalOverlay();
         this.add(this.modalOverlay);
-    }
-
-    function _createGrid() {
-        this.grid = new SceneGrid(this.options.grid);
-<<<<<<< HEAD
-        this.grid.app = this;
-        this.gridModifier = new StateModifier({
-            origin: this.options.center,
-            align: this.options.center,
-=======
-        this.gridModifier = new StateModifier({
-            origin: [0.5, 0.5],
-            align: [0.5, 0.5],
->>>>>>> Fixes cookie checking
-            size: [this.options.grid.width, this.options.grid.height]
-        });
-
-        this.gridNode = this.add(this.gridModifier).add(this.grid);
     }
 
     function _setListeners() {
@@ -252,13 +236,10 @@ console.log('no cookies, but i got this great modalOverlay ', this.modalOverlay)
         var height = dimensions[1];
         var gridDimensions = [dimensions[2], dimensions[3]];
         var cellSize = [width/gridDimensions[0], height/gridDimensions[1]];
-        this.options.grid = {
-            width: width,
-            height: height,
-            dimensions: gridDimensions,
-            cellSize: cellSize
-        }
-
+        this.options.width = width;
+        this.options.height = height;
+        this.options.cols = dimensions[2];
+        this.options.rows = dimensions[3];
         _generateViews.call(this);
     }
 
@@ -266,9 +247,10 @@ console.log('no cookies, but i got this great modalOverlay ', this.modalOverlay)
         _createWorkView.call(this);
         _createBackground.call(this);
         _createModalOverlay.call(this);
-        _createGrid.call(this);
         _createMenuView.call(this);
         _setListeners.call(this);
+                console.log(this.options.width,this.options.height,this.options.cols,this.options.rows);
+
     }
 
     module.exports = AppView;
