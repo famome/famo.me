@@ -39,7 +39,6 @@ define(function(require, exports, module) {
     // needs refactoring
     WorkView.prototype.createLayoutView = function(offset) {
         this.numLayouts++;
-        console.log(offset);
 
         var layoutView = new LayoutView(offset || this.options.layout);
         layoutView.linkTo(this.layouts, this.layoutsList, this.numLayouts);
@@ -202,7 +201,7 @@ define(function(require, exports, module) {
         this.subscribe(this.grid._eventOutput);
 
         this.grid.on('createNewSquare', function(data) {
-            this.createLayoutView([data % 16, Math.floor(data / 16)]);
+            this.createLayoutView({offset: [data % 16, Math.floor(data / 16)]});
         }.bind(this));
     }
 
