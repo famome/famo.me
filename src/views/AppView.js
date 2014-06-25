@@ -10,7 +10,8 @@ define(function(require, exports, module) {
     var MenuView = require('views/MenuView');
     var WorkView = require('views/WorkView');
     var ModalOverlay = require('views/ModalOverlay');
-
+    var SceneGrid = require('views/SceneGrid');
+    
     var generate = require('utils/Generator');
 
     // Simple cookies framework from MDN
@@ -21,11 +22,8 @@ define(function(require, exports, module) {
 
         this.menuToggle = false;
 
-
         _eventCookiesHandler.call(this);
-
-        _createModalOverlay.call(this);
-        _getWorkviewSizeFromUser.call(this);
+        _checkCookies.call(this);
 
         this._eventInput.on('updateDimensions', _handleDimensions.bind(this));
     }
@@ -59,6 +57,18 @@ define(function(require, exports, module) {
         EventHandler.setOutputHandler(docCookies, docCookies.eventOutput);
 
         docCookies.eventOutput.pipe(this._eventInput);
+    }
+
+    function _checkCookies() {
+        var dimensions;
+        if (dimensions = docCookies.getItem('dimensions')) {
+            console.log('dimensions already set FTW!!! ', dimensions);
+            _handleDimensions.call(this, dimensions.split(','));
+        } else {
+            _createModalOverlay.call(this);
+            _getWorkviewSizeFromUser.call(this);
+        }
+        
     }
 
     function _createMenuView() {
@@ -110,10 +120,16 @@ define(function(require, exports, module) {
 
     function _createGrid() {
         this.grid = new SceneGrid(this.options.grid);
+<<<<<<< HEAD
         this.grid.app = this;
         this.gridModifier = new StateModifier({
             origin: this.options.center,
             align: this.options.center,
+=======
+        this.gridModifier = new StateModifier({
+            origin: [0.5, 0.5],
+            align: [0.5, 0.5],
+>>>>>>> Fixes cookie checking
             size: [this.options.grid.width, this.options.grid.height]
         });
 
@@ -231,24 +247,29 @@ console.log('no cookies, but i got this great modalOverlay ', this.modalOverlay)
     }
 
     function _handleDimensions(dimensions) {
-            console.log('appView heard you!', dimensions);
-            var width = dimensions[0];
-            var height = dimensions[1];
-            var gridDimensions = [dimensions[2], dimensions[3]];
-            var cellSize = [width/gridDimensions[0], height/gridDimensions[1]];
-            this.options.grid = {
-                width: width,
-                height: height,
-                dimensions: gridDimensions,
-                cellSize: cellSize
-            }
-            _createWorkView.call(this);
-            _createBackground.call(this);
-            _createModalOverlay.call(this);
-            _createGrid.call(this);
-            _createMenuView.call(this);
-            _setListeners.call(this);
+        console.log('appView heard you!', dimensions);
+        var width = dimensions[0];
+        var height = dimensions[1];
+        var gridDimensions = [dimensions[2], dimensions[3]];
+        var cellSize = [width/gridDimensions[0], height/gridDimensions[1]];
+        this.options.grid = {
+            width: width,
+            height: height,
+            dimensions: gridDimensions,
+            cellSize: cellSize
         }
+
+        _generateViews.call(this);
+    }
+
+    function _generateViews() {
+        _createWorkView.call(this);
+        _createBackground.call(this);
+        _createModalOverlay.call(this);
+        _createGrid.call(this);
+        _createMenuView.call(this);
+        _setListeners.call(this);
+    }
 
     module.exports = AppView;
 });
