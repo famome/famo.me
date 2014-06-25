@@ -115,9 +115,11 @@ define(function(require, exports, module) {
             '⿴': function() {
                 var layouts = this.workView.getLayouts();
                 var data = generate.sceneData(layouts, this.options.size);
+                var output = generate.output(data.scene, layouts);
+                var formatted = hljs.highlight('javascript', output);
 
                 // refactor inline style
-                this.workView.back.setContent('<pre style="background-color: transparent">'+generate.output(data.scene, layouts)+'</pre>');
+                this.workView.back.setContent('<pre id="code" style="background-color: transparent">'+formatted.value+'</pre>');
                 this.workView.back.setProperties({
                     overflowY: 'scroll',
                     overflowX: 'hidden'
@@ -126,6 +128,8 @@ define(function(require, exports, module) {
                 this.workView.flip();
             }
         };
+
+        
 
         this.subscribe(this.modalOverlay._eventOutput);
         this.subscribe(this.workView._eventOutput);
