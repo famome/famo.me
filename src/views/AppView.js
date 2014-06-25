@@ -14,7 +14,7 @@ define(function(require, exports, module) {
     var generate = require('utils/Generator');
 
     // Simple cookies framework from MDN
-    var docCookies = require('./cookies');
+    var docCookies = require('../cookies');
 
     function AppView() {
         View.apply(this, arguments);
