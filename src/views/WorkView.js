@@ -90,50 +90,6 @@ define(function(require, exports, module) {
         this.renderController.show(this.grid);
     }
 
-    function _createGrid() {
-        this.grid = new SceneGrid(this.options.grid);
-        this.gridModifier = new StateModifier({
-            origin: this.options.center,
-            size: [this.options.grid.width, this.options.grid.height]
-        });
-
-        this.renderController.add(this.gridModifier).add(this.grid);
-        this.renderController.show(this.grid);
-
-        this.flipper = new Flipper({
-            direction: 1
-        });
-
-        this.flipper.setFront(this.renderController);
-        this.back = new Surface({
-            properties: {
-                backgroundColor: 'pink',
-                webkitBackfaceVisibility: 'visible',
-                backfaceVisibility: 'visible'
-            }
-        });
-        this.flipper.setBack(this.back);
-
-        var centerModifier = new Modifier({origin : [0.5, 0.5]});
-
-        this.gridNode = this.add(centerModifier).add(this.flipper);
-
-
-        var show = function() {
-            Timer.setTimeout(function() {   // debounce doesn't work
-                this.renderController.show(this.grid, {duration: this.options.flipDelay/2});
-            }.bind(this), this.options.flipDelay);
-        };
-
-        var toggle = false;
-        this.flip = function(){
-            toggle ? show.call(this) : this.renderController.hide({duration: 0});
-            var angle = toggle ? 0 : Math.PI;
-            this.flipper.setAngle(angle, {curve : 'easeOutBounce', duration : this.options.flipDelay});
-            toggle = !toggle;
-        }.bind(this);
-    }
-
     function _createFlipper() {
         this.toggle = false;
 
