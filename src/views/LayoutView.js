@@ -7,13 +7,6 @@ define(function(require, exports, module) {
     var Draginator    = require('Draginator');
     var RenderController = require('famous/views/RenderController');
     var Transitionable = require('famous/transitions/Transitionable');
-    var SpringTransition = require('famous/transitions/SpringTransition');
-    Transitionable.registerMethod('spring', SpringTransition);
-    var spring = {
-        method: 'spring',
-        period: 500,
-        dampingRatio: 0
-    };
 
     function LayoutView(offset) {
         View.apply(this, arguments);
@@ -84,7 +77,6 @@ define(function(require, exports, module) {
             zIndex: 100
         });
         this.draginator.select();
-        this.modifier.setTransform(Transform.translate(0.5, 0.5, 0), spring);
     };
 
     LayoutView.DEFAULT_OPTIONS = {
