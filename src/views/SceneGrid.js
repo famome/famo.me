@@ -3,7 +3,7 @@ define(function(require, exports, module) {
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
     var EventHandler  = require('famous/core/EventHandler');
-    
+
     var GridLayout    = require('views/GridLayoutCellSized');
 
     var sceneGrid = new GridLayout();
@@ -11,7 +11,7 @@ define(function(require, exports, module) {
     function SceneGrid(properties) {
         View.apply(this, arguments);
 
-        return _createGrid(properties);
+        _createGrid.call(this, properties);
     }
 
     SceneGrid.prototype = Object.create(View.prototype);
@@ -48,6 +48,7 @@ define(function(require, exports, module) {
                 textAlign: 'center'
               }
             });
+            this._eventInput.subscribe(surface);
             surface.on('mouseenter', function(e){
                 this.setProperties({
                     backgroundColor: "rgba(255, 255, 255, .5)",
@@ -60,10 +61,20 @@ define(function(require, exports, module) {
                     boxShadow: "inset 0 0 20px rgba(255, 192, 203, .125)"
                 })
             });
+            surface.on('click', function(){
+                var id = this.id - 4;
+                console.log(this.id);
+                this.emit('prepareForSquare', id);
+            });
             grid.surfaces.push(surface);
         }
 
-        return grid;
+        this._eventInput.on('prepareForSquare', function(data) {
+            console.log(data);
+            this._eventOutput.emit('createNewSquare', data);
+        }.bind(this));
+
+        this.add(grid);
     }
 
     module.exports = SceneGrid;

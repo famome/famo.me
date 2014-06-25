@@ -7,12 +7,13 @@ define(function(require, exports, module) {
     var Draginator    = require('Draginator');
     var RenderController = require('famous/views/RenderController');
 
-    function LayoutView() {
+    function LayoutView(offset) {
         View.apply(this, arguments);
 
         this.id = 'LayoutView';
-        this.xOffset = 0;
-        this.yOffset = 0;
+        this.options.offset = offset || this.options.offset;
+        this.xOffset = this.options.offset[0];
+        this.yOffset = this.options.offset[1];
         this.width = this.options.size.width;
         this.height = this.options.size.height;
 
@@ -26,6 +27,7 @@ define(function(require, exports, module) {
 
         // this.add(this.draginator).add(this.modifier).add(this.surface);
         this.add(this.draginator).add(this.modifier).add(this.renderController);
+        this.draginator.setPosition([this.options.snapX * this.xOffset, this.options.snapY * this.yOffset]);
     }
 
     LayoutView.prototype = Object.create(View.prototype);
