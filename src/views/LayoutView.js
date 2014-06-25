@@ -15,8 +15,6 @@ define(function(require, exports, module) {
         this.dimension = this.options.dimension; // Grid Units, based off protoSize
         this.xOffset = this.options.offset[0]; // Grid Units
         this.yOffset = this.options.offset[1]; // Grid Units
-        this.width = this.options.size.width; // PX
-        this.height = this.options.size.height; // PX
         this.snapX = this.options.snapX; // PX
         this.snapY = this.options.snapY; // PX
 
@@ -43,13 +41,14 @@ define(function(require, exports, module) {
         return [this.width, this.height];
     };
     LayoutView.prototype.addLayout = function() {
+        var currentSize = this.modifier.getSize();
         this.layouts[this.id] = {
             // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // Change to store pixels
             offset: [this.xOffset * this.options.protoSize.width, this.yOffset * this.options.protoSize.height],
             // offset: [this.xOffset, this.yOffset],
             // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            size: [this.width, this.height]
+            size: [currentSize[0], currentSize[1]]
         };
         this.layoutsList.push(this);
     };
@@ -134,6 +133,7 @@ define(function(require, exports, module) {
 
     function _setEdges(event) {
         this.surface.setProperties({mouseInside: true});
+        var currentSize = this.modifier.getSize();
         var edge = '';
 
         var edges = {
@@ -150,11 +150,11 @@ define(function(require, exports, module) {
 
         if (event.offsetY < this.options.edgeDetectSize)
             edge = 'n';
-        if (this.height - event.offsetY < this.options.edgeDetectSize)
+        if (currentSize[1] - event.offsetY < this.options.edgeDetectSize)
             edge = 's';
         if (event.offsetX < this.options.edgeDetectSize)
             edge += 'w';
-        if (this.width - event.offsetX < this.options.edgeDetectSize)
+        if (currentSize[0] - event.offsetX < this.options.edgeDetectSize)
             edge += 'e';
 
         this.draggable = edge === '';
@@ -229,8 +229,8 @@ define(function(require, exports, module) {
             if ((currentSize[0] + data[0] * this.snapX) // make sure box doesn't shrink to 0 width
                 && (currentSize[1] + data[1] * this.snapY) // make sure box doesn't shrink to 0 height
                 // Make sure right/bottom doesn't go past grid boundaries
-                && (this.xOffset * this.options.box.width + currentSize[0] + data[0] * this.snapX <= this.options.screen.width)
-                && (this.yOffset * this.options.box.height + currentSize[1] + data[1] * this.snapY <= this.options.screen.height)) {
+                && (this.xOffset * this.options.protoSize.width + currentSize[0] + data[0] * this.snapX <= this.options.screen.width)
+                && (this.yOffset * this.options.protoSize.height + currentSize[1] + data[1] * this.snapY <= this.options.screen.height)) {
                 // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 this.dimension[0] = currentDimension[0] + data[0];
                 this.dimension[1] = currentDimension[1] + data[1];
