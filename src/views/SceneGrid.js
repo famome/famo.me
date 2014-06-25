@@ -17,6 +17,7 @@ define(function(require, exports, module) {
 
     SceneGrid.prototype = Object.create(View.prototype);
     SceneGrid.prototype.constructor = SceneGrid;
+    
     SceneGrid.prototype.setOptions = function setOptions(options) {
         return this._optionsManager.setOptions(options);
     };
@@ -36,7 +37,7 @@ define(function(require, exports, module) {
 
         var surfaces = [];
         grid.sequenceFrom(surfaces);
-        
+
         var cols = this.options.width / this.options.cellSize[0];
         var rows = this.options.height / this.options.cellSize[1];
         var cells = rows * cols;
