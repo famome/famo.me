@@ -23,7 +23,7 @@ define(function(require, exports, module) {
         this.layouts = {};
         this.layoutsList = [];
         this.selectedLayout = undefined;
-        
+
         _createGrid.call(this);
         _createFlipper.call(this);
         _setListeners.call(this);
@@ -39,8 +39,9 @@ define(function(require, exports, module) {
     // needs refactoring
     WorkView.prototype.createLayoutView = function(offset) {
         this.numLayouts++;
+        console.log(offset);
 
-        var layoutView = new LayoutView(offset);
+        var layoutView = new LayoutView(offset || this.options.layout);
         layoutView.linkTo(this.layouts, this.layoutsList, this.numLayouts);
         layoutView.addLayout();
 
@@ -75,7 +76,22 @@ define(function(require, exports, module) {
     WorkView.DEFAULT_OPTIONS = {
         flipDelay: 1000,
         dimensions: [100, 200],
-        flipperBackColor: '#B2F5D9'
+        flipperBackColor: '#B2F5D9',
+        surface: '#FFFFF5',
+        dotColor: '#B2F5D9',
+        grid: {
+            width: 960,
+            height: 600,
+            dimensions: [6, 8],
+            cellSize: [60, 60] // Dominates dimensions
+        },
+        layout: {
+            size: {
+            width: 60,
+            height: 60
+            },
+            offset: [0, 0]
+        }
     };
 
     function _createGrid() {
@@ -180,7 +196,7 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.subscribe(this.grid._eventOutput);
-        
+
         this.grid.on('createNewSquare', function(data) {
             this.createLayoutView([data % 16, Math.floor(data / 16)]);
         }.bind(this));

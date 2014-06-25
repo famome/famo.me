@@ -1,3 +1,8 @@
+// this.options.dimension and this.options.offset are in grid units
+// this.options.offset is vital to know where the top left of the layer starts
+// delete this.layouts
+// refactor to make options permanent attributs and this.whatever to be specific attributes to the layer
+
 define(function(require, exports, module) {
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
@@ -8,15 +13,16 @@ define(function(require, exports, module) {
     var RenderController = require('famous/views/RenderController');
     var Transitionable = require('famous/transitions/Transitionable');
 
-    function LayoutView(offset) {
+    function LayoutView() {
         View.apply(this, arguments);
 
         this.id = 'LayoutView';
-        this.options.offset = offset || this.options.offset;
-
         this.options.dimension = [1, 1];
+        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // Vital
         this.xOffset = this.options.offset[0];
         this.yOffset = this.options.offset[1];
+        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         this.width = this.options.size.width;
         this.height = this.options.size.height;
 
@@ -28,7 +34,10 @@ define(function(require, exports, module) {
 
         // this.add(this.draginator).add(this.modifier).add(this.surface);
         this.add(this.draginator).add(this.modifier).add(this.renderController);
-        this.draginator.setPosition([this.options.snapX * this.xOffset, this.options.snapY * this.yOffset]);
+        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // Vital
+        this.draginator.setPosition([this.options.size.width * this.xOffset, this.options.size.height * this.yOffset]);
+        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     LayoutView.prototype = Object.create(View.prototype);
@@ -36,15 +45,21 @@ define(function(require, exports, module) {
     LayoutView.prototype.getId = function() {
         return this.id;
     };
+    // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // Delete
     LayoutView.prototype.getOffset = function() {
         return [this.xOffset, this.yOffset];
     };
+    // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     LayoutView.prototype.getSize = function() {
         return [this.width, this.height];
     };
     LayoutView.prototype.addLayout = function() {
         this.layouts[this.id] = {
+            // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // Change to store pixels
             offset: [this.xOffset, this.yOffset],
+            // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             size: [this.width, this.height]
         };
         this.layoutsList.push(this);
@@ -79,9 +94,14 @@ define(function(require, exports, module) {
     };
 
     LayoutView.DEFAULT_OPTIONS = {
-        snapX: 60,
-        snapY: 60,
+        // snapX: 60,
+        // snapY: 60,
+        snapX: 1,
+        snapY: 1,
+        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // Vital
         offset: [0, 0],
+        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         dimension: [1, 1],
         color: 'pink',
         size: {
@@ -96,8 +116,8 @@ define(function(require, exports, module) {
         this.draginator = new Draginator({
             snapX: this.options.snapX,
             snapY: this.options.snapY,
-            xRange: [0, 960 - this.options.snapX],
-            yRange: [0, 600 - this.options.snapY],
+            xRange: [0, 960 - this.options.size.width],
+            yRange: [0, 600 - this.options.size.height],
             transition  : {duration : 500, curve: "easeIn"}
             // xRange: [0, this.options.size.width],
             // yRange: [0, this.options.size.height]
@@ -190,11 +210,13 @@ define(function(require, exports, module) {
                 var currentDimension = this.options.dimension;
                 console.log('current dimension', currentDimension);
                 console.log('translating');
+                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // Change to store pixels
                 this.xOffset += data[0];
                 this.yOffset += data[1];
 
                 this.layouts[this.id].offset = [this.xOffset, this.yOffset];
-                console.log(this.xOffset);
+                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
         }.bind(this));
 
@@ -221,8 +243,11 @@ define(function(require, exports, module) {
 
             if ((currentSize[0] + data[0] * this.options.snapX)
                 && (currentSize[1] + data[1] * this.options.snapY)
-                && (this.xOffset * this.options.snapX + currentSize[0] + data[0] * this.options.snapX <= 960)
-                && (this.yOffset * this.options.snapY + currentSize[1] + data[1] * this.options.snapY <= 600)) {
+                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // Change to make sure new right/bottom doesn't go past grid boundaries
+                && (this.xOffset * this.options.size.width + currentSize[0] + data[0] * this.options.snapX <= 960)
+                && (this.yOffset * this.options.size.height + currentSize[1] + data[1] * this.options.snapY <= 600)) {
+                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 this.options.dimension[0] = currentDimension[0] + data[0];
                 this.options.dimension[1] = currentDimension[1] + data[1];
 

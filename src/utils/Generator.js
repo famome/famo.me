@@ -2,7 +2,7 @@ define(function(require, exports, module) {
     var Scene      = require('famous/core/Scene');
     var Surface    = require('famous/core/Surface');
     var Transform  = require('famous/core/Transform');
-    
+
     var generator = {
         sceneData: function(layouts) {
             var data = {
@@ -54,7 +54,7 @@ define(function(require, exports, module) {
                 for (var layout in layouts) {
                     string += _generateSurfaceString(layout, layouts);
                 }
-    
+
                 return string;
             };
 
@@ -68,7 +68,7 @@ define(function(require, exports, module) {
             string = string.replace(/\"transform\"\:\ \[\n\W+/g, '"transform": [').replace(/^\W+(\d+)\,\n/gm,'$1, ').replace(/\,\W+(\d+)/g,', $1').replace(/\n\W+?\]\,/g,'],');
             return string;
         },
-        
+
     };
 
     module.exports = generator;

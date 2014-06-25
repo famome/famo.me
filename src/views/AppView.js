@@ -7,7 +7,7 @@ define(function(require, exports, module) {
     var MenuView = require('views/MenuView');
     var WorkView = require('views/WorkView');
     var ModalOverlay = require('views/ModalOverlay');
-    
+
     var generate = require('utils/Generator');
 
     function AppView() {
