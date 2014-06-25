@@ -36,7 +36,7 @@ define(function(require, exports, module) {
     WorkView.prototype.setOptions = function setOptions(options) {
         return this._optionsManager.setOptions(options);
     };
-
+    // needs refactoring
     WorkView.prototype.createLayoutView = function(offset) {
         this.numLayouts++;
 
