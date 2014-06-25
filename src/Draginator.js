@@ -41,6 +41,7 @@ define(function(require, exports, module) {
         this._differential  = [0,0];
         this._active = true;
         this._selected = false;
+        this.snapped = false;
 
         this.sync = new GenericSync(['mouse', 'touch'], {scale : this.options.scale});
         this.eventOutput = new EventHandler();
@@ -96,7 +97,6 @@ define(function(require, exports, module) {
     }
 
     function _deleteElement(event) {
-        console.log('delete the current element');
 
         this.eventOutput.emit('delete');
         // this.deactivate();
@@ -105,23 +105,42 @@ define(function(require, exports, module) {
     }
 
     function _createElement() {
-        console.log('create a new element');
         this.eventOutput.emit('create');
     }
 
     function _switchElement() {
-        console.log('switch to another element');
         this.eventOutput.emit('switch');
     }
 
     function _generateJSON() {
-        console.log('generate JSON');
         this.eventOutput.emit('generate');
     }
 
     function _editPropertiesOfSelected() {
-        console.log('_editPropertiesOfSelected');
         this.eventOutput.emit('editPropertiesOfSelected');
+    }
+
+    function _snapToGrid() {
+        var currentPosition = this.getPosition();
+        var newPosition = [];
+        var snap = {
+            min: 1,
+            max: 60
+        }
+
+        if (this.options.snapX === snap.min) {
+            this.snapped = true;
+            newPosition[0] = Math.round(currentPosition[0] / 60) * 60;
+            newPosition[1] = Math.round(currentPosition[1] / 60) * 60;
+            this.setPosition(newPosition);
+            this.eventOutput.emit('translate', newPosition);
+            this.options.snapX = snap.max;
+            this.options.snapY = snap.max;
+        } else {
+            this.snapped = false;
+            this.options.snapX = snap.min;
+            this.options.snapY = snap.min;
+        }
     }
 
     function _handleMove(event) {
@@ -136,12 +155,19 @@ define(function(require, exports, module) {
                 Left: [-this.options.snapX, 0],
                 Right: [this.options.snapX, 0]
             };
+            var shiftKeyMatrix = {
+                Up: [0, -this.options.snapY * 25],
+                Down: [0, this.options.snapY * 25],
+                Left: [-this.options.snapX * 25, 0],
+                Right: [this.options.snapX * 25, 0]
+            }
 
             var commandMatrix = {
                 'U+0008': _deleteElement.bind(this), // delete
                 'U+004E': _createElement.bind(this), // 'n'
                 'U+0009': _switchElement.bind(this), // tab
                 'U+001B': _editPropertiesOfSelected.bind(this), // ESC
+                'U+0020': _snapToGrid.bind(this), // space
                 Enter: _generateJSON.bind(this)
             };
 
@@ -150,27 +176,28 @@ define(function(require, exports, module) {
             }
 
             if (keyMatrix[event.keyIdentifier]) {
-                if (event.metaKey) {
-                    this.dragging = true;
+                if (event.shiftKey) {
+                    if (event.metaKey) {
+                        this.dragging = true;
+                    } else {
+                        this.dragging = false;
+                    }
+                    this._differential = shiftKeyMatrix[event.keyIdentifier];
                 } else {
-                    this.dragging = false;
+                    if (event.metaKey) {
+                        this.dragging = true;
+                    } else {
+                        this.dragging = false;
+                    }
+                    this._differential = keyMatrix[event.keyIdentifier];
                 }
-                this._differential = keyMatrix[event.keyIdentifier];
             }
         } else {
             this.keybinding = false;
             this._differential = event.position;
-            console.log('mouse ', this._differential);
         }
 
-
         var newDifferential = _mapDifferential.call(this, this._differential);
-
-        //find the cols and rows offest...
-        var gridDifferential = [
-            newDifferential[0] / this.options.snapX,
-            newDifferential[1] / this.options.snapY
-        ];
 
         //buffer the differential if snapping is set
         this._differential[0] -= newDifferential[0];
@@ -181,8 +208,7 @@ define(function(require, exports, module) {
 
         //pipe that
         if (this.dragging) {
-            console.log('dragging in draginator');
-            this.eventOutput.emit('resize', gridDifferential);
+            this.eventOutput.emit('resize', newDifferential);
         } else {
             //modify position, retain reference
             pos[0] += newDifferential[0];
@@ -202,8 +228,7 @@ define(function(require, exports, module) {
             }
 
             if (pos[0] !== originalPos[0] || pos[1] !== originalPos[1]) {
-                console.log('translating in draginator');
-                this.eventOutput.emit('translate', gridDifferential);
+                this.eventOutput.emit('translate', pos);
             }
             this.eventOutput.emit('update', {position : pos});
         }

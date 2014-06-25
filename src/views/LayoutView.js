@@ -8,17 +8,15 @@ define(function(require, exports, module) {
     var RenderController = require('famous/views/RenderController');
     var Transitionable = require('famous/transitions/Transitionable');
 
-    function LayoutView(offset) {
+    function LayoutView() {
         View.apply(this, arguments);
 
         this.id = 'LayoutView';
-        this.options.offset = offset || this.options.offset;
-
-        this.options.dimension = [1, 1];
-        this.xOffset = this.options.offset[0];
-        this.yOffset = this.options.offset[1];
-        this.width = this.options.size.width;
-        this.height = this.options.size.height;
+        //this.dimension = this.options.dimension; // Grid Units, based off protoSize
+        this.xOffset = this.options.offset[0] * this.options.protoSize.width; // PX
+        this.yOffset = this.options.offset[1] * this.options.protoSize.width; // PX
+        this.snapX = this.options.snapX; // PX
+        this.snapY = this.options.snapY; // PX
 
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
@@ -26,9 +24,8 @@ define(function(require, exports, module) {
 
         _setListeners.call(this);
 
-        // this.add(this.draginator).add(this.modifier).add(this.surface);
         this.add(this.draginator).add(this.modifier).add(this.renderController);
-        this.draginator.setPosition([this.options.snapX * this.xOffset, this.options.snapY * this.yOffset]);
+        this.draginator.setPosition([this.xOffset, this.yOffset]);
     }
 
     LayoutView.prototype = Object.create(View.prototype);
@@ -43,9 +40,10 @@ define(function(require, exports, module) {
         return [this.width, this.height];
     };
     LayoutView.prototype.addLayout = function() {
+        var currentSize = this.modifier.getSize();
         this.layouts[this.id] = {
             offset: [this.xOffset, this.yOffset],
-            size: [this.width, this.height]
+            size: [currentSize[0], currentSize[1]]
         };
         this.layoutsList.push(this);
     };
@@ -55,9 +53,6 @@ define(function(require, exports, module) {
         this.layoutsList = layoutsList;
 
         this.id += this.numLayouts;
-        console.log('numLayouts', this.numLayouts);
-        console.log('layoutsList', this.layoutsList);
-        console.log('layouts', JSON.stringify(this.layouts));
     };
     LayoutView.prototype.removeLayout = function() {
         var index = this.layoutsList.indexOf(this);
@@ -70,7 +65,6 @@ define(function(require, exports, module) {
     };
 
     LayoutView.prototype.selectSurface = function() {
-        console.log('selectSurface ', this);
         this.surface.setProperties({
             backgroundColor: 'pink',
             zIndex: 100
@@ -79,8 +73,10 @@ define(function(require, exports, module) {
     };
 
     LayoutView.DEFAULT_OPTIONS = {
-        snapX: 60,
-        snapY: 60,
+        // snapX: 60,
+        // snapY: 60,
+        snapX: 1,
+        snapY: 1,
         offset: [0, 0],
         dimension: [1, 1],
         color: 'pink',
@@ -88,19 +84,24 @@ define(function(require, exports, module) {
             width: 60,
             height: 60
         },
+        protoSize: {
+            width: 60,
+            height: 60
+        },
+        screen: {
+            width: 960,
+            height: 600
+        },
         edgeDetectSize: 20,
         zIndex: 9
     };
 
     function _createLayoutDraginator() {
         this.draginator = new Draginator({
-            snapX: this.options.snapX,
-            snapY: this.options.snapY,
-            xRange: [0, 960 - this.options.snapX],
-            yRange: [0, 600 - this.options.snapY],
-            transition  : {duration : 500, curve: "easeIn"}
-            // xRange: [0, this.options.size.width],
-            // yRange: [0, this.options.size.height]
+            snapX: this.snapX,
+            snapY: this.snapY,
+            xRange: [0, this.options.screen.width - this.options.size.width],
+            yRange: [0, this.options.screen.height - this.options.size.height]
         });
     }
 
@@ -123,6 +124,7 @@ define(function(require, exports, module) {
 
     function _setEdges(event) {
         this.surface.setProperties({mouseInside: true});
+        var currentSize = this.modifier.getSize();
         var edge = '';
 
         var edges = {
@@ -139,11 +141,11 @@ define(function(require, exports, module) {
 
         if (event.offsetY < this.options.edgeDetectSize)
             edge = 'n';
-        if (this.options.snapY * this.options.dimension[1] - event.offsetY < this.options.edgeDetectSize)
+        if (currentSize[1] - event.offsetY < this.options.edgeDetectSize)
             edge = 's';
         if (event.offsetX < this.options.edgeDetectSize)
             edge += 'w';
-        if (this.options.snapY * this.options.dimension[0] - event.offsetX < this.options.edgeDetectSize)
+        if (currentSize[0] - event.offsetX < this.options.edgeDetectSize)
             edge += 'e';
 
         this.draggable = edge === '';
@@ -186,15 +188,11 @@ define(function(require, exports, module) {
 
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
-            if (this.layouts[this.id]) {
-                var currentDimension = this.options.dimension;
-                console.log('current dimension', currentDimension);
-                console.log('translating');
-                this.xOffset += data[0];
-                this.yOffset += data[1];
+            if (this.layoutsList[this.layoutsList.indexOf(this)]) {
+                this.xOffset = data[0];
+                this.yOffset = data[1];
 
                 this.layouts[this.id].offset = [this.xOffset, this.yOffset];
-                console.log(this.xOffset);
             }
         }.bind(this));
 
@@ -213,30 +211,25 @@ define(function(require, exports, module) {
 
         // view listens for resize from draggable
         this._eventInput.on('resize', function(data) {
-            console.log('resizing');
             var cursor = this.surface.properties.cursor;
             var currentSize = this.modifier.getSize();
-            var currentDimension = this.options.dimension;
-            console.log('current dimension', currentDimension);
+            //var currentDimension = this.dimension;
 
-            if ((currentSize[0] + data[0] * this.options.snapX)
-                && (currentSize[1] + data[1] * this.options.snapY)
-                && (this.xOffset * this.options.snapX + currentSize[0] + data[0] * this.options.snapX <= 960)
-                && (this.yOffset * this.options.snapY + currentSize[1] + data[1] * this.options.snapY <= 600)) {
-                this.options.dimension[0] = currentDimension[0] + data[0];
-                this.options.dimension[1] = currentDimension[1] + data[1];
+            if ((currentSize[0] + data[0]) // make sure box doesn't shrink to 0 width
+                && (currentSize[1] + data[1]) // make sure box doesn't shrink to 0 height
+                // Make sure right/bottom doesn't go past grid boundaries
+                && (this.xOffset + currentSize[0] + data[0] <= this.options.screen.width)
+                && (this.yOffset + currentSize[1] + data[1] <= this.options.screen.height)) {
+                //this.dimension[0] = currentDimension[0] + data[0];
+                //this.dimension[1] = currentDimension[1] + data[1];
 
                 this.modifier.setSize(
-                    [currentSize[0] + data[0] * this.options.snapX,
-                    currentSize[1] + data[1] * this.options.snapY]);
+                    [currentSize[0] + data[0], currentSize[1] + data[1]]);
+                this.layouts[this.id].size = this.modifier.getSize();
 
-                this.draginator.options.xRange[1] -= data[0] * this.options.snapX;
-                this.draginator.options.yRange[1] -= data[1] * this.options.snapY;
+                this.draginator.options.xRange[1] -= data[0];
+                this.draginator.options.yRange[1] -= data[1];
 
-                this.layouts[this.id].size = [
-                    currentSize[0] + data[0] * this.options.snapX,
-                    currentSize[1] + data[1] * this.options.snapY
-                ];
             }
         }.bind(this));
 
@@ -250,10 +243,6 @@ define(function(require, exports, module) {
             this._eventOutput.emit('allowCreation');
         }.bind(this));
 
-        // this._eventInput.on('allowCreate', function() {
-        //     this._eventOutput.emit('allowCreation');
-        // }.bind(this));
-
         this._eventInput.on('create', function() {
             this._eventOutput.emit('createNewLayout');
         }.bind(this));
@@ -266,7 +255,6 @@ define(function(require, exports, module) {
 
         this._eventInput.on('select', function(selectedView) {
             if(this === selectedView) {
-                console.log('going to selectSurface ', this);
                 this.selectSurface.call(this);
             }
         }.bind(this));
