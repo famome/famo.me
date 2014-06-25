@@ -12,9 +12,9 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         this.id = 'LayoutView';
-        this.dimension = this.options.dimension; // Grid Units, based off protoSize
-        this.xOffset = this.options.offset[0]; // Grid Units
-        this.yOffset = this.options.offset[1]; // Grid Units
+        //this.dimension = this.options.dimension; // Grid Units, based off protoSize
+        this.xOffset = this.options.offset[0] * this.options.protoSize.width; // PX
+        this.yOffset = this.options.offset[1] * this.options.protoSize.width; // PX
         this.snapX = this.options.snapX; // PX
         this.snapY = this.options.snapY; // PX
 
@@ -25,8 +25,7 @@ define(function(require, exports, module) {
         _setListeners.call(this);
 
         this.add(this.draginator).add(this.modifier).add(this.renderController);
-        this.draginator.setPosition([this.options.protoSize.width * this.xOffset,
-            this.options.protoSize.height * this.yOffset]);
+        this.draginator.setPosition([this.xOffset, this.yOffset]);
     }
 
     LayoutView.prototype = Object.create(View.prototype);
@@ -42,12 +41,9 @@ define(function(require, exports, module) {
     };
     LayoutView.prototype.addLayout = function() {
         var currentSize = this.modifier.getSize();
+        console.log('addLayout');
         this.layouts[this.id] = {
-            // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // Change to store pixels
-            offset: [this.xOffset * this.options.protoSize.width, this.yOffset * this.options.protoSize.height],
-            // offset: [this.xOffset, this.yOffset],
-            // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            offset: [this.xOffset, this.yOffset],
             size: [currentSize[0], currentSize[1]]
         };
         this.layoutsList.push(this);
@@ -197,7 +193,7 @@ define(function(require, exports, module) {
 
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
-            if (this.layouts[this.id]) {
+            if (this.layoutsList[this.layoutsList.indexOf(this)]) {
                 console.log('translating');
                 this.xOffset += data[0];
                 this.yOffset += data[1];
@@ -224,28 +220,23 @@ define(function(require, exports, module) {
             console.log('resizing');
             var cursor = this.surface.properties.cursor;
             var currentSize = this.modifier.getSize();
-            var currentDimension = this.dimension;
+            //var currentDimension = this.dimension;
 
-            if ((currentSize[0] + data[0] * this.snapX) // make sure box doesn't shrink to 0 width
-                && (currentSize[1] + data[1] * this.snapY) // make sure box doesn't shrink to 0 height
+            if ((currentSize[0] + data[0]) // make sure box doesn't shrink to 0 width
+                && (currentSize[1] + data[1]) // make sure box doesn't shrink to 0 height
                 // Make sure right/bottom doesn't go past grid boundaries
-                && (this.xOffset * this.options.protoSize.width + currentSize[0] + data[0] * this.snapX <= this.options.screen.width)
-                && (this.yOffset * this.options.protoSize.height + currentSize[1] + data[1] * this.snapY <= this.options.screen.height)) {
-                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                this.dimension[0] = currentDimension[0] + data[0];
-                this.dimension[1] = currentDimension[1] + data[1];
+                && (this.xOffset + currentSize[0] + data[0] <= this.options.screen.width)
+                && (this.yOffset + currentSize[1] + data[1] <= this.options.screen.height)) {
+                //this.dimension[0] = currentDimension[0] + data[0];
+                //this.dimension[1] = currentDimension[1] + data[1];
 
                 this.modifier.setSize(
-                    [currentSize[0] + data[0] * this.snapX,
-                    currentSize[1] + data[1] * this.snapY]);
+                    [currentSize[0] + data[0], currentSize[1] + data[1]]);
+                this.layouts[this.id].size = this.modifier.getSize();
 
-                this.draginator.options.xRange[1] -= data[0] * this.snapX;
-                this.draginator.options.yRange[1] -= data[1] * this.snapY;
+                this.draginator.options.xRange[1] -= data[0];
+                this.draginator.options.yRange[1] -= data[1];
 
-                this.layouts[this.id].size = [
-                    currentSize[0] + data[0] * this.options.snapX,
-                    currentSize[1] + data[1] * this.snapY
-                ];
             }
         }.bind(this));
 

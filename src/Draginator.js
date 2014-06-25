@@ -126,11 +126,24 @@ define(function(require, exports, module) {
 
     function _snapToGrid() {
         console.log('snapping to grid');
-        // find current position
-        // use formulas to find closest grid coordinate
-        // Math.floor(index/colCount), index % colCount
-        // save differential between origin and new point
-        // emit translate with differential so it can store the new movement
+        var currentPosition = this.getPosition();
+        var newPosition = [];
+        var snap = {
+            min: 1,
+            max: 60
+        }
+
+        if (this.options.snapX === snap.min) {
+            newPosition[0] = Math.round(currentPosition[0] / 60) * 60;
+            newPosition[1] = Math.round(currentPosition[1] / 60) * 60;
+            this.setPosition(newPosition);
+            this.eventOutput.emit('translate', [newPosition[0] - currentPosition[0], newPosition[1] - currentPosition[1]]);
+            this.options.snapX = snap.max;
+            this.options.snapY = snap.max;
+        } else {
+            this.options.snapX = snap.min;
+            this.options.snapY = snap.min;
+        }
     }
 
     function _handleMove(event) {
@@ -177,15 +190,6 @@ define(function(require, exports, module) {
 
         var newDifferential = _mapDifferential.call(this, this._differential);
 
-        //find the cols and rows offest...
-        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // Delete
-        var gridDifferential = [
-            newDifferential[0] / this.options.snapX,
-            newDifferential[1] / this.options.snapY
-        ];
-        // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
         //buffer the differential if snapping is set
         this._differential[0] -= newDifferential[0];
         this._differential[1] -= newDifferential[1];
@@ -196,11 +200,7 @@ define(function(require, exports, module) {
         //pipe that
         if (this.dragging) {
             console.log('dragging in draginator');
-            // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // Change to emit total translation units
-            // RED ALERT Change how resize is implemented
-            this.eventOutput.emit('resize', gridDifferential);
-            // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            this.eventOutput.emit('resize', newDifferential);
         } else {
             //modify position, retain reference
             pos[0] += newDifferential[0];
@@ -221,10 +221,7 @@ define(function(require, exports, module) {
 
             if (pos[0] !== originalPos[0] || pos[1] !== originalPos[1]) {
                 console.log('translating in draginator');
-                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // Change to emit total translation units
-                this.eventOutput.emit('translate', gridDifferential);
-                // ALERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                this.eventOutput.emit('translate', newDifferential);
             }
             this.eventOutput.emit('update', {position : pos});
         }
