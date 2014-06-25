@@ -159,6 +159,12 @@ define(function(require, exports, module) {
                 Left: [-this.options.snapX, 0],
                 Right: [this.options.snapX, 0]
             };
+            var shiftKeyMatrix = {
+                Up: [0, -this.options.snapY * 25],
+                Down: [0, this.options.snapY * 25],
+                Left: [-this.options.snapX * 25, 0],
+                Right: [this.options.snapX * 25, 0]
+            }
 
             var commandMatrix = {
                 'U+0008': _deleteElement.bind(this), // delete
@@ -176,10 +182,13 @@ define(function(require, exports, module) {
             if (keyMatrix[event.keyIdentifier]) {
                 if (event.metaKey) {
                     this.dragging = true;
+                } else if (event.shiftKey) {
+                    this.dragging = false;
+                    this._differential = shiftKeyMatrix[event.keyIdentifier];
                 } else {
                     this.dragging = false;
+                    this._differential = keyMatrix[event.keyIdentifier];
                 }
-                this._differential = keyMatrix[event.keyIdentifier];
             }
         } else {
             this.keybinding = false;
