@@ -43,13 +43,13 @@ define(function(require, exports, module) {
             properties: {
                 lineHeight: '150px',
                 textAlign: 'center',
-                backgroundColor: 'rgba(0, 200, 0, .7)',
+                backgroundColor: 'rgba(0, 0, 0, .75)',
                 zIndex: -2
             }
         });
         // renderController.add(modifier).add(this.surface);
-        console.log(this.modifier, this.surface);
-        this.add(this.modifier).add(this.surface);
+        this.modalNode = this.add(this.modifier);
+        this.modalNode.add(this.surface);
     }
 
     function _setListeners() {
