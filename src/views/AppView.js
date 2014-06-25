@@ -8,7 +8,7 @@ define(function(require, exports, module) {
     var MenuView = require('views/MenuView');
     var WorkView = require('views/WorkView');
     var ModalOverlay = require('views/ModalOverlay');
-    var SceneGrid = require('views/SceneGrid');
+    
     var generate = require('utils/Generator');
 
     function AppView() {
@@ -19,7 +19,6 @@ define(function(require, exports, module) {
         _createWorkView.call(this);
         _createBackground.call(this);
         _createModalOverlay.call(this);
-        _createGrid.call(this);
         _createMenuView.call(this);
         _setListeners.call(this);
     }
@@ -84,10 +83,11 @@ define(function(require, exports, module) {
         });
 
         var backgroundModifier = new StateModifier({
-            transform: Transform.translate(0, 0, -2)
+            transform: Transform.translate(0, 0, -1)
         });
 
         this.add(backgroundModifier).add(background);
+
     }
 
     function _createModalOverlay() {
@@ -116,7 +116,13 @@ define(function(require, exports, module) {
                 var layouts = this.workView.getLayouts();
                 var data = generate.sceneData(layouts, this.options.size);
 
-                console.log(generate.output(data.scene, layouts));
+                // refactor inline style
+                this.workView.back.setContent('<pre style="background-color: transparent">'+generate.output(data.scene, layouts)+'</pre>');
+                this.workView.back.setProperties({
+                    overflowY: 'scroll',
+                    overflowX: 'hidden'
+                });
+                this.workView.flip();
             }
         };
 

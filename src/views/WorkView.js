@@ -7,7 +7,13 @@ define(function(require, exports, module) {
     var StateModifier = require('famous/modifiers/StateModifier');
     var Draginator    = require('Draginator');
     var LayoutView    = require('views/LayoutView');
+    var Engine        = require('famous/core/Engine');
+    var Modifier      = require('famous/core/Modifier');
     var RenderController = require('famous/views/RenderController');
+    var SceneGrid = require('views/SceneGrid');
+    var Flipper       = require('famous/views/Flipper');
+    var Timer             = require('famous/utilities/Timer');
+
 
     function WorkView() {
         View.apply(this, arguments);
@@ -17,6 +23,8 @@ define(function(require, exports, module) {
         this.selectedLayout = undefined;
 window.wv = this; // testing only
         _createRenderController.call(this);
+        _createGrid.call(this);
+        _createFlipper.call(this);
         _setListeners.call(this);
     }
 
@@ -59,48 +67,82 @@ window.wv = this; // testing only
     };
 
     WorkView.DEFAULT_OPTIONS = {
-        // center: [0.5, 0.5],
-        // dimensions: [100, 200],
-        // color: '#FFFFF5',
-        // grid: {
-        //     width: 960,
-        //     height: 600,
-        //     dimensions: [6, 8],
-        //     cellSize: [120, 120] // Dominates dimensions
-        // }
+        flipDelay: 1000,
+        dimensions: [100, 200],
+        surface: '#FFFFF5',
+        dotColor: '#B2F5D9',
+        grid: {
+            width: 960,
+            height: 600,
+            dimensions: [6, 8],
+            cellSize: [120, 120] // Dominates dimensions
+        }
     };
+
+    function _createRenderController() {
+        this.renderController = new RenderController({
+            inTransition: false,
+            outTransition: false,
+            overlap: false
+        });
+
+        this.add(this.renderController);
+    }
+
+    function _createFlipper() {
+        this.flipper = new Flipper({
+            direction: Flipper.DIRECTION_Y
+        });
+
+        this.flipper.setFront(this.renderController);
+        this.back = new Surface({
+            properties: {
+                backgroundColor: this.options.dotColor,
+                webkitBackfaceVisibility: 'visible',
+                backfaceVisibility: 'visible'
+            }
+        });
+        this.flipper.setBack(this.back);
+
+        var centerModifier = new Modifier({origin : [0.5, 0.5]});
+
+        this.add(centerModifier).add(this.flipper);
+
+        var show = function() {
+            this.back.setContent('');
+            this.back.setProperties({
+                backgroundColor: this.options.white
+            });
+            Timer.setTimeout(function() {   // debounce doesn't work
+                this.renderController.show(this.grid, {duration: this.options.flipDelay});
+            }.bind(this), this.options.flipDelay);
+        };
+
+        var hide = function() {
+            this.renderController.hide({duration: 0});
+            this.back.setProperties({
+                backgroundColor: this.options.dotColor
+            });
+        };
+
+        var toggle = false;
+        this.flip = function(){
+            toggle ? show.call(this) : hide.call(this);
+            var angle = toggle ? 0 : Math.PI;
+            this.flipper.setAngle(angle, {curve : 'easeOutBounce', duration : this.options.flipDelay});
+            toggle = !toggle;
+        }.bind(this);
+    }
 
     function _createGrid() {
         this.grid = new SceneGrid(this.options.grid);
-        // this.gridModifier = new StateModifier({
-        //     origin: [0.5, 0.5],
-        //     align: [0.5, 0.5],
-        //     size: [this.options.grid.width, this.options.grid.height]
-        // });
-
-        // this.gridNode = this.add(this.gridModifier).add(this.grid);
-        this.add(this.grid);
-    }
-
-    function _createRenderController() {
-        var renderController = new RenderController();
-        this.add(renderController);
-    }
-
-    function _createWorkSurface() {
-        var workSurface = new Surface({
-            size: this.options.dimensions,
-            properties: {
-                backgroundColor: this.options.color
-            }
+        this.gridModifier = new StateModifier({
+            origin: [0.5, 0.5],
+            size: [this.options.grid.width, this.options.grid.height]
         });
 
-        var workSurfaceModifier = new StateModifier({
-            origin: this.options.center,
-            align: this.options.center
-        });
-
-        this.add(workSurfaceModifier).add(workSurface);
+        this.renderController.add(this.gridModifier).add(this.grid);
+        this.renderController.show(this.grid);
     }
 
     function _setListeners() {
@@ -145,14 +187,6 @@ window.wv = this; // testing only
             console.log(this);
             this.createLayoutView();
         }.bind(this));
-
-        // this._eventInput.on('allowCreation', function() {
-        //     window.onkeydown = function(event) {
-        //         if (event.keyIdentifier === 'U+004E') {
-        //             this.createLayoutView();
-        //         }
-        //     }.bind(this);
-        // }.bind(this));
 
         this._eventInput.on('editMyProperties', function(layoutView) {
             console.log('heard event editMyProperties');
