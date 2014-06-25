@@ -2,24 +2,30 @@ define(function(require, exports, module) {
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
+    var Modifier     = require('famous/core/Modifier');
+    var EventHandler = require('famous/core/EventHandler')
     var StateModifier = require('famous/modifiers/StateModifier');
-
+    var Easing        = require('famous/transitions/Easing');
+    var InputSurface  = require('famous/surfaces/InputSurface');
     var MenuView = require('views/MenuView');
     var WorkView = require('views/WorkView');
     var ModalOverlay = require('views/ModalOverlay');
-
+    var SceneGrid = require('views/SceneGrid');
+    
     var generate = require('utils/Generator');
+
+    // Simple cookies framework from MDN
+    var docCookies = require('../cookies');
 
     function AppView() {
         View.apply(this, arguments);
 
         this.menuToggle = false;
 
-        _createWorkView.call(this);
-        _createBackground.call(this);
-        _createModalOverlay.call(this);
-        _createMenuView.call(this);
-        _setListeners.call(this);
+        _eventCookiesHandler.call(this);
+        _checkCookies.call(this);
+
+        this._eventInput.on('updateDimensions', _handleDimensions.bind(this));
     }
 
     AppView.prototype = Object.create(View.prototype);
@@ -46,6 +52,25 @@ define(function(require, exports, module) {
         cellSize: [60, 60]
     };
 
+    function _eventCookiesHandler() {
+        docCookies.eventOutput = new EventHandler();
+        EventHandler.setOutputHandler(docCookies, docCookies.eventOutput);
+
+        docCookies.eventOutput.pipe(this._eventInput);
+    }
+
+    function _checkCookies() {
+        var dimensions;
+        if (dimensions = docCookies.getItem('dimensions')) {
+            console.log('dimensions already set FTW!!! ', dimensions);
+            _handleDimensions.call(this, dimensions.split(','));
+        } else {
+            _createModalOverlay.call(this);
+            _getWorkviewSizeFromUser.call(this);
+        }
+        
+    }
+
     function _createMenuView() {
         this.menuView = new MenuView();
         this.menuModifier = new StateModifier({
@@ -58,7 +83,9 @@ define(function(require, exports, module) {
     function _createWorkView() {
         this.workView = new WorkView({
             width: this.options.width,
-            height: this.options.height
+            height: this.options.height,
+            cols: this.options.cols,
+            rows: this.options.rows
         });
 
         this.workModifier = new StateModifier({
@@ -91,18 +118,6 @@ define(function(require, exports, module) {
     function _createModalOverlay() {
         this.modalOverlay = new ModalOverlay();
         this.add(this.modalOverlay);
-    }
-
-    function _createGrid() {
-        this.grid = new SceneGrid(this.options.grid);
-        this.grid.app = this;
-        this.gridModifier = new StateModifier({
-            origin: this.options.center,
-            align: this.options.center,
-            size: [this.options.grid.width, this.options.grid.height]
-        });
-
-        this.gridNode = this.add(this.gridModifier).add(this.grid);
     }
 
     function _setListeners() {
@@ -144,6 +159,98 @@ define(function(require, exports, module) {
             this.modalOverlay.modifier.setTransform(Transform.translate(0, 0, 99));
             this.modalOverlay.state = true;
         }.bind(this));
+    }
+
+    function _getWorkviewSizeFromUser() {
+        if (!docCookies.getItem("workViewDimensions")) {
+console.log('no cookies, but i got this great modalOverlay ', this.modalOverlay);
+            var modal = this.modalOverlay;
+            modal.modifier.setTransform( Transform.translate(0, 0, 8) );
+            var inputWidth = new InputSurface({
+                size: [200, 80],
+                name: 'width',
+                placeholder: 'WIDTH',
+                value: '',
+                type: 'text'
+            });
+
+            var inputHeight = new InputSurface({
+                size: [200, 80],
+                name: 'height',
+                placeholder: 'HEIGHT',
+                value: '',
+                type: 'text'
+            });
+
+            var inputCols = new InputSurface({
+                size: [200, 80],
+                name: 'Cols',
+                placeholder: 'COLS',
+                value: '',
+                type: 'text'
+            });
+
+            var inputRows = new InputSurface({
+                size: [200, 80],
+                name: 'Rows',
+                placeholder: 'ROWS',
+                value: '',
+                type: 'text'
+            });
+
+            this.modalOverlay.modalNode.add(new Modifier({origin: [0.5, 0.5], align: [0.5, .2], properties: {zIndex:999}})).add(inputWidth);
+            this.modalOverlay.modalNode.add(new Modifier({origin: [0.5, 0.5], align: [0.5, .4], properties: {zIndex:999}})).add(inputHeight);
+            this.modalOverlay.modalNode.add(new Modifier({origin: [0.5, 0.5], align: [0.5, .6], properties: {zIndex:999}})).add(inputCols);
+            this.modalOverlay.modalNode.add(new Modifier({origin: [0.5, 0.5], align: [0.5, .8], properties: {zIndex:999}})).add(inputRows);
+        }
+
+        window.onkeydown = function(e) {
+            // Enter Key was pressed
+            if (e.keyCode === 13) {
+                var inputs = document.getElementsByTagName('input')
+                var inps = Array.prototype.slice.call(inputs);
+                var dims = [];
+                inps.forEach(function(el) {
+                    dims.push(el.value);
+                });
+
+                // Set cookie and update views when options are all set
+                if ( dims.indexOf("") === -1 && dims.length === 4 ) {
+                    docCookies.setItem('dimensions', dims);
+                    var dimensions = docCookies.getItem('dimensions')
+                        .split(',')
+                        .map(function(item) {
+                            return parseInt(item);
+                        });
+
+                        this.modalOverlay.modifier.setTransform(Transform.translate(0, 0, -3));
+                        docCookies.eventOutput.emit('updateDimensions', dimensions);
+                }
+            }
+        }.bind(this);
+    }
+
+    function _handleDimensions(dimensions) {
+        console.log('appView heard you!', dimensions);
+        var width = dimensions[0];
+        var height = dimensions[1];
+        var gridDimensions = [dimensions[2], dimensions[3]];
+        var cellSize = [width/gridDimensions[0], height/gridDimensions[1]];
+        this.options.width = width;
+        this.options.height = height;
+        this.options.cols = dimensions[2];
+        this.options.rows = dimensions[3];
+        _generateViews.call(this);
+    }
+
+    function _generateViews() {
+        _createWorkView.call(this);
+        _createBackground.call(this);
+        _createModalOverlay.call(this);
+        _createMenuView.call(this);
+        _setListeners.call(this);
+                console.log(this.options.width,this.options.height,this.options.cols,this.options.rows);
+
     }
 
     module.exports = AppView;

@@ -39,8 +39,22 @@ define(function(require, exports, module) {
     // needs refactoring
     WorkView.prototype.createLayoutView = function(offset) {
         this.numLayouts++;
-
-        var layoutView = new LayoutView(offset || this.options.layout);
+console.log("I got your problem right here: ", offset)
+        var layoutView = new LayoutView({
+            size: {
+                width: this.options.width/this.options.cols,
+                height: this.options.height/this.options.rows
+            },
+            protoSize: {
+                width: this.options.width/this.options.cols,
+                height: this.options.height/this.options.rows
+            },
+            screen: {
+                width: this.options.width,
+                height: this.options.height
+            },
+            offset: (offset || [0, 0])
+        });
         layoutView.linkTo(this.layouts, this.layoutsList, this.numLayouts);
         layoutView.addLayout();
 
@@ -77,29 +91,18 @@ define(function(require, exports, module) {
         dimensions: [100, 200],
         flipperBackColor: '#B2F5D9',
         surface: '#FFFFF5',
-        dotColor: '#B2F5D9',
-        grid: {
-            width: 960,
-            height: 600,
-            dimensions: [6, 8],
-            cellSize: [60, 60] // Dominates dimensions
-        },
-        layout: {
-            size: {
-                width: 60,
-                height: 60
-            },
-            boxSize: {
-                width: 60,
-                height: 60
-            },
-            offset: [0, 0]
-        }
+        dotColor: '#B2F5D9'
     };
 
     function _createGrid() {
         this.renderController = new RenderController();
-        this.grid = new SceneGrid();
+        this.grid = new SceneGrid({
+            width: this.options.width,
+            height: this.options.height,
+            cols: this.options.cols,
+            rows: this.options.rows,
+            cellSize: [this.options.width/this.options.cols, this.options.height/this.options.rows]
+        });
         this.gridModifier = new StateModifier({
             origin: [0.5, 0.5],
             size: [this.options.width, this.options.height]
@@ -201,7 +204,7 @@ define(function(require, exports, module) {
         this.subscribe(this.grid._eventOutput);
 
         this.grid.on('createNewSquare', function(data) {
-            this.createLayoutView({offset: [data % 16, Math.floor(data / 16)]});
+            this.createLayoutView([data % 16, Math.floor(data / 16)]);
         }.bind(this));
     }
 
