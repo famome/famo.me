@@ -4,7 +4,7 @@ define(function(require, exports, module) {
     var Transform  = require('famous/core/Transform');
     
     var generator = {
-        sceneData: function(layouts, cw) {
+        sceneData: function(layouts) {
             var data = {
                 scene: [],
                 surfaces: {}
@@ -12,7 +12,7 @@ define(function(require, exports, module) {
 
             for (var layout in layouts) {
                 data.scene.push({
-                    transform: Transform.translate(layouts[layout].offset[0]*cw, layouts[layout].offset[1]*cw),
+                    transform: Transform.translate(layouts[layout].offset[0], layouts[layout].offset[1]),
                     target: {id: layout}
                 });
 
