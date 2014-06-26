@@ -22,13 +22,7 @@ define(function(require, exports, module) {
         return this._optionsManager.setOptions(options);
     };
 
-    SceneGrid.DEFAULT_OPTIONS = {
-        width: 600,
-        height: 600,
-        cols: 10,
-        rows: 10,
-        cellSize: [60, 60]
-    };
+    SceneGrid.DEFAULT_OPTIONS = {};
 
     function _createGrid() {
         var grid = new GridLayoutCellSized({

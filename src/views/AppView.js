@@ -46,10 +46,9 @@ define(function(require, exports, module) {
 
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150,
-        size: 60,
-        width: 960,
+        width: 600,
         height: 600,
-        dimensions: [15, 10],
+        dimensions: [10, 10],
         cellSize: [60, 60]
     };
 
