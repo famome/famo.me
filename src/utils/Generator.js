@@ -10,16 +10,20 @@ define(function(require, exports, module) {
                 surfaces: {}
             };
 
-            for (var layout in layouts) {
+            for (var i = 0; i < layouts.length; i++) {
+                var offset = layouts[i].getOffset();
+                var id = layouts[i].getId();
+                var size = layouts[i].getSize();
+
                 data.scene.push({
-                    transform: Transform.translate(layouts[layout].offset[0], layouts[layout].offset[1]),
-                    target: {id: layout}
+                    transform: Transform.translate(offset[0], offset[1]),
+                    target: {id: id}
                 });
 
-                data.surfaces[layout] = new Surface({
-                    content: layout,
+                data.surfaces[id] = new Surface({
+                    content: id,
                     classes: ['red-bg'],
-                    size: layouts[layout].size,
+                    size: size,
                     properties: {
                         textAlign: 'center'
                     }

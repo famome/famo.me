@@ -19,8 +19,6 @@ define(function(require, exports, module) {
         if (options) this.setOptions(options);
 
         this.numLayouts = 0;
-        // TODO: remove either layouts or layoutsList
-        this.layouts = {};
         this.layoutsList = [];
         this.selectedLayout = undefined;
 
@@ -54,7 +52,7 @@ define(function(require, exports, module) {
             },
             offset: (offset || [0, 0])
         });
-        layoutView.linkTo(this.layouts, this.layoutsList, this.numLayouts);
+        layoutView.linkTo(this.layoutsList, this.numLayouts);
         layoutView.addLayout();
 
         this.add(layoutView);
@@ -68,10 +66,6 @@ define(function(require, exports, module) {
         this._eventOutput.emit('select', layoutView);
 
         this.selectedLayout = layoutView;
-    };
-
-    WorkView.prototype.getLayouts = function() {
-        return this.layouts;
     };
 
     WorkView.prototype.getLayoutsList = function() {

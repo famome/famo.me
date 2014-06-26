@@ -27,23 +27,22 @@ define(function(require, exports, module) {
 
     LayoutView.prototype = Object.create(View.prototype);
     LayoutView.prototype.constructor = LayoutView;
+
     LayoutView.prototype.getId = function() {
         return this.id;
+    };
+
+    LayoutView.prototype.getOffset = function() {
+        return [this.xOffset, this.yOffset];
     };
 
     LayoutView.prototype.getSize = function() {
         return [this.width, this.height];
     };
     LayoutView.prototype.addLayout = function() {
-        var currentSize = this.modifier.getSize();
-        this.layouts[this.id] = {
-            offset: [this.xOffset, this.yOffset],
-            size: [currentSize[0], currentSize[1]]
-        };
         this.layoutsList.push(this);
     };
-    LayoutView.prototype.linkTo = function(layouts, layoutsList, numLayouts) {
-        this.layouts = layouts;
+    LayoutView.prototype.linkTo = function(layoutsList, numLayouts) {
         this.numLayouts = numLayouts;
         this.layoutsList = layoutsList;
 
@@ -53,12 +52,7 @@ define(function(require, exports, module) {
         var index = this.layoutsList.indexOf(this);
         this._eventOutput.emit('cycleToNextLayout', index);
         this.layoutsList.splice(index, 1);
-        delete this.layouts[this.id];
     };
-    LayoutView.prototype.getLayouts = function() {
-        return this.layouts;
-    };
-
     LayoutView.prototype.selectSurface = function() {
         this.surface.setProperties({
             backgroundColor: 'pink',
@@ -184,8 +178,6 @@ define(function(require, exports, module) {
             if (this.layoutsList[this.layoutsList.indexOf(this)]) {
                 this.xOffset = data[0];
                 this.yOffset = data[1];
-
-                this.layouts[this.id].offset = [this.xOffset, this.yOffset];
             }
         }.bind(this));
 
@@ -215,7 +207,6 @@ define(function(require, exports, module) {
 
                 this.modifier.setSize(
                     [currentSize[0] + data[0], currentSize[1] + data[1]]);
-                this.layouts[this.id].size = this.modifier.getSize();
 
                 this.draginator.options.xRange[1] -= data[0];
                 this.draginator.options.yRange[1] -= data[1];
@@ -224,7 +215,7 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.surface.on('dblclick', function() {
-            console.log(this.id, this.getLayouts()[this.id]);
+            console.log(this.id, this.layoutsList[this.layoutsList.indexOf(this)]);
         }.bind(this));
 
         this._eventInput.on('delete', function() {

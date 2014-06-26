@@ -64,12 +64,10 @@ define(function(require, exports, module) {
             console.log('translating');
             this.xOffset += data[0];
             this.yOffset += data[1];
-
-            this.layouts[this.id].offset = [this.xOffset, this.yOffset];
         }.bind(this));
 
         this.surface.on('dblclick', function() {
-            console.log('modal dblclick ', this.id, this.getLayouts()[this.id]);
+            console.log('modal dblclick ', this.id, this.getLayoutsList().id);
         }.bind(this));
     }
 
