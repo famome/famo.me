@@ -10,6 +10,8 @@ define(function(require, exports, module) {
     var OptionsManager   = require('famous/core/OptionsManager');
     var RenderController = require('famous/views/RenderController');
 
+    var RenderNode = require('famous/core/RenderNode');
+
 
     function WorkView(options) {
         View.apply(this);
@@ -21,6 +23,8 @@ define(function(require, exports, module) {
         this.numLayouts = 0;
         this.layoutsList = [];
         this.selectedLayout = undefined;
+
+        this.node = new RenderNode();
 
         _createGrid.call(this);
         _createFlipper.call(this);
@@ -51,7 +55,7 @@ define(function(require, exports, module) {
         layoutView.linkTo(this.layoutsList, this.numLayouts);
         layoutView.addLayout();
 
-        this.add(layoutView);
+        this.node.add(new Modifier({origin: [0, 0]})).add(layoutView);
 
         this._eventOutput.pipe(layoutView._eventInput);
         layoutView._eventOutput.pipe(this._eventInput);
@@ -78,7 +82,7 @@ define(function(require, exports, module) {
     WorkView.DEFAULT_OPTIONS = {
         flipDelay: 1000,
         dimensions: [100, 200],
-        flipperBackColor: '#B2F5D9',
+        // flipperBackColor: '#B2F5D9',
         surface: '#FFFFF5'
     };
 
@@ -96,8 +100,8 @@ define(function(require, exports, module) {
             size: [this.options.width, this.options.height]
         });
 
-        this.renderController.add(this.gridModifier).add(this.grid);
-        this.renderController.show(this.grid);
+        this.renderController.add(this.node).add(this.gridModifier).add(this.grid);
+        this.renderController.show(this.node);
     }
 
     function _createFlipper() {
@@ -109,7 +113,7 @@ define(function(require, exports, module) {
 
         this.codeDisplay = new Surface({
             properties: {
-                backgroundColor: this.options.flipperBackColor,
+                backgroundColor: this.options.surface,
                 webkitBackfaceVisibility: 'visible',
                 backfaceVisibility: 'visible'
             }
@@ -128,7 +132,7 @@ define(function(require, exports, module) {
         });
 
         Timer.setTimeout(function() {   // debounce doesn't work
-            this.renderController.show(this.grid, {duration: this.options.flipDelay});
+            this.renderController.show(this.node, {duration: this.options.flipDelay});
         }.bind(this), this.options.flipDelay);
     }
 
