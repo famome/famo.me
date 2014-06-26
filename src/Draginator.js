@@ -124,7 +124,7 @@ define(function(require, exports, module) {
         this.eventOutput.emit('editPropertiesOfSelected');
     }
 
-    function _snapToGrid() {
+    function _toggleSnapToGrid() {
         var currentPosition = this.getPosition();
         var newPosition = [];
         var snap = {
@@ -174,7 +174,7 @@ define(function(require, exports, module) {
                 'U+0009': _switchElement.bind(this), // tab
                 'U+001B': _deselectAll.bind(this), // space bar
                 'U+0045': _editPropertiesOfSelected.bind(this), // 'e'
-                'U+0020': _snapToGrid.bind(this), // space
+                'U+0020': _toggleSnapToGrid.bind(this), // space
                 Enter: _generateJSON.bind(this)
             };
 
@@ -258,8 +258,10 @@ define(function(require, exports, module) {
      */
     Draginator.prototype.setOptions = function setOptions(options) {
         var currentOptions = this.options;
+
         if (options.projection !== undefined) {
             var proj = options.projection;
+
             this.options.projection = 0;
             ['x', 'y'].forEach(function(val) {
                 if (proj.indexOf(val) !== -1) currentOptions.projection |= _direction[val];
@@ -302,6 +304,7 @@ define(function(require, exports, module) {
     Draginator.prototype.setRelativePosition = function setRelativePosition(position, transition, callback) {
         var currPos = this.getPosition();
         var relativePosition = [currPos[0] + position[0], currPos[1] + position[1]];
+
         this.setPosition(relativePosition, transition, callback);
     };
 
@@ -374,7 +377,7 @@ define(function(require, exports, module) {
 
         // there can only be one active window.onkeydown function available at a time
         window.onkeydown = function(event) {
-            if (event.metaKey && event.keyIdentifier === 'Left' // brower back
+            if (event.metaKey && event.keyIdentifier === 'Left' // browser back
                 || event.metaKey && event.keyIdentifier === 'Right') { // browser forward
                 event.preventDefault();
             }

@@ -45,11 +45,7 @@ define(function(require, exports, module) {
             screen: {
                 width: this.options.width,
                 height: this.options.height
-            },
-            edgeDetect: {
-                right: this.options.width/this.options.cols/3,
-                bottom: this.options.height/this.options.rows/3
-            },
+            }
             offset: (offset || [0, 0])
         });
         layoutView.linkTo(this.layoutsList, this.numLayouts);

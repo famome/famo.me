@@ -1,12 +1,12 @@
 define(function(require, exports, module) {
-    var View          = require('famous/core/View');
-    var Surface       = require('famous/core/Surface');
-    var Transform     = require('famous/core/Transform');
-    var StateModifier = require('famous/modifiers/StateModifier');
-    var EventHandler  = require('famous/core/EventHandler');
-    var Draginator    = require('Draginator');
+    var EventHandler     = require('famous/core/EventHandler');
+    var Surface          = require('famous/core/Surface');
+    var Transform        = require('famous/core/Transform');
+    var View             = require('famous/core/View');
+    var StateModifier    = require('famous/modifiers/StateModifier');
+    var Transitionable   = require('famous/transitions/Transitionable');
     var RenderController = require('famous/views/RenderController');
-    var Transitionable = require('famous/transitions/Transitionable');
+    var Draginator       = require('Draginator');
 
     function LayoutView() {
         View.apply(this, arguments);
@@ -39,20 +39,24 @@ define(function(require, exports, module) {
     LayoutView.prototype.getSize = function() {
         return [this.width, this.height];
     };
+
     LayoutView.prototype.addLayout = function() {
         this.layoutsList.push(this);
     };
+
     LayoutView.prototype.linkTo = function(layoutsList, numLayouts) {
         this.numLayouts = numLayouts;
         this.layoutsList = layoutsList;
-
         this.id += this.numLayouts;
     };
+
     LayoutView.prototype.removeLayout = function() {
         var index = this.layoutsList.indexOf(this);
+
         this._eventOutput.emit('cycleToNextLayout', index);
         this.layoutsList.splice(index, 1);
     };
+
     LayoutView.prototype.selectSurface = function() {
         this.surface.setProperties({
             boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
@@ -115,7 +119,6 @@ define(function(require, exports, module) {
         this.surface.setProperties({mouseInside: true});
         var currentSize = this.modifier.getSize();
         var edge = '';
-
         var edges = {
           // 'n' : { cursor: 'ns-resize' },
           // 'nw': { cursor: 'nwse-resize' },
