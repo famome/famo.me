@@ -23,7 +23,7 @@ define(function(require, exports, module) {
         this.menuToggle = false;
 
         _eventCookiesHandler.call(this);
-        _checkCookies.call(this);
+        // _checkCookies.call(this);
 
         this._eventInput.on('updateDimensions', _handleDimensions.bind(this));
     }
@@ -81,7 +81,7 @@ define(function(require, exports, module) {
     function _createMenuView() {
         this.menuView = new MenuView();
         this.menuModifier = new StateModifier({
-            size: [this.options.menuSize, undefined],
+            size: [this.options.menuSize, 100],
             origin: [1, 0]
         });
         this.add(this.menuModifier).add(this.menuView);
