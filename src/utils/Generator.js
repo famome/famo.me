@@ -42,11 +42,12 @@ define(function(require, exports, module) {
             return scene;
         },
         output: function(sceneJSON, layouts) {
-            var _generateSurfaceString = function(layout, layouts) {
-                return  'scene.id[\'' + layout + '\'].add(new Surface({\n' +
-                            '\tcontent:\'' + layout + '\',\n' +
+            var _generateSurfaceString = function(layout) {
+                console.log(layout.getId(), layout.modifier.getSize());
+                return  'scene.id[\'' + layout.getId() + '\'].add(new Surface({\n' +
+                            '\tcontent:\'' + layout.getId() + '\',\n' +
                             '\tclasses: [\'red-bg\'],\n' +
-                            '\tsize:[' + layouts[layout].size + '],\n' +
+                            '\tsize:[' + layout.modifier.getSize() + '],\n' +
                             '\tproperties: {\n' +
                                 '\t\ttextAlign: \'center\'\n' +
                             '\t}\n' +
@@ -55,8 +56,8 @@ define(function(require, exports, module) {
 
             var _generateSurfaceStrings = function(layouts) {
                 var string = '';
-                for (var layout in layouts) {
-                    string += _generateSurfaceString(layout, layouts);
+                for (var i = 0; i < layouts.length; i++) {
+                    string += _generateSurfaceString(layouts[i]);
                 }
 
                 return string;
