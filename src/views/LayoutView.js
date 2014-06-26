@@ -1,29 +1,21 @@
 define(function(require, exports, module) {
-    var View          = require('famous/core/View');
-    var Surface       = require('famous/core/Surface');
-    var Transform     = require('famous/core/Transform');
-    var StateModifier = require('famous/modifiers/StateModifier');
-    var EventHandler  = require('famous/core/EventHandler');
-    var Draginator    = require('Draginator');
-    var RenderController = require('famous/views/RenderController');
-    var Transitionable = require('famous/transitions/Transitionable');
-    var SpringTransition = require('famous/transitions/SpringTransition');
-    Transitionable.registerMethod('spring', SpringTransition);
-    var spring = {
-        method: 'spring',
-        period: 500,
-        dampingRatio: 0
-    };
+    var EventHandler     = require('famous/core/EventHandler');
+    var Transform        = require('famous/core/Transform');
+    var Surface          = require('famous/core/Surface');
+    var View             = require('famous/core/View');
 
-    function LayoutView(offset) {
+    var RenderController = require('famous/views/RenderController');
+
+    var StateModifier    = require('famous/modifiers/StateModifier');
+
+    var Draginator       = require('Draginator');
+
+    function LayoutView() {
         View.apply(this, arguments);
 
         this.id = 'LayoutView';
-        this.options.offset = offset || this.options.offset;
-        this.xOffset = this.options.offset[0];
-        this.yOffset = this.options.offset[1];
-        this.width = this.options.size.width;
-        this.height = this.options.size.height;
+        this.xOffset = this.options.offset[0] * this.options.size.width; // PX
+        this.yOffset = this.options.offset[1] * this.options.size.height; // PX
 
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
@@ -31,83 +23,79 @@ define(function(require, exports, module) {
 
         _setListeners.call(this);
 
-        // this.add(this.draginator).add(this.modifier).add(this.surface);
         this.add(this.draginator).add(this.modifier).add(this.renderController);
-        this.draginator.setPosition([this.options.snapX * this.xOffset, this.options.snapY * this.yOffset]);
+        this.draginator.setPosition([this.xOffset, this.yOffset]);
     }
 
     LayoutView.prototype = Object.create(View.prototype);
     LayoutView.prototype.constructor = LayoutView;
+
     LayoutView.prototype.getId = function() {
         return this.id;
     };
+
     LayoutView.prototype.getOffset = function() {
         return [this.xOffset, this.yOffset];
     };
+
     LayoutView.prototype.getSize = function() {
         return [this.width, this.height];
     };
+
     LayoutView.prototype.addLayout = function() {
-        this.layouts[this.id] = {
-            offset: [this.xOffset, this.yOffset],
-            size: [this.width, this.height]
-        };
         this.layoutsList.push(this);
     };
-    LayoutView.prototype.linkTo = function(layouts, layoutsList, numLayouts) {
-        this.layouts = layouts;
+
+    LayoutView.prototype.linkTo = function(layoutsList, numLayouts) {
         this.numLayouts = numLayouts;
         this.layoutsList = layoutsList;
-
         this.id += this.numLayouts;
-        console.log('numLayouts', this.numLayouts);
-        console.log('layoutsList', this.layoutsList);
-        console.log('layouts', JSON.stringify(this.layouts));
     };
+
     LayoutView.prototype.removeLayout = function() {
         var index = this.layoutsList.indexOf(this);
+
         this._eventOutput.emit('cycleToNextLayout', index);
         this.layoutsList.splice(index, 1);
-        delete this.layouts[this.id];
-    };
-    LayoutView.prototype.getLayouts = function() {
-        return this.layouts;
     };
 
     LayoutView.prototype.selectSurface = function() {
-        console.log('selectSurface ', this);
         this.surface.setProperties({
-            // boxShadow: '0 0 50px #FFFFA5',
-            backgroundColor: 'pink',
+            boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
+            backgroundColor: '#1496CC',
             zIndex: 100
         });
         this.draginator.select();
-        this.modifier.setTransform(Transform.translate(0.5, 0.5, 0), spring);
     };
 
     LayoutView.DEFAULT_OPTIONS = {
-        snapX: 60,
-        snapY: 60,
         offset: [0, 0],
-        dimension: [1, 1],
         color: 'pink',
         size: {
             width: 60,
             height: 60
         },
-        edgeDetectSize: 20,
+        screen: {
+            width: 960,
+            height: 600
+        },
+        edgeDetectSize: {
+            right: 20,
+            bottom: 20
+        },
         zIndex: 9
     };
 
     function _createLayoutDraginator() {
         this.draginator = new Draginator({
-            snapX: this.options.snapX,
-            snapY: this.options.snapY,
-            xRange: [0, 960 - this.options.snapX],
-            yRange: [0, 600 - this.options.snapY],
-            transition  : {duration : 500, curve: "easeIn"}
-            // xRange: [0, this.options.size.width],
-            // yRange: [0, this.options.size.height]
+            snapX: this.options.size.width,
+            snapY: this.options.size.height,
+            minSnapX: 1,
+            minSnapY: 1,
+            maxSnapX: this.options.size.width,
+            maxSnapY: this.options.size.height,
+            xRange: [0, this.options.screen.width - this.options.size.width],
+            yRange: [0, this.options.screen.height - this.options.size.height]
         });
     }
 
@@ -120,8 +108,8 @@ define(function(require, exports, module) {
     function _createLayoutSurface() {
         this.surface = new Surface({
             properties: {
-                border: '0px solid purple',
                 backgroundColor: this.options.color,
+                boxShadow: '0 0 10px black',
                 cursor: '-webkit-grab'
             }
         });
@@ -131,8 +119,8 @@ define(function(require, exports, module) {
 
     function _setEdges(event) {
         this.surface.setProperties({mouseInside: true});
+        var currentSize = this.modifier.getSize();
         var edge = '';
-
         var edges = {
           // 'n' : { cursor: 'ns-resize' },
           // 'nw': { cursor: 'nwse-resize' },
@@ -145,13 +133,13 @@ define(function(require, exports, module) {
           ''  : { cursor: '-webkit-grab' }
         };
 
-        if (event.offsetY < this.options.edgeDetectSize)
+        if (event.offsetY < this.options.edgeDetectSize.bottom)
             edge = 'n';
-        if (this.options.snapY * this.options.dimension[1] - event.offsetY < this.options.edgeDetectSize)
+        if (currentSize[1] - event.offsetY < this.options.edgeDetectSize.bottom)
             edge = 's';
-        if (event.offsetX < this.options.edgeDetectSize)
+        if (event.offsetX < this.options.edgeDetectSize.right)
             edge += 'w';
-        if (this.options.snapY * this.options.dimension[0] - event.offsetX < this.options.edgeDetectSize)
+        if (currentSize[0] - event.offsetX < this.options.edgeDetectSize.right)
             edge += 'e';
 
         this.draggable = edge === '';
@@ -194,17 +182,9 @@ define(function(require, exports, module) {
 
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
-            if (this.layouts[this.id]) {
-                var currentDimension = this.options.dimension;
-                console.log('current dimension', currentDimension);
-                console.log('translating');
-                this.xOffset += data[0];
-                this.yOffset += data[1];
-                console.log(this.xOffset, this.yOffset);
-
-
-                this.layouts[this.id].offset = [this.xOffset, this.yOffset];
-                console.log(this.xOffset);
+            if (this.layoutsList[this.layoutsList.indexOf(this)]) {
+                this.xOffset = data[0];
+                this.yOffset = data[1];
             }
         }.bind(this));
 
@@ -223,37 +203,25 @@ define(function(require, exports, module) {
 
         // view listens for resize from draggable
         this._eventInput.on('resize', function(data) {
-            console.log('resizing');
             var cursor = this.surface.properties.cursor;
             var currentSize = this.modifier.getSize();
-            var currentDimension = this.options.dimension;
-            console.log('current dimension', currentDimension);
 
-            if ((currentSize[0] + data[0] * this.options.snapX)
-                && (currentSize[1] + data[1] * this.options.snapY)
-                && (this.xOffset * this.options.snapX + currentSize[0] + data[0] * this.options.snapX <= 960)
-                && (this.yOffset * this.options.snapY + currentSize[1] + data[1] * this.options.snapY <= 600)) {
-                    this.options.dimension[0] = currentDimension[0] + data[0];
-                    this.options.dimension[1] = currentDimension[1] + data[1];
-                    console.log(this.xOffset, this.yOffset);
+            if ((currentSize[0] + data[0]) // make sure box doesn't shrink to 0 width
+                && (currentSize[1] + data[1]) // make sure box doesn't shrink to 0 height
+                // Make sure right/bottom doesn't go past grid boundaries
+                && (this.xOffset + currentSize[0] + data[0] <= this.options.screen.width)
+                && (this.yOffset + currentSize[1] + data[1] <= this.options.screen.height)) {
 
-                    this.modifier.setSize(
-                        [currentSize[0] + data[0] * this.options.snapX,
-                        currentSize[1] + data[1] * this.options.snapY]);
+                this.modifier.setSize(
+                    [currentSize[0] + data[0], currentSize[1] + data[1]]);
 
-                    this.draginator.options.xRange[1] -= data[0] * this.options.snapX;
-                    this.draginator.options.yRange[1] -= data[1] * this.options.snapY;
-
-                    this.layouts[this.id].size = [
-                        currentSize[0] + data[0] * this.options.snapX,
-                        currentSize[1] + data[1] * this.options.snapY
-                    ];
+                this.draginator.options.xRange[1] -= data[0];
+                this.draginator.options.yRange[1] -= data[1];
             }
         }.bind(this));
 
         this.surface.on('dblclick', function() {
-            // console.log(this.id, this.getLayouts()[this.id]);
-            this._eventOutput.emit('superSizeMe', this);
+            console.log(this.id, this.layoutsList[this.layoutsList.indexOf(this)]);
         }.bind(this));
 
         this._eventInput.on('delete', function() {
@@ -261,10 +229,6 @@ define(function(require, exports, module) {
             this.removeLayout();
             this._eventOutput.emit('allowCreation');
         }.bind(this));
-
-        // this._eventInput.on('allowCreate', function() {
-        //     this._eventOutput.emit('allowCreation');
-        // }.bind(this));
 
         this._eventInput.on('create', function() {
             this._eventOutput.emit('createNewLayout');
@@ -278,17 +242,17 @@ define(function(require, exports, module) {
 
         this._eventInput.on('select', function(selectedView) {
             if(this === selectedView) {
-                console.log('going to selectSurface ', this);
                 this.selectSurface.call(this);
             }
         }.bind(this));
 
         this._eventInput.on('deselect', function() {
-                this.surface.setProperties({
-                    boxShadow: 'none',
-                    backgroundColor: 'pink',
-                    zIndex: 9
-                })
+            this.surface.setProperties({
+                boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
+                backgroundColor: 'pink',
+                zIndex: 9
+            });
+
             this.modifier.setTransform(this.modifier.getTransform());
             this.draginator.deselect();
         }.bind(this));

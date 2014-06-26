@@ -2,24 +2,28 @@ define(function(require, exports, module) {
     var Scene      = require('famous/core/Scene');
     var Surface    = require('famous/core/Surface');
     var Transform  = require('famous/core/Transform');
-    
+
     var generator = {
-        sceneData: function(layouts, cw) {
+        sceneData: function(layouts) {
             var data = {
                 scene: [],
                 surfaces: {}
             };
 
-            for (var layout in layouts) {
+            for (var i = 0; i < layouts.length; i++) {
+                var offset = layouts[i].getOffset();
+                var id = layouts[i].getId();
+                var size = layouts[i].getSize();
+
                 data.scene.push({
-                    transform: Transform.translate(layouts[layout].offset[0]*cw, layouts[layout].offset[1]*cw),
-                    target: {id: layout}
+                    transform: Transform.translate(offset[0], offset[1]),
+                    target: {id: id}
                 });
 
-                data.surfaces[layout] = new Surface({
-                    content: layout,
+                data.surfaces[id] = new Surface({
+                    content: id,
                     classes: ['red-bg'],
-                    size: layouts[layout].size,
+                    size: size,
                     properties: {
                         textAlign: 'center'
                     }
@@ -38,11 +42,12 @@ define(function(require, exports, module) {
             return scene;
         },
         output: function(sceneJSON, layouts) {
-            var _generateSurfaceString = function(layout, layouts) {
-                return  'scene.id[\'' + layout + '\'].add(new Surface({\n' +
-                            '\tcontent:\'' + layout + '\',\n' +
+            var _generateSurfaceString = function(layout) {
+                console.log(layout.getId(), layout.modifier.getSize());
+                return  'scene.id[\'' + layout.getId() + '\'].add(new Surface({\n' +
+                            '\tcontent:\'' + layout.getId() + '\',\n' +
                             '\tclasses: [\'red-bg\'],\n' +
-                            '\tsize:[' + layouts[layout].size + '],\n' +
+                            '\tsize:[' + layout.modifier.getSize() + '],\n' +
                             '\tproperties: {\n' +
                                 '\t\ttextAlign: \'center\'\n' +
                             '\t}\n' +
@@ -51,10 +56,10 @@ define(function(require, exports, module) {
 
             var _generateSurfaceStrings = function(layouts) {
                 var string = '';
-                for (var layout in layouts) {
-                    string += _generateSurfaceString(layout, layouts);
+                for (var i = 0; i < layouts.length; i++) {
+                    string += _generateSurfaceString(layouts[i]);
                 }
-    
+
                 return string;
             };
 
@@ -68,7 +73,7 @@ define(function(require, exports, module) {
             string = string.replace(/\"transform\"\:\ \[\n\W+/g, '"transform": [').replace(/^\W+(\d+)\,\n/gm,'$1, ').replace(/\,\W+(\d+)/g,', $1').replace(/\n\W+?\]\,/g,'],');
             return string;
         },
-        
+
     };
 
     module.exports = generator;

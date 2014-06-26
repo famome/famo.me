@@ -8,14 +8,16 @@
  */
 
 define(function(require, exports, module) {
-    var Transform = require('famous/core/Transform');
-    var Transitionable = require('famous/transitions/Transitionable');
-    var EventHandler = require('famous/core/EventHandler');
-    var Utilities = require('famous/math/Utilities');
+    var Transform      = require('famous/core/Transform');
+    var EventHandler   = require('famous/core/EventHandler');
 
-    var GenericSync = require('famous/inputs/GenericSync');
-    var MouseSync = require('famous/inputs/MouseSync');
-    var TouchSync = require('famous/inputs/TouchSync');
+    var Transitionable = require('famous/transitions/Transitionable');
+
+    var Utilities      = require('famous/math/Utilities');
+
+    var GenericSync    = require('famous/inputs/GenericSync');
+    var MouseSync      = require('famous/inputs/MouseSync');
+    var TouchSync      = require('famous/inputs/TouchSync');
     GenericSync.register({'mouse': MouseSync, 'touch': TouchSync});
 
     /**
@@ -41,6 +43,7 @@ define(function(require, exports, module) {
         this._differential  = [0,0];
         this._active = true;
         this._selected = false;
+        this.snapped = true;
 
         this.sync = new GenericSync(['mouse', 'touch'], {scale : this.options.scale});
         this.eventOutput = new EventHandler();
@@ -67,8 +70,12 @@ define(function(require, exports, module) {
         scale       : 1,
         xRange      : null,
         yRange      : null,
-        snapX       : 0,
-        snapY       : 0,
+        snapX       : 60,
+        snapY       : 60,
+        minSnapX    : 1,
+        minSnapY    : 1,
+        maxSnapX    : 60,
+        maxSnapY    : 60,
         transition  : {duration : 500}
     };
 
@@ -96,32 +103,52 @@ define(function(require, exports, module) {
     }
 
     function _deleteElement(event) {
-        console.log('delete the current element');
-
         this.eventOutput.emit('delete');
-        // this.deactivate();
-
-        // this.eventOutput.emit('allowCreate');
     }
 
     function _createElement() {
-        console.log('create a new element');
         this.eventOutput.emit('create');
     }
 
     function _switchElement() {
-        console.log('switch to another element');
         this.eventOutput.emit('switch');
     }
 
     function _generateJSON() {
-        console.log('generate JSON');
         this.eventOutput.emit('generate');
     }
 
+    function _deselectAll() {
+        this.eventOutput.emit('deselect');
+    }
+
     function _editPropertiesOfSelected() {
-        console.log('_editPropertiesOfSelected');
         this.eventOutput.emit('editPropertiesOfSelected');
+    }
+
+    function _toggleSnapToGrid() {
+        var currentPosition = this.getPosition();
+        var newPosition = [];
+        var snap = {
+            minX: this.options.minSnapX,
+            minY: this.options.minSnapY,
+            maxX: this.options.maxSnapX,
+            maxY: this.options.maxSnapY
+        }
+
+        if (!this.snapped) {
+            this.snapped = true;
+            newPosition[0] = Math.round(currentPosition[0] / this.options.maxSnapX) * this.options.maxSnapX;
+            newPosition[1] = Math.round(currentPosition[1] / this.options.maxSnapY) * this.options.maxSnapY;
+            this.setPosition(newPosition);
+            this.eventOutput.emit('translate', newPosition);
+            this.options.snapX = snap.maxX;
+            this.options.snapY = snap.maxY;
+        } else {
+            this.snapped = false;
+            this.options.snapX = snap.minX;
+            this.options.snapY = snap.minY;
+        }
     }
 
     function _handleMove(event) {
@@ -136,12 +163,20 @@ define(function(require, exports, module) {
                 Left: [-this.options.snapX, 0],
                 Right: [this.options.snapX, 0]
             };
+            var shiftKeyMatrix = {
+                Up: [0, -this.options.snapY * 25],
+                Down: [0, this.options.snapY * 25],
+                Left: [-this.options.snapX * 25, 0],
+                Right: [this.options.snapX * 25, 0]
+            }
 
             var commandMatrix = {
                 'U+0008': _deleteElement.bind(this), // delete
                 'U+004E': _createElement.bind(this), // 'n'
                 'U+0009': _switchElement.bind(this), // tab
-                'U+001B': _editPropertiesOfSelected.bind(this), // ESC
+                'U+001B': _deselectAll.bind(this), // space bar
+                'U+0045': _editPropertiesOfSelected.bind(this), // 'e'
+                'U+0020': _toggleSnapToGrid.bind(this), // space
                 Enter: _generateJSON.bind(this)
             };
 
@@ -150,27 +185,28 @@ define(function(require, exports, module) {
             }
 
             if (keyMatrix[event.keyIdentifier]) {
-                if (event.metaKey) {
-                    this.dragging = true;
+                if (event.shiftKey) {
+                    if (event.metaKey) {
+                        this.dragging = true;
+                    } else {
+                        this.dragging = false;
+                    }
+                    this._differential = shiftKeyMatrix[event.keyIdentifier];
                 } else {
-                    this.dragging = false;
+                    if (event.metaKey) {
+                        this.dragging = true;
+                    } else {
+                        this.dragging = false;
+                    }
+                    this._differential = keyMatrix[event.keyIdentifier];
                 }
-                this._differential = keyMatrix[event.keyIdentifier];
             }
         } else {
             this.keybinding = false;
             this._differential = event.position;
-            console.log('mouse ', this._differential);
         }
 
-
         var newDifferential = _mapDifferential.call(this, this._differential);
-
-        //find the cols and rows offest...
-        var gridDifferential = [
-            newDifferential[0] / this.options.snapX,
-            newDifferential[1] / this.options.snapY
-        ];
 
         //buffer the differential if snapping is set
         this._differential[0] -= newDifferential[0];
@@ -181,8 +217,7 @@ define(function(require, exports, module) {
 
         //pipe that
         if (this.dragging) {
-            console.log('dragging in draginator');
-            this.eventOutput.emit('resize', gridDifferential);
+            this.eventOutput.emit('resize', newDifferential);
         } else {
             //modify position, retain reference
             pos[0] += newDifferential[0];
@@ -190,20 +225,15 @@ define(function(require, exports, module) {
 
             //handle bounding box
             if (options.xRange){
-                // var xRange = [options.xRange[0] + 0.5 * options.snapX, options.xRange[1] - 0.5 * options.snapX];
-                // pos[0] = _clamp(pos[0], xRange);
                 pos[0] = _clamp(pos[0], options.xRange);
             }
 
             if (options.yRange){
-                // var yRange = [options.yRange[0] + 0.5 * options.snapY, options.yRange[1] - 0.5 * options.snapY];
-                // pos[1] = _clamp(pos[1], yRange);
                 pos[1] = _clamp(pos[1], options.yRange);
             }
 
             if (pos[0] !== originalPos[0] || pos[1] !== originalPos[1]) {
-                console.log('translating in draginator');
-                this.eventOutput.emit('translate', gridDifferential);
+                this.eventOutput.emit('translate', pos);
             }
             this.eventOutput.emit('update', {position : pos});
         }
@@ -230,8 +260,10 @@ define(function(require, exports, module) {
      */
     Draginator.prototype.setOptions = function setOptions(options) {
         var currentOptions = this.options;
+
         if (options.projection !== undefined) {
             var proj = options.projection;
+
             this.options.projection = 0;
             ['x', 'y'].forEach(function(val) {
                 if (proj.indexOf(val) !== -1) currentOptions.projection |= _direction[val];
@@ -274,6 +306,7 @@ define(function(require, exports, module) {
     Draginator.prototype.setRelativePosition = function setRelativePosition(position, transition, callback) {
         var currPos = this.getPosition();
         var relativePosition = [currPos[0] + position[0], currPos[1] + position[1]];
+
         this.setPosition(relativePosition, transition, callback);
     };
 
@@ -346,7 +379,7 @@ define(function(require, exports, module) {
 
         // there can only be one active window.onkeydown function available at a time
         window.onkeydown = function(event) {
-            if (event.metaKey && event.keyIdentifier === 'Left' // brower back
+            if (event.metaKey && event.keyIdentifier === 'Left' // browser back
                 || event.metaKey && event.keyIdentifier === 'Right') { // browser forward
                 event.preventDefault();
             }

@@ -19,12 +19,30 @@
         <link rel="stylesheet" type="text/css" href="http://code.famo.us/famous/0.2/famous.css" />
         <script type="text/javascript" src="http://code.famo.us/famous/0.2/famous.min.js"></script>
 
+        <!-- highlight.js for syntax highlighting -->
+        <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/default.min.css">
+        <script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
         <!-- app code -->
         <link rel="stylesheet" type="text/css" href="http://code.famo.us/assets/famous_styles.css" />
         <script type="text/javascript">
             require.config({baseUrl: 'src/'});
             require(['main']);
         </script>
+
+        <style>
+            input.famous-surface {
+                background-color: black;
+                color: white;
+                font-size: 38px;
+                line-height: 80px;
+                font-family: Helvetica;
+                font-weight: 900;
+                text-align: center;
+                border: none;
+            }
+        </style>
     </head>
     <body></body>
 </html>

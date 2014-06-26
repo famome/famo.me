@@ -1,28 +1,31 @@
 define(function(require, exports, module) {
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
+    var Modifier      = require('famous/core/Modifier');
     var Transform     = require('famous/core/Transform');
-    var StateModifier = require('famous/modifiers/StateModifier');
-    var Easing        = require('famous/transitions/Easing');
 
-    var MenuView = require('views/MenuView');
-    var WorkView = require('views/WorkView');
-    var ModalOverlay = require('views/ModalOverlay');
-    var SceneGrid = require('views/SceneGrid');
-    var generate = require('utils/Generator');
+    var MenuView      = require('views/MenuView');
+    var WorkView      = require('views/WorkView');
+    var ModalOverlay  = require('views/ModalOverlay');
+
+    var StateModifier = require('famous/modifiers/StateModifier');
+    
+    var InputSurface  = require('famous/surfaces/InputSurface');
+
+    var generate      = require('utils/Generator');
+    var docCookies    = require('utils/cookies'); // Simple cookies framework from MDN
 
     function AppView() {
         View.apply(this, arguments);
 
         this.menuToggle = false;
 
-        _createWorkView.call(this);
-        _createBackground.call(this);
-        _createModalOverlay.call(this);
-        _createGrid.call(this);
-        _createMenuView.call(this);
-        _setListeners.call(this);
+        _eventCookiesHandler.call(this);
+        // _checkCookies.call(this);
+
+        this._eventInput.on('updateDimensions', _handleDimensions.bind(this));
     }
+
 
     AppView.prototype = Object.create(View.prototype);
     AppView.prototype.constructor = AppView;
@@ -41,34 +44,57 @@ define(function(require, exports, module) {
 
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150,
-        center: [0.5, 0.5],
-        dimensions: [100, 200],
-        color: '#FFFFF5',
-        size: 60,
-        grid: {
-            width: 960,
-            height: 600,
-            dimensions: [6, 8],
-            cellSize: [60, 60]
-        }
+        width: 800,
+        height: 800,
+        dimensions: [10, 10],
     };
+
+    function _eventCookiesHandler() {
+        // docCookies.eventOutput = new EventHandler();
+        // EventHandler.setOutputHandler(docCookies, docCookies.eventOutput);
+
+        // docCookies.eventOutput.pipe(this._eventInput);
+        _handleDimensions.call(this, [
+            this.options.width,
+            this.options.height,
+            this.options.dimensions[0],
+            this.options.dimensions[1]
+        ]);
+    }
+
+    function _checkCookies() {
+        var dimensions;
+        if (dimensions = docCookies.getItem('dimensions')) {
+            _handleDimensions.call(this, dimensions.split(','));
+        } else {
+            _createModalOverlay.call(this);
+            _getWorkviewSizeFromUser.call(this);
+        }
+
+    }
 
     function _createMenuView() {
         this.menuView = new MenuView();
         this.menuModifier = new StateModifier({
-            size: [this.options.menuSize, undefined],
+            size: [this.options.menuSize, 100],
             origin: [1, 0]
         });
         this.add(this.menuModifier).add(this.menuView);
     }
 
     function _createWorkView() {
-        this.workView = new WorkView(this.options);
-        this.workModifier = new StateModifier({
-            origin: this.options.center,
-            align: this.options.center,
-            size: [this.options.grid.width, this.options.grid.height]
+        this.workView = new WorkView({
+            width: this.options.width,
+            height: this.options.height,
+            cols: this.options.cols,
+            rows: this.options.rows
         });
+
+        this.workModifier = new StateModifier({
+            origin: [0.5, 0.5],
+            size: [this.options.width, this.options.height]
+        });
+
         this.add(this.workModifier).add(this.workView);
     }
 
@@ -84,27 +110,16 @@ define(function(require, exports, module) {
         });
 
         var backgroundModifier = new StateModifier({
-            transform: Transform.translate(0, 0, -2)
+            transform: Transform.translate(0, 0, -1)
         });
 
         this.add(backgroundModifier).add(background);
+
     }
 
     function _createModalOverlay() {
         this.modalOverlay = new ModalOverlay();
         this.add(this.modalOverlay);
-    }
-
-    function _createGrid() {
-        this.grid = new SceneGrid(this.options.grid);
-        this.grid.app = this;
-        this.gridModifier = new StateModifier({
-            origin: this.options.center,
-            align: this.options.center,
-            size: [this.options.grid.width, this.options.grid.height]
-        });
-
-        this.gridNode = this.add(this.gridModifier).add(this.grid);
     }
 
     function _setListeners() {
@@ -113,21 +128,31 @@ define(function(require, exports, module) {
                 this.workView.createLayoutView();
             },
             '⿴': function() {
-                var layouts = this.workView.getLayouts();
-                var data = generate.sceneData(layouts, this.options.size);
+                var layouts = this.workView.getLayoutsList();
+                var data = generate.sceneData(layouts);
+                var output = generate.output(data.scene, layouts);
+                var formatted = hljs.highlight('javascript', output);
 
-                console.log(generate.output(data.scene, layouts));
+                // refactor inline style
+                this.workView.codeDisplay.setContent('<pre id="code" style="background-color: transparent">'+formatted.value+'</pre>');
+                this.workView.codeDisplay.setProperties({
+                    overflowY: 'scroll',
+                    overflowX: 'hidden'
+                });
+
+                this.workView.flip();
             }
         };
 
+
+
         this.subscribe(this.modalOverlay._eventOutput);
         this.subscribe(this.workView._eventOutput);
-        this.subscribe(this.grid._eventOutput);
+        this.subscribe(this.menuView._eventOutput);
 
-        this.grid.on('createNewSquare', function(data) {
-            console.log(data);
-            this.workView.createLayoutView([data % 16, Math.floor(data / 16)]);
-        }.bind(this));
+        this.menuView.on('□', function(info) {
+            console.log(info);
+        });
 
         this.workView.on('activate', function(menuIcon) {
             events[menuIcon].bind(this)();
@@ -141,6 +166,94 @@ define(function(require, exports, module) {
             this.modalOverlay.modifier.setTransform(Transform.translate(0, 0, 99));
             this.modalOverlay.state = true;
         }.bind(this));
+    }
+
+    function _getWorkviewSizeFromUser() {
+        if (!docCookies.getItem("workViewDimensions")) {
+            var modal = this.modalOverlay;
+            modal.modifier.setTransform( Transform.translate(0, 0, 8) );
+            var inputWidth = new InputSurface({
+                size: [200, 80],
+                name: 'width',
+                placeholder: 'WIDTH',
+                value: '',
+                type: 'text'
+            });
+
+            var inputHeight = new InputSurface({
+                size: [200, 80],
+                name: 'height',
+                placeholder: 'HEIGHT',
+                value: '',
+                type: 'text'
+            });
+
+            var inputCols = new InputSurface({
+                size: [200, 80],
+                name: 'Cols',
+                placeholder: 'COLS',
+                value: '',
+                type: 'text'
+            });
+
+            var inputRows = new InputSurface({
+                size: [200, 80],
+                name: 'Rows',
+                placeholder: 'ROWS',
+                value: '',
+                type: 'text'
+            });
+
+            this.modalOverlay.modalNode.add(new Modifier({origin: [0.5, 0.5], align: [0.5, .2], properties: {zIndex:999}})).add(inputWidth);
+            this.modalOverlay.modalNode.add(new Modifier({origin: [0.5, 0.5], align: [0.5, .4], properties: {zIndex:999}})).add(inputHeight);
+            this.modalOverlay.modalNode.add(new Modifier({origin: [0.5, 0.5], align: [0.5, .6], properties: {zIndex:999}})).add(inputCols);
+            this.modalOverlay.modalNode.add(new Modifier({origin: [0.5, 0.5], align: [0.5, .8], properties: {zIndex:999}})).add(inputRows);
+        }
+
+        window.onkeydown = function(e) {
+            // Enter Key was pressed
+            if (e.keyCode === 13) {
+                var inputs = document.getElementsByTagName('input')
+                var inps = Array.prototype.slice.call(inputs);
+                var dims = [];
+                inps.forEach(function(el) {
+                    dims.push(el.value);
+                });
+
+                // Set cookie and update views when options are all set
+                if ( dims.indexOf("") === -1 && dims.length === 4 ) {
+                    docCookies.setItem('dimensions', dims);
+                    var dimensions = docCookies.getItem('dimensions')
+                        .split(',')
+                        .map(function(item) {
+                            return parseInt(item);
+                        });
+
+                        this.modalOverlay.modifier.setTransform(Transform.translate(0, 0, -3));
+                        docCookies.eventOutput.emit('updateDimensions', dimensions);
+                }
+            }
+        }.bind(this);
+    }
+
+    function _handleDimensions(dimensions) {
+        var width = dimensions[0];
+        var height = dimensions[1];
+        var gridDimensions = [dimensions[2], dimensions[3]];
+        var cellSize = [width/gridDimensions[0], height/gridDimensions[1]];
+        this.options.width = width;
+        this.options.height = height;
+        this.options.cols = dimensions[2];
+        this.options.rows = dimensions[3];
+        _generateViews.call(this);
+    }
+
+    function _generateViews() {
+        _createWorkView.call(this);
+        _createBackground.call(this);
+        _createModalOverlay.call(this);
+        _createMenuView.call(this);
+        _setListeners.call(this);
     }
 
     module.exports = AppView;

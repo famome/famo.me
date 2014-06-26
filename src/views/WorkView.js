@@ -1,43 +1,61 @@
 define(function(require, exports, module) {
-    var View          = require('famous/core/View');
-    var Surface       = require('famous/core/Surface');
-    var Transform     = require('famous/core/Transform');
-    var EventHandler  = require('famous/core/EventHandler');
-    var ModifierChain = require('famous/modifiers/ModifierChain');
-    var StateModifier = require('famous/modifiers/StateModifier');
-    var Draginator    = require('Draginator');
-    var LayoutView    = require('views/LayoutView');
+    var View             = require('famous/core/View');
+    var Timer            = require('famous/utilities/Timer');
+    var Flipper          = require('famous/views/Flipper');
+    var Surface          = require('famous/core/Surface');
+    var Modifier         = require('famous/core/Modifier');
+    var SceneGrid        = require('views/SceneGrid');
+    var LayoutView       = require('views/LayoutView');
+    var StateModifier    = require('famous/modifiers/StateModifier');
+    var OptionsManager   = require('famous/core/OptionsManager');
     var RenderController = require('famous/views/RenderController');
 
-    function WorkView() {
-        View.apply(this, arguments);
+    var RenderNode = require('famous/core/RenderNode');
+
+
+    function WorkView(options) {
+        View.apply(this);
+
+        this.options = Object.create(WorkView.DEFAULT_OPTIONS);
+        this._optionsManager = new OptionsManager(this.options);
+        if (options) this.setOptions(options);
+
         this.numLayouts = 0;
-        this.layouts = {};
         this.layoutsList = [];
         this.selectedLayout = undefined;
-window.wv = this; // testing only
-        _createRenderController.call(this);
+
+        this.node = new RenderNode();
+
+        _createGrid.call(this);
+        _createFlipper.call(this);
         _setListeners.call(this);
+        _setKeybinds.call(this);
     }
 
     WorkView.prototype = Object.create(View.prototype);
     WorkView.prototype.constructor = WorkView;
-    WorkView.prototype.toggleHeader = function() {
-        this.header = !this.header;
-    };
 
-    WorkView.prototype.toggleFooter = function() {
-        this.footer = !this.footer;
+    WorkView.prototype.setOptions = function setOptions(options) {
+        return this._optionsManager.setOptions(options);
     };
-
+    // needs refactoring
     WorkView.prototype.createLayoutView = function(offset) {
         this.numLayouts++;
-
-        var layoutView = new LayoutView(offset);
-        layoutView.linkTo(this.layouts, this.layoutsList, this.numLayouts);
+        var layoutView = new LayoutView({
+            size: {
+                width: this.options.width/this.options.cols,
+                height: this.options.height/this.options.rows
+            },
+            screen: {
+                width: this.options.width,
+                height: this.options.height
+            },
+            offset: (offset || [0, 0])
+        });
+        layoutView.linkTo(this.layoutsList, this.numLayouts);
         layoutView.addLayout();
 
-        this.add(layoutView);
+        this.node.add(new Modifier({origin: [0, 0]})).add(layoutView);
 
         this._eventOutput.pipe(layoutView._eventInput);
         layoutView._eventOutput.pipe(this._eventInput);
@@ -50,57 +68,94 @@ window.wv = this; // testing only
         this.selectedLayout = layoutView;
     };
 
-    WorkView.prototype.getLayouts = function() {
-        return this.layouts;
-    };
-
     WorkView.prototype.getLayoutsList = function() {
         return this.layoutsList;
     };
 
+    WorkView.prototype.flip = function() {
+        this.toggle ? _showCodeDisplay.call(this) : _hideCodeDisplay.call(this);
+        var angle = this.toggle ? 0 : Math.PI;
+        this.flipper.setAngle(angle, {curve : 'easeOutBounce', duration : this.options.flipDelay});
+        this.toggle = !this.toggle;
+    };
+
     WorkView.DEFAULT_OPTIONS = {
-        // center: [0.5, 0.5],
-        // dimensions: [100, 200],
-        // color: '#FFFFF5',
-        // grid: {
-        //     width: 960,
-        //     height: 600,
-        //     dimensions: [6, 8],
-        //     cellSize: [120, 120] // Dominates dimensions
-        // }
+        flipDelay: 1000,
+        dimensions: [100, 200],
+        // flipperBackColor: '#B2F5D9',
+        surface: '#FFFFF5'
     };
 
     function _createGrid() {
-        this.grid = new SceneGrid(this.options.grid);
-        // this.gridModifier = new StateModifier({
-        //     origin: [0.5, 0.5],
-        //     align: [0.5, 0.5],
-        //     size: [this.options.grid.width, this.options.grid.height]
-        // });
+        this.renderController = new RenderController();
+        this.grid = new SceneGrid({
+            width: this.options.width,
+            height: this.options.height,
+            cols: this.options.cols,
+            rows: this.options.rows,
+            cellSize: [this.options.width/this.options.cols, this.options.height/this.options.rows]
+        });
+        this.gridModifier = new StateModifier({
+            origin: [0.5, 0.5],
+            size: [this.options.width, this.options.height]
+        });
 
-        // this.gridNode = this.add(this.gridModifier).add(this.grid);
-        this.add(this.grid);
+        this.renderController.add(this.node).add(this.gridModifier).add(this.grid);
+        this.renderController.show(this.node);
     }
 
-    function _createRenderController() {
-        var renderController = new RenderController();
-        this.add(renderController);
-    }
+    function _createFlipper() {
+        this.toggle = false;
 
-    function _createWorkSurface() {
-        var workSurface = new Surface({
-            size: this.options.dimensions,
+        this.flipper = new Flipper({
+            direction: Flipper.DIRECTION_Y
+        });
+
+        this.codeDisplay = new Surface({
             properties: {
-                backgroundColor: this.options.color
+                backgroundColor: this.options.surface,
+                webkitBackfaceVisibility: 'visible',
+                backfaceVisibility: 'visible'
             }
         });
 
-        var workSurfaceModifier = new StateModifier({
-            origin: this.options.center,
-            align: this.options.center
+        this.flipper.setFront(this.renderController);
+        this.flipper.setBack(this.codeDisplay);
+
+        this.add(new Modifier({origin : [0.5, 0.5]})).add(this.flipper);
+    }
+
+    function _showCodeDisplay() {
+        this.codeDisplay.setContent('');
+        this.codeDisplay.setProperties({
+            backgroundColor: this.options.white
         });
 
-        this.add(workSurfaceModifier).add(workSurface);
+        Timer.setTimeout(function() {   // debounce doesn't work
+            this.renderController.show(this.node, {duration: this.options.flipDelay});
+        }.bind(this), this.options.flipDelay);
+    }
+
+    function _hideCodeDisplay() {
+        this.renderController.hide({duration: 0});
+        this.codeDisplay.setProperties({
+            backgroundColor: this.options.flipperBackColor
+        });
+    }
+
+    function _setKeybinds() {
+        window.onkeydown = function(event) {
+            if (event.keyIdentifier === 'U+004E') {
+                console.log('U+004E!!!');
+                this.createLayoutView();
+            }
+
+            // ESC key edits properties of selected view
+            if (event.keyCode === 27) {
+                console.log('ESC!');
+                _editProperties.call(this, this.selectedLayout);
+            }
+        }.bind(this);
     }
 
     function _setListeners() {
@@ -110,7 +165,6 @@ window.wv = this; // testing only
         }.bind(this));
 
         this._eventInput.on('cycleToNextLayout', function(index) {
-            console.log('cycling from', index);
             this._eventOutput.emit('deselect');
             if (index + 1 >= this.layoutsList.length) {
                 var nextLayout = this.layoutsList[0];
@@ -124,54 +178,29 @@ window.wv = this; // testing only
         }.bind(this));
 
         this._eventInput.on('generate', function() {
-            console.log('generating?');
             this._eventOutput.emit('activate', '⿴');
         }.bind(this));
 
-        window.onkeydown = function(event) {
-            if (event.keyIdentifier === 'U+004E') {
-                console.log('U+004E!!!');
-                this.createLayoutView();
-            }
-
-            // ESC key edits properties of selected view
-            if (event.keyCode === 27) {
-                console.log('ESC!');
-                _editProperties.call(this, this.selectedLayout);
-            }
-        }.bind(this);
-
         this._eventInput.on('createNewLayout', function() {
-            console.log(this);
             this.createLayoutView();
         }.bind(this));
 
-        // this._eventInput.on('allowCreation', function() {
-        //     window.onkeydown = function(event) {
-        //         if (event.keyIdentifier === 'U+004E') {
-        //             this.createLayoutView();
-        //         }
-        //     }.bind(this);
-        // }.bind(this));
-
         this._eventInput.on('editMyProperties', function(layoutView) {
-            console.log('heard event editMyProperties');
             _editProperties.call(this, layoutView);
         }.bind(this));
 
         this._eventInput.on('editPropertiesOfSelected', function() {
-            console.log('heard event editPropertiesOfSelected');
             _editProperties.call(this, this.selectedLayout);
         }.bind(this));
-    
-        this._eventInput.on('superSizeMe', function(layoutView) {
-            console.log('Imma supersize this ', layoutView);
-            _superSize.call(this, layoutView);
+
+        this.subscribe(this.grid._eventOutput);
+
+        this.grid.on('createNewSquare', function(data) {
+            this.createLayoutView([data % this.options.cols, Math.floor(data / this.options.cols)]);
         }.bind(this));
     }
 
     function _editProperties(layoutView) {
-        console.log('edit lv properties');
         this._eventOutput.emit('editSelectedLayoutView');
     }
 
