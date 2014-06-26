@@ -27,6 +27,7 @@ define(function(require, exports, module) {
 
         this._eventInput.on('updateDimensions', _handleDimensions.bind(this));
     }
+    
 
     AppView.prototype = Object.create(View.prototype);
     AppView.prototype.constructor = AppView;
