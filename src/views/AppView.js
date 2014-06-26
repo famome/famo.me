@@ -1,21 +1,19 @@
 define(function(require, exports, module) {
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
+    var Modifier      = require('famous/core/Modifier');
     var Transform     = require('famous/core/Transform');
-    var Modifier     = require('famous/core/Modifier');
-    var EventHandler = require('famous/core/EventHandler')
+
+    var MenuView      = require('views/MenuView');
+    var WorkView      = require('views/WorkView');
+    var ModalOverlay  = require('views/ModalOverlay');
+
     var StateModifier = require('famous/modifiers/StateModifier');
-    var Easing        = require('famous/transitions/Easing');
+    
     var InputSurface  = require('famous/surfaces/InputSurface');
-    var MenuView = require('views/MenuView');
-    var WorkView = require('views/WorkView');
-    var ModalOverlay = require('views/ModalOverlay');
-    var SceneGrid = require('views/SceneGrid');
 
-    var generate = require('utils/Generator');
-
-    // Simple cookies framework from MDN
-    var docCookies = require('../cookies');
+    var generate      = require('utils/Generator');
+    var docCookies    = require('utils/cookies'); // Simple cookies framework from MDN
 
     function AppView() {
         View.apply(this, arguments);
@@ -68,7 +66,6 @@ define(function(require, exports, module) {
     function _checkCookies() {
         var dimensions;
         if (dimensions = docCookies.getItem('dimensions')) {
-            console.log('dimensions already set FTW!!! ', dimensions);
             _handleDimensions.call(this, dimensions.split(','));
         } else {
             _createModalOverlay.call(this);
@@ -152,6 +149,11 @@ define(function(require, exports, module) {
 
         this.subscribe(this.modalOverlay._eventOutput);
         this.subscribe(this.workView._eventOutput);
+        this.subscribe(this.menuView._eventOutput);
+
+        this.menuView.on('□', function(info) {
+            console.log(info);
+        });
 
         this.workView.on('activate', function(menuIcon) {
             events[menuIcon].bind(this)();
@@ -169,7 +171,6 @@ define(function(require, exports, module) {
 
     function _getWorkviewSizeFromUser() {
         if (!docCookies.getItem("workViewDimensions")) {
-console.log('no cookies, but i got this great modalOverlay ', this.modalOverlay);
             var modal = this.modalOverlay;
             modal.modifier.setTransform( Transform.translate(0, 0, 8) );
             var inputWidth = new InputSurface({
