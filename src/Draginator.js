@@ -8,14 +8,16 @@
  */
 
 define(function(require, exports, module) {
-    var Transform = require('famous/core/Transform');
-    var Transitionable = require('famous/transitions/Transitionable');
-    var EventHandler = require('famous/core/EventHandler');
-    var Utilities = require('famous/math/Utilities');
+    var Transform      = require('famous/core/Transform');
+    var EventHandler   = require('famous/core/EventHandler');
 
-    var GenericSync = require('famous/inputs/GenericSync');
-    var MouseSync = require('famous/inputs/MouseSync');
-    var TouchSync = require('famous/inputs/TouchSync');
+    var Transitionable = require('famous/transitions/Transitionable');
+
+    var Utilities      = require('famous/math/Utilities');
+
+    var GenericSync    = require('famous/inputs/GenericSync');
+    var MouseSync      = require('famous/inputs/MouseSync');
+    var TouchSync      = require('famous/inputs/TouchSync');
     GenericSync.register({'mouse': MouseSync, 'touch': TouchSync});
 
     /**
@@ -144,8 +146,8 @@ define(function(require, exports, module) {
             this.options.snapY = snap.maxY;
         } else {
             this.snapped = false;
-            this.options.snapX = snap.min;
-            this.options.snapY = snap.min;
+            this.options.snapX = snap.minX;
+            this.options.snapY = snap.minY;
         }
     }
 

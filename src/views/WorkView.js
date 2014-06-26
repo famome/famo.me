@@ -45,7 +45,7 @@ define(function(require, exports, module) {
             screen: {
                 width: this.options.width,
                 height: this.options.height
-            }
+            },
             offset: (offset || [0, 0])
         });
         layoutView.linkTo(this.layoutsList, this.numLayouts);

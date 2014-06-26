@@ -1,11 +1,16 @@
 define(function(require, exports, module) {
     var EventHandler     = require('famous/core/EventHandler');
-    var Surface          = require('famous/core/Surface');
     var Transform        = require('famous/core/Transform');
+    var Surface          = require('famous/core/Surface');
     var View             = require('famous/core/View');
-    var StateModifier    = require('famous/modifiers/StateModifier');
-    var Transitionable   = require('famous/transitions/Transitionable');
+
     var RenderController = require('famous/views/RenderController');
+
+    var StateModifier    = require('famous/modifiers/StateModifier');
+
+    var Transitionable   = require('famous/transitions/Transitionable');
+
+
     var Draginator       = require('Draginator');
 
     function LayoutView() {
@@ -246,11 +251,12 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this._eventInput.on('deselect', function() {
-                this.surface.setProperties({
-                    boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
-                    backgroundColor: 'pink',
-                    zIndex: 9
-                })
+            this.surface.setProperties({
+                boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
+                backgroundColor: 'pink',
+                zIndex: 9
+            });
+
             this.modifier.setTransform(this.modifier.getTransform());
             this.draginator.deselect();
         }.bind(this));
