@@ -11,7 +11,7 @@ define(function(require, exports, module) {
     var WorkView = require('views/WorkView');
     var ModalOverlay = require('views/ModalOverlay');
     var SceneGrid = require('views/SceneGrid');
-    
+
     var generate = require('utils/Generator');
 
     // Simple cookies framework from MDN
@@ -74,7 +74,7 @@ define(function(require, exports, module) {
             _createModalOverlay.call(this);
             _getWorkviewSizeFromUser.call(this);
         }
-        
+
     }
 
     function _createMenuView() {
@@ -132,7 +132,7 @@ define(function(require, exports, module) {
                 this.workView.createLayoutView();
             },
             '⿴': function() {
-                var layouts = this.workView.getLayouts();
+                var layouts = this.workView.getLayoutsList();
                 var data = generate.sceneData(layouts);
                 var output = generate.output(data.scene, layouts);
                 var formatted = hljs.highlight('javascript', output);

@@ -19,8 +19,6 @@ define(function(require, exports, module) {
         if (options) this.setOptions(options);
 
         this.numLayouts = 0;
-        // TODO: remove either layouts or layoutsList
-        this.layouts = {};
         this.layoutsList = [];
         this.selectedLayout = undefined;
 
@@ -39,13 +37,8 @@ define(function(require, exports, module) {
     // needs refactoring
     WorkView.prototype.createLayoutView = function(offset) {
         this.numLayouts++;
-console.log("I got your problem right here: ", offset)
         var layoutView = new LayoutView({
             size: {
-                width: this.options.width/this.options.cols,
-                height: this.options.height/this.options.rows
-            },
-            protoSize: {
                 width: this.options.width/this.options.cols,
                 height: this.options.height/this.options.rows
             },
@@ -53,9 +46,13 @@ console.log("I got your problem right here: ", offset)
                 width: this.options.width,
                 height: this.options.height
             },
+            edgeDetect: {
+                right: this.options.width/this.options.cols/3,
+                bottom: this.options.height/this.options.rows/3
+            },
             offset: (offset || [0, 0])
         });
-        layoutView.linkTo(this.layouts, this.layoutsList, this.numLayouts);
+        layoutView.linkTo(this.layoutsList, this.numLayouts);
         layoutView.addLayout();
 
         this.add(layoutView);
@@ -69,10 +66,6 @@ console.log("I got your problem right here: ", offset)
         this._eventOutput.emit('select', layoutView);
 
         this.selectedLayout = layoutView;
-    };
-
-    WorkView.prototype.getLayouts = function() {
-        return this.layouts;
     };
 
     WorkView.prototype.getLayoutsList = function() {

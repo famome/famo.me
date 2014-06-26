@@ -12,11 +12,8 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         this.id = 'LayoutView';
-        //this.dimension = this.options.dimension; // Grid Units, based off protoSize
-        this.xOffset = this.options.offset[0] * this.options.protoSize.width; // PX
-        this.yOffset = this.options.offset[1] * this.options.protoSize.width; // PX
-        this.snapX = this.options.snapX; // PX
-        this.snapY = this.options.snapY; // PX
+        this.xOffset = this.options.offset[0] * this.options.size.width; // PX
+        this.yOffset = this.options.offset[1] * this.options.size.height; // PX
 
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
@@ -30,25 +27,22 @@ define(function(require, exports, module) {
 
     LayoutView.prototype = Object.create(View.prototype);
     LayoutView.prototype.constructor = LayoutView;
+
     LayoutView.prototype.getId = function() {
         return this.id;
     };
+
     LayoutView.prototype.getOffset = function() {
         return [this.xOffset, this.yOffset];
     };
+
     LayoutView.prototype.getSize = function() {
         return [this.width, this.height];
     };
     LayoutView.prototype.addLayout = function() {
-        var currentSize = this.modifier.getSize();
-        this.layouts[this.id] = {
-            offset: [this.xOffset, this.yOffset],
-            size: [currentSize[0], currentSize[1]]
-        };
         this.layoutsList.push(this);
     };
-    LayoutView.prototype.linkTo = function(layouts, layoutsList, numLayouts) {
-        this.layouts = layouts;
+    LayoutView.prototype.linkTo = function(layoutsList, numLayouts) {
         this.numLayouts = numLayouts;
         this.layoutsList = layoutsList;
 
@@ -58,12 +52,7 @@ define(function(require, exports, module) {
         var index = this.layoutsList.indexOf(this);
         this._eventOutput.emit('cycleToNextLayout', index);
         this.layoutsList.splice(index, 1);
-        delete this.layouts[this.id];
     };
-    LayoutView.prototype.getLayouts = function() {
-        return this.layouts;
-    };
-
     LayoutView.prototype.selectSurface = function() {
         this.surface.setProperties({
             backgroundColor: 'pink',
@@ -73,18 +62,9 @@ define(function(require, exports, module) {
     };
 
     LayoutView.DEFAULT_OPTIONS = {
-        // snapX: 60,
-        // snapY: 60,
-        snapX: 1,
-        snapY: 1,
         offset: [0, 0],
-        dimension: [1, 1],
         color: 'pink',
         size: {
-            width: 60,
-            height: 60
-        },
-        protoSize: {
             width: 60,
             height: 60
         },
@@ -92,14 +72,21 @@ define(function(require, exports, module) {
             width: 960,
             height: 600
         },
-        edgeDetectSize: 20,
+        edgeDetectSize: {
+            right: 20,
+            bottom: 20
+        },
         zIndex: 9
     };
 
     function _createLayoutDraginator() {
         this.draginator = new Draginator({
-            snapX: this.snapX,
-            snapY: this.snapY,
+            snapX: this.options.size.width,
+            snapY: this.options.size.height,
+            minSnapX: 1,
+            minSnapY: 1,
+            maxSnapX: this.options.size.width,
+            maxSnapY: this.options.size.height,
             xRange: [0, this.options.screen.width - this.options.size.width],
             yRange: [0, this.options.screen.height - this.options.size.height]
         });
@@ -139,13 +126,13 @@ define(function(require, exports, module) {
           ''  : { cursor: '-webkit-grab' }
         };
 
-        if (event.offsetY < this.options.edgeDetectSize)
+        if (event.offsetY < this.options.edgeDetectSize.bottom)
             edge = 'n';
-        if (currentSize[1] - event.offsetY < this.options.edgeDetectSize)
+        if (currentSize[1] - event.offsetY < this.options.edgeDetectSize.bottom)
             edge = 's';
-        if (event.offsetX < this.options.edgeDetectSize)
+        if (event.offsetX < this.options.edgeDetectSize.right)
             edge += 'w';
-        if (currentSize[0] - event.offsetX < this.options.edgeDetectSize)
+        if (currentSize[0] - event.offsetX < this.options.edgeDetectSize.right)
             edge += 'e';
 
         this.draggable = edge === '';
@@ -191,8 +178,6 @@ define(function(require, exports, module) {
             if (this.layoutsList[this.layoutsList.indexOf(this)]) {
                 this.xOffset = data[0];
                 this.yOffset = data[1];
-
-                this.layouts[this.id].offset = [this.xOffset, this.yOffset];
             }
         }.bind(this));
 
@@ -213,19 +198,15 @@ define(function(require, exports, module) {
         this._eventInput.on('resize', function(data) {
             var cursor = this.surface.properties.cursor;
             var currentSize = this.modifier.getSize();
-            //var currentDimension = this.dimension;
 
             if ((currentSize[0] + data[0]) // make sure box doesn't shrink to 0 width
                 && (currentSize[1] + data[1]) // make sure box doesn't shrink to 0 height
                 // Make sure right/bottom doesn't go past grid boundaries
                 && (this.xOffset + currentSize[0] + data[0] <= this.options.screen.width)
                 && (this.yOffset + currentSize[1] + data[1] <= this.options.screen.height)) {
-                //this.dimension[0] = currentDimension[0] + data[0];
-                //this.dimension[1] = currentDimension[1] + data[1];
 
                 this.modifier.setSize(
                     [currentSize[0] + data[0], currentSize[1] + data[1]]);
-                this.layouts[this.id].size = this.modifier.getSize();
 
                 this.draginator.options.xRange[1] -= data[0];
                 this.draginator.options.yRange[1] -= data[1];
@@ -234,7 +215,7 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.surface.on('dblclick', function() {
-            console.log(this.id, this.getLayouts()[this.id]);
+            console.log(this.id, this.layoutsList[this.layoutsList.indexOf(this)]);
         }.bind(this));
 
         this._eventInput.on('delete', function() {

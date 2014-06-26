@@ -41,7 +41,7 @@ define(function(require, exports, module) {
         this._differential  = [0,0];
         this._active = true;
         this._selected = false;
-        this.snapped = false;
+        this.snapped = true;
 
         this.sync = new GenericSync(['mouse', 'touch'], {scale : this.options.scale});
         this.eventOutput = new EventHandler();
@@ -68,8 +68,12 @@ define(function(require, exports, module) {
         scale       : 1,
         xRange      : null,
         yRange      : null,
-        snapX       : 0,
-        snapY       : 0,
+        snapX       : 60,
+        snapY       : 60,
+        minSnapX    : 1,
+        minSnapY    : 1,
+        maxSnapX    : 60,
+        maxSnapY    : 60,
         transition  : {duration : 500}
     };
 
@@ -97,11 +101,7 @@ define(function(require, exports, module) {
     }
 
     function _deleteElement(event) {
-
         this.eventOutput.emit('delete');
-        // this.deactivate();
-
-        // this.eventOutput.emit('allowCreate');
     }
 
     function _createElement() {
@@ -124,18 +124,20 @@ define(function(require, exports, module) {
         var currentPosition = this.getPosition();
         var newPosition = [];
         var snap = {
-            min: 1,
-            max: 60
+            minX: this.options.minSnapX,
+            minY: this.options.minSnapY,
+            maxX: this.options.maxSnapX,
+            maxY: this.options.maxSnapY
         }
 
-        if (this.options.snapX === snap.min) {
+        if (!this.snapped) {
             this.snapped = true;
-            newPosition[0] = Math.round(currentPosition[0] / 60) * 60;
-            newPosition[1] = Math.round(currentPosition[1] / 60) * 60;
+            newPosition[0] = Math.round(currentPosition[0] / this.options.maxSnapX) * this.options.maxSnapX;
+            newPosition[1] = Math.round(currentPosition[1] / this.options.maxSnapY) * this.options.maxSnapY;
             this.setPosition(newPosition);
             this.eventOutput.emit('translate', newPosition);
-            this.options.snapX = snap.max;
-            this.options.snapY = snap.max;
+            this.options.snapX = snap.maxX;
+            this.options.snapY = snap.maxY;
         } else {
             this.snapped = false;
             this.options.snapX = snap.min;
@@ -216,14 +218,10 @@ define(function(require, exports, module) {
 
             //handle bounding box
             if (options.xRange){
-                // var xRange = [options.xRange[0] + 0.5 * options.snapX, options.xRange[1] - 0.5 * options.snapX];
-                // pos[0] = _clamp(pos[0], xRange);
                 pos[0] = _clamp(pos[0], options.xRange);
             }
 
             if (options.yRange){
-                // var yRange = [options.yRange[0] + 0.5 * options.snapY, options.yRange[1] - 0.5 * options.snapY];
-                // pos[1] = _clamp(pos[1], yRange);
                 pos[1] = _clamp(pos[1], options.yRange);
             }
 
