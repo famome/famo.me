@@ -1,17 +1,20 @@
 define(function(require, exports, module) {
-    var View          = require('famous/core/View');
-    var Surface       = require('famous/core/Surface');
-    var Transform     = require('famous/core/Transform');
-    var EventHandler  = require('famous/core/EventHandler');
-    var ModifierChain = require('famous/modifiers/ModifierChain');
-    var StateModifier = require('famous/modifiers/StateModifier');
+    var View                = require('famous/core/View');
+    var Surface             = require('famous/core/Surface');
+    var Transform           = require('famous/core/Transform');
+    var EventHandler        = require('famous/core/EventHandler');
+    var OptionsManager      = require('famous/core/OptionsManager');
 
-    var RenderController = require('famous/views/RenderController');
-    var GenericSync = require('famous/inputs/GenericSync');
-    var MouseSync = require('famous/inputs/MouseSync');
-    var TouchSync = require('famous/inputs/TouchSync');
+    var RenderController    = require('famous/views/RenderController');
+
+    var ModifierChain       = require('famous/modifiers/ModifierChain');
+    var StateModifier       = require('famous/modifiers/StateModifier');
+
+    var MouseSync           = require('famous/inputs/MouseSync');
+    var TouchSync           = require('famous/inputs/TouchSync');
+    var GenericSync         = require('famous/inputs/GenericSync');
+
     GenericSync.register({'mouse': MouseSync, 'touch': TouchSync});
-
 
     function ModalOverlay() {
         View.apply(this, arguments);
@@ -30,7 +33,7 @@ define(function(require, exports, module) {
 
     ModalOverlay.DEFAULT_OPTIONS = {
         center: [0.5, 0.5],
-        color: 'rgba(0, 255, 0, .2)'
+        color: 'rgba(0, 0, 0, .2)'
     };
 
     function _createSurface() {
@@ -60,8 +63,6 @@ define(function(require, exports, module) {
         // view listens for translate from draggable
         this._eventInput.on('showModal', function(data){
             var currentDimension = this.options.dimension;
-            console.log('current dimension', currentDimension);
-            console.log('translating');
             this.xOffset += data[0];
             this.yOffset += data[1];
         }.bind(this));

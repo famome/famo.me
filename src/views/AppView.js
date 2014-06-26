@@ -44,10 +44,9 @@ define(function(require, exports, module) {
 
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150,
-        width: 600,
-        height: 600,
+        width: 800,
+        height: 800,
         dimensions: [10, 10],
-        cellSize: [60, 60]
     };
 
     function _eventCookiesHandler() {
