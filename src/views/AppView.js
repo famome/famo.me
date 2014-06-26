@@ -27,7 +27,7 @@ define(function(require, exports, module) {
 
         this._eventInput.on('updateDimensions', _handleDimensions.bind(this));
     }
-    
+
 
     AppView.prototype = Object.create(View.prototype);
     AppView.prototype.constructor = AppView;
@@ -49,15 +49,21 @@ define(function(require, exports, module) {
         size: 60,
         width: 960,
         height: 600,
-        dimensions: [6, 8],
+        dimensions: [15, 10],
         cellSize: [60, 60]
     };
 
     function _eventCookiesHandler() {
-        docCookies.eventOutput = new EventHandler();
-        EventHandler.setOutputHandler(docCookies, docCookies.eventOutput);
+        // docCookies.eventOutput = new EventHandler();
+        // EventHandler.setOutputHandler(docCookies, docCookies.eventOutput);
 
-        docCookies.eventOutput.pipe(this._eventInput);
+        // docCookies.eventOutput.pipe(this._eventInput);
+        _handleDimensions.call(this, [
+            this.options.width,
+            this.options.height,
+            this.options.dimensions[0],
+            this.options.dimensions[1]
+        ]);
     }
 
     function _checkCookies() {
