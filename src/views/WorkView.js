@@ -39,19 +39,18 @@ define(function(require, exports, module) {
     // needs refactoring
     WorkView.prototype.createLayoutView = function(offset) {
         this.numLayouts++;
-console.log("I got your problem right here: ", offset)
         var layoutView = new LayoutView({
             size: {
-                width: this.options.width/this.options.cols,
-                height: this.options.height/this.options.rows
-            },
-            protoSize: {
                 width: this.options.width/this.options.cols,
                 height: this.options.height/this.options.rows
             },
             screen: {
                 width: this.options.width,
                 height: this.options.height
+            },
+            edgeDetect: {
+                right: this.options.width/this.options.cols/3,
+                bottom: this.options.height/this.options.rows/3
             },
             offset: (offset || [0, 0])
         });
