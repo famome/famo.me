@@ -237,7 +237,6 @@ console.log('no cookies, but i got this great modalOverlay ', this.modalOverlay)
     }
 
     function _handleDimensions(dimensions) {
-        console.log('appView heard you!', dimensions);
         var width = dimensions[0];
         var height = dimensions[1];
         var gridDimensions = [dimensions[2], dimensions[3]];
