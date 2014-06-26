@@ -116,6 +116,10 @@ define(function(require, exports, module) {
         this.eventOutput.emit('generate');
     }
 
+    function _deselectAll() {
+        this.eventOutput.emit('deselect');
+    }
+
     function _editPropertiesOfSelected() {
         this.eventOutput.emit('editPropertiesOfSelected');
     }
@@ -168,7 +172,8 @@ define(function(require, exports, module) {
                 'U+0008': _deleteElement.bind(this), // delete
                 'U+004E': _createElement.bind(this), // 'n'
                 'U+0009': _switchElement.bind(this), // tab
-                'U+001B': _editPropertiesOfSelected.bind(this), // ESC
+                'U+001B': _deselectAll.bind(this), // space bar
+                'U+0045': _editPropertiesOfSelected.bind(this), // 'e'
                 'U+0020': _snapToGrid.bind(this), // space
                 Enter: _generateJSON.bind(this)
             };

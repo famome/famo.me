@@ -255,8 +255,6 @@ console.log('no cookies, but i got this great modalOverlay ', this.modalOverlay)
         _createModalOverlay.call(this);
         _createMenuView.call(this);
         _setListeners.call(this);
-                console.log(this.options.width,this.options.height,this.options.cols,this.options.rows);
-
     }
 
     module.exports = AppView;

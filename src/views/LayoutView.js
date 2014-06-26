@@ -55,7 +55,8 @@ define(function(require, exports, module) {
     };
     LayoutView.prototype.selectSurface = function() {
         this.surface.setProperties({
-            backgroundColor: 'pink',
+            boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
+            backgroundColor: '#1496CC',
             zIndex: 100
         });
         this.draginator.select();
@@ -102,6 +103,7 @@ define(function(require, exports, module) {
         this.surface = new Surface({
             properties: {
                 backgroundColor: this.options.color,
+                boxShadow: '0 0 10px black',
                 cursor: '-webkit-grab'
             }
         });
@@ -242,7 +244,7 @@ define(function(require, exports, module) {
 
         this._eventInput.on('deselect', function() {
                 this.surface.setProperties({
-                    boxShadow: 'none',
+                    boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
                     backgroundColor: 'pink',
                     zIndex: 9
                 })
