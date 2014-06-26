@@ -90,8 +90,7 @@ console.log("I got your problem right here: ", offset)
         flipDelay: 1000,
         dimensions: [100, 200],
         flipperBackColor: '#B2F5D9',
-        surface: '#FFFFF5',
-        dotColor: '#B2F5D9'
+        surface: '#FFFFF5'
     };
 
     function _createGrid() {
@@ -204,7 +203,7 @@ console.log("I got your problem right here: ", offset)
         this.subscribe(this.grid._eventOutput);
 
         this.grid.on('createNewSquare', function(data) {
-            this.createLayoutView([data % 16, Math.floor(data / 16)]);
+            this.createLayoutView([data % this.options.cols, Math.floor(data / this.options.cols)]);
         }.bind(this));
     }
 
