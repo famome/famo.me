@@ -2,11 +2,11 @@ define(function(require, exports, module) {
     var View          = require('famous/core/View');
     var Surface       = require('famous/core/Surface');
     var Transform     = require('famous/core/Transform');
-    var StateModifier = require('famous/modifiers/StateModifier');
-    var ModifierChain = require('famous/modifiers/ModifierChain');
+
     var GridLayout    = require('famous/views/GridLayout');
-    var RenderNode    = require('famous/core/RenderNode');
+
     var Draggable     = require('famous/modifiers/Draggable');
+    var StateModifier = require('famous/modifiers/StateModifier');
 
     var ToolView      = require('views/ToolView');
 
@@ -14,6 +14,8 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         var draggable = new Draggable();
+        this.icons = ['□', '⿴'];
+        this.options.rows = Math.ceil(this.icons.length/this.options.cols);
 
         _createToolMenu.call(this, draggable);
         _createButtons.call(this, draggable);
@@ -23,14 +25,16 @@ define(function(require, exports, module) {
     MenuView.prototype.constructor = MenuView;
 
     MenuView.DEFAULT_OPTIONS = {
-        topOffset: 50
+        topOffset: 50,
+        cols: 2,
+        spacing: 62.5,
+        padding: 25
     };
 
     function _createToolMenu(draggable) {
         this.toolMenu = new Surface({
-            size: [this.options.menuSize, undefined],
-            origin: [0.5, 0],
-            align: [0.5, 0],
+            size: [this.options.cols * this.options.spacing + this.options.padding, 
+                   this.options.rows * this.options.spacing + this.options.padding],
             properties: {
                 backgroundColor: '#FFFFF5',
                 zIndex: 1,
@@ -46,36 +50,34 @@ define(function(require, exports, module) {
 
         draggable.subscribe(this.toolMenu);
 
-        this.add(this.toolMenuModifier).add(draggable).add(this.toolMenu);
+        this.add(this.toolMenuModifier)
+            .add(draggable)
+            .add(this.toolMenu);
     }
 
-    function _createButtons(draggable) {
+    function _createButtons(draggable) {        
         var grid = new GridLayout({
-            dimensions: [2, 3],
+            dimensions: [this.options.cols, this.options.rows],
             gutterSize: [5, 5]
         });
 
         var tools = [];
         grid.sequenceFrom(tools);
-        var icons = ['⬒', '⬓', '⎚', '▥', '□', '⿴'];
 
         var menuEvent = function() {
             this.menu.current = this.content;
             this.menu._eventOutput.emit('menu');
         };
 
-        for (var i = 0; i < 6; i++) {
+        for (var i = 0; i < this.icons.length; i++) {
             var toolView = new ToolView();
             toolView.tool.setOptions({
-                content: icons[i],
-                size: [undefined, undefined],
-                origin: [0.5, 0.5],
-                align: [0.5, 0.5],
+                content: this.icons[i],
                 properties: {
                     backgroundColor: 'pink',
                     lineHeight: '60px',
                     textAlign: 'center',
-                    fontSize: 40 + 'px',
+                    fontSize: '40px',
                     cursor: 'pointer'
                 }
             });
@@ -88,8 +90,10 @@ define(function(require, exports, module) {
         }
 
         var gridModifier = new StateModifier({
-            size: [125, 187.5],
-            origin: [0.5, 0.25],
+            size: [this.options.spacing * this.options.cols, 
+                   this.options.spacing * this.options.rows],
+            origin: [0.5, 0],
+            align: [0.5, 0.12],
             transform: Transform.translate(0, 0, 1),
             properties: {
                 zIndex: 1
