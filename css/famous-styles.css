@@ -124,12 +124,13 @@ a:hover {
 }
 
 pre {
-  font-family: monospace;
+  font-family: "Lucida Console", monospace !important;
   width: 100%;
   background-color: #404040;
   border-radius: 5px;
   padding: 27px 18px;
   overflow-x: scroll;
+  letter-spacing: -1.6px !important;
 }
 
 ul {
