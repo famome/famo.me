@@ -188,18 +188,17 @@ define(function(require, exports, module) {
         this._eventInput.on('resize', function(data) {
             var cursor = this.surface.properties.cursor;
             var currentSize = this.modifier.getSize();
+            var potentialWidth = currentSize[0] + data[0];
+            var potentialHeight = currentSize[1] + data[1];
 
-            if ((currentSize[0] + data[0]) // make sure box doesn't shrink to 0 width
-                && (currentSize[1] + data[1]) // make sure box doesn't shrink to 0 height
+            if (potentialWidth // make sure box doesn't shrink to 0 width
+                && potentialHeight // make sure box doesn't shrink to 0 height
                 // Make sure right/bottom doesn't go past grid boundaries
-                && (this.xOffset + currentSize[0] + data[0] <= this.options.screen.width)
-                && (this.yOffset + currentSize[1] + data[1] <= this.options.screen.height)) {
-
-                this.modifier.setSize(
-                    [currentSize[0] + data[0], currentSize[1] + data[1]]);
-
-                this.draginator.options.xRange[1] -= data[0];
-                this.draginator.options.yRange[1] -= data[1];
+                && (this.xOffset + potentialWidth <= this.options.screen.width)
+                && (this.yOffset + potentialHeight <= this.options.screen.height)) {
+                    this.modifier.setSize([potentialWidth, potentialHeight]);
+                    this.draginator.options.xRange[1] -= data[0];
+                    this.draginator.options.yRange[1] -= data[1];
             }
         }.bind(this));
 
