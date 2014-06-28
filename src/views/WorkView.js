@@ -52,8 +52,9 @@ define(function(require, exports, module) {
             },
             offset: (offset || [0, 0])
         });
-        layoutView.linkTo(this.layoutsList, this.numLayouts);
-        layoutView.addLayout();
+        // layoutView.linkTo(this.layoutsList, this.numLayouts);
+        layoutView.id = "layoutView" + this.layoutsList.length;
+        this.addLayout(layoutView);
 
         this.node.add(new Modifier({origin: [0, 0]})).add(layoutView);
 
@@ -72,6 +73,18 @@ define(function(require, exports, module) {
         return this.layoutsList;
     };
 
+    WorkView.prototype.addLayout = function(layoutView) {
+        this.layoutsList.push(layoutView);
+    };
+
+    WorkView.prototype.removeLayout = function(layoutView) {
+        var index = this.layoutsList.indexOf(layoutView);
+        console.log("key hit once!");
+        layoutView.active = false;
+        this.layoutsList.splice(index, 1);
+        _cycleToNextLayout.call(this, index);
+    };
+
     WorkView.prototype.flip = function() {
         this.toggle ? _showCodeDisplay.call(this) : _hideCodeDisplay.call(this);
         var angle = this.toggle ? 0 : Math.PI;
@@ -85,6 +98,23 @@ define(function(require, exports, module) {
         // flipperBackColor: '#B2F5D9',
         surface: '#FFFFF5'
     };
+
+    function _cycleToNextLayout(index) {
+        if (!this.layoutsList.length) return null;
+        if (index === undefined)
+            index = this.layoutsList.indexOf(this.selectedLayout);
+        this._eventOutput.emit('deselect');
+        if (index - 1 < 0) {
+            var nextLayout = this.layoutsList[this.layoutsList.length - 1];
+            this.selectedLayout = nextLayout;
+            nextLayout.selectSurface();
+        } else {
+            var nextLayout = this.layoutsList[index - 1];
+            this.selectedLayout = nextLayout;
+            console.log('next: ', index-1, nextLayout);
+            nextLayout.selectSurface();
+        }
+    }
 
     function _createGrid() {
         this.renderController = new RenderController();
@@ -159,26 +189,25 @@ define(function(require, exports, module) {
     }
 
     function _setListeners() {
-        this._eventInput.on('deselectRest', function(selectedLayout) {
+        this._eventInput.on('select', function(selectedLayout) {
             this.selectedLayout = selectedLayout;
             this._eventOutput.emit('deselect');
         }.bind(this));
 
-        this._eventInput.on('cycleToNextLayout', function(index) {
-            this._eventOutput.emit('deselect');
-            if (index + 1 >= this.layoutsList.length) {
-                var nextLayout = this.layoutsList[0];
-                this.selectedLayout = nextLayout;
-                nextLayout.selectSurface();
-            } else {
-                var nextLayout = this.layoutsList[index + 1];
-                this.selectedLayout = nextLayout;
-                nextLayout.selectSurface();
-            }
-        }.bind(this));
-
         this._eventInput.on('generate', function() {
             this._eventOutput.emit('activate', '⿴');
+        }.bind(this));
+
+
+        this._eventInput.on('switch', function() {
+            _cycleToNextLayout.call(this);
+        }.bind(this));
+
+        this._eventInput.on('delete', function() {
+            console.log('wv heard delete', this.selectedLayout);
+            var layoutView = this.selectedLayout;
+            this.removeLayout(layoutView);
+            layoutView.renderController.hide(layoutView.surface);
         }.bind(this));
 
         this._eventInput.on('createNewLayout', function() {
@@ -205,7 +234,7 @@ define(function(require, exports, module) {
     }
 
     function _superSize(layoutView) {
-        console.log('num layouts to compare to ', this.numLayouts);
+        console.log('num layouts to compare to ', this.layoutsList.length);
         var i;
         var minX = minY = maxX = maxY = 0;
         for (i = 0; i < this.layoutsList.length; i++) {

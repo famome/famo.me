@@ -13,9 +13,9 @@ define(function(require, exports, module) {
     function LayoutView() {
         View.apply(this, arguments);
 
-        this.id = 'LayoutView';
         this.xOffset = this.options.offset[0] * this.options.size.width; // PX
         this.yOffset = this.options.offset[1] * this.options.size.height; // PX
+        this.active = true;
 
         _createLayoutDraginator.call(this);
         _createLayoutModifier.call(this);
@@ -40,23 +40,6 @@ define(function(require, exports, module) {
 
     LayoutView.prototype.getSize = function() {
         return [this.width, this.height];
-    };
-
-    LayoutView.prototype.addLayout = function() {
-        this.layoutsList.push(this);
-    };
-
-    LayoutView.prototype.linkTo = function(layoutsList, numLayouts) {
-        this.numLayouts = numLayouts;
-        this.layoutsList = layoutsList;
-        this.id += this.numLayouts;
-    };
-
-    LayoutView.prototype.removeLayout = function() {
-        var index = this.layoutsList.indexOf(this);
-
-        this._eventOutput.emit('cycleToNextLayout', index);
-        this.layoutsList.splice(index, 1);
     };
 
     LayoutView.prototype.selectSurface = function() {
@@ -182,7 +165,7 @@ define(function(require, exports, module) {
 
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
-            if (this.layoutsList[this.layoutsList.indexOf(this)]) {
+            if (this.active) {
                 this.xOffset = data[0];
                 this.yOffset = data[1];
             }
@@ -221,13 +204,7 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.surface.on('dblclick', function() {
-            console.log(this.id, this.layoutsList[this.layoutsList.indexOf(this)]);
-        }.bind(this));
-
-        this._eventInput.on('delete', function() {
-            this.renderController.hide(this.surface);
-            this.removeLayout();
-            this._eventOutput.emit('allowCreation');
+            console.log(this.id, this.modifier.getSize(), "dblclick!", this.getOffset());
         }.bind(this));
 
         this._eventInput.on('create', function() {
@@ -235,10 +212,6 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.surface.draginator = this.draginator;
-
-        this._eventInput.on('switch', function() {
-            this._eventOutput.emit('cycleToNextLayout', this.layoutsList.indexOf(this));
-        }.bind(this));
 
         this._eventInput.on('select', function(selectedView) {
             if(this === selectedView) {
@@ -258,7 +231,7 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this.surface.on('click', function() {
-            this._eventOutput.emit('deselectRest', this);
+            this._eventOutput.emit('select', this);
             this.draginator.select();
             this.selectSurface.call(this);
         }.bind(this));
