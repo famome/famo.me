@@ -15,6 +15,8 @@ define(function(require, exports, module) {
                 var id = layouts[i].getId();
                 var size = layouts[i].getSize();
 
+                // console.log(offset);
+
                 data.scene.push({
                     transform: Transform.translate(offset[0], offset[1]),
                     target: {id: id}
@@ -32,6 +34,55 @@ define(function(require, exports, module) {
 
             return data;
         },
+        strings: function(layouts) {
+            
+
+            var string = 'var Engine  = require(\'famous/core/Engine\');\n' +
+                         'var mainContext = Engine.createContext();\n\n';
+
+            var data = {
+                fixed: [string],
+                flexible: [string]
+            };
+
+            for (var i = 0; i < layouts.length; i++) {
+                var offset = layouts[i].getOffset();
+                var id = layouts[i].getId();
+                var size = layouts[i].modifier.getSize();
+
+                // console.log(offset);
+
+                data.fixed.push(
+                    'var ' + id + 'Modifier = new Modifier({\n' +
+                        '\tsize:[' + size + '],\n' +
+                        '\ttransform: Transform.translate(' + offset + ')\n' +
+                    '});\n' +
+                    'var ' + id + 'Surface = new Surface({\n' +
+                        '\tsize:[undefined, undefined],\n' +
+                        '\tclasses: [\'red-bg\'],\n' +
+                        '\tproperties: {\n' +
+                            '\t\ttextAlign: \'center\'\n' +
+                        '\t}\n' +
+                    '});\n' +
+                    'mainContext.add(' + id + 'Modifier).add('+ id + 'Surface);\n\n'
+                );
+
+                data.flexible.push(
+                    'var ' + id + 'Surface = new Surface({\n' +
+                        '\tsize:[' + size + '],\n' +
+                        '\torigin:[0,0],\n' +
+                        '\talign:[' + offset[0]/800 + ',' + offset[0]/800 + '],\n' +
+                        '\tclasses: [\'red-bg\'],\n' +
+                        '\tproperties: {\n' +
+                            '\t\ttextAlign: \'center\'\n' +
+                        '\t}\n' +
+                    '});\n' +
+                    'mainContext.add('+ id + 'Surface);\n\n'
+                );
+            }
+
+            return data;
+        },
         scene: function(sceneJSON) {
             var scene = new Scene({
                 id: 'root',
@@ -43,7 +94,7 @@ define(function(require, exports, module) {
         },
         output: function(sceneJSON, layouts) {
             var _generateSurfaceString = function(layout) {
-                console.log(layout.getId(), layout.modifier.getSize());
+                // console.log(layout.getId(), layout.modifier.getSize());
                 return  'scene.id[\'' + layout.getId() + '\'].add(new Surface({\n' +
                             '\tcontent:\'' + layout.getId() + '\',\n' +
                             '\tclasses: [\'red-bg\'],\n' +

@@ -130,6 +130,8 @@ define(function(require, exports, module) {
             '⿴': function() {
                 var layouts = this.workView.getLayoutsList();
                 var data = generate.sceneData(layouts);
+                var strings = generate.strings(layouts);
+                console.log(strings.fixed.join('\n'));
                 var output = generate.output(data.scene, layouts);
                 var formatted = hljs.highlight('javascript', output);
 
