@@ -34,7 +34,7 @@ define(function(require, exports, module) {
 
             return data;
         },
-        strings: function(layouts) {
+        strings: function(layouts, width, height) {
             
 
             var string = 'var Engine  = require(\'famous/core/Engine\');\n' +
@@ -70,11 +70,11 @@ define(function(require, exports, module) {
                 data.flexible.push(
                     'var ' + id + 'Modifier = new Modifier({\n' +
                         '\torigin:[0,0],\n' +
-                        '\talign:[' + offset[0]/800 + ',' + offset[1]/800 + '],\n' +
+                        '\talign:[' + offset[0]/width + ',' + offset[1]/height + '],\n' +
                     '});\n' +
                     id + 'Modifier.sizeFrom(function(){\n' +
                         '\tvar size = mainContext.getSize();\n' +
-                        '\treturn [' + size[0]/800 +'* size[0],'+ size[0]/800 +'* size[0]];' +
+                        '\treturn [' + size[0]/width +'*size[0],'+ size[0]/height +'*size[0]];' +
                     '});\n' +
                     'var ' + id + 'Surface = new Surface({\n' +
                         '\tsize:[undefined, undefined],\n' +

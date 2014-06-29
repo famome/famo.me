@@ -130,7 +130,7 @@ define(function(require, exports, module) {
             '⿴': function() {
                 var layouts = this.workView.getLayoutsList();
                 // var data = generate.sceneData(layouts);
-                var strings = generate.strings(layouts);
+                var strings = generate.strings(layouts, this.options.width, this.options.height);
                 var output = strings.flexible.join('\n');
                 // var output = generate.output(data.scene, layouts);
                 var formatted = hljs.highlight('javascript', output);
