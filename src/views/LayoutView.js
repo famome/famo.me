@@ -58,6 +58,10 @@ define(function(require, exports, module) {
             width: 60,
             height: 60
         },
+        protoSize: {
+            width: 60,
+            height: 60
+        },
         screen: {
             width: 960,
             height: 600
@@ -188,18 +192,58 @@ define(function(require, exports, module) {
         this._eventInput.on('resize', function(data) {
             var cursor = this.surface.properties.cursor;
             var currentSize = this.modifier.getSize();
+            var potentialWidth = currentSize[0] + data[0];
+            var potentialHeight = currentSize[1] + data[1];
+            var snapToFreeDifferentialWidth = currentSize[0] % this.options.protoSize.width;
+            var snapToFreeDifferentialHeight = currentSize[1] % this.options.protoSize.height;
 
-            if ((currentSize[0] + data[0]) // make sure box doesn't shrink to 0 width
-                && (currentSize[1] + data[1]) // make sure box doesn't shrink to 0 height
-                // Make sure right/bottom doesn't go past grid boundaries
-                && (this.xOffset + currentSize[0] + data[0] <= this.options.screen.width)
-                && (this.yOffset + currentSize[1] + data[1] <= this.options.screen.height)) {
+            if (potentialWidth // make sure box doesn't shrink to 0 width
+                && potentialHeight // make sure box doesn't shrink to 0 height
 
-                this.modifier.setSize(
-                    [currentSize[0] + data[0], currentSize[1] + data[1]]);
+                // Make sure right doesn't go past grid boundaries
+                && (this.xOffset + potentialWidth <= this.options.screen.width)
 
-                this.draginator.options.xRange[1] -= data[0];
-                this.draginator.options.yRange[1] -= data[1];
+                // Make sure bottom doesn't go past grid boundaries
+                && (this.yOffset + potentialHeight <= this.options.screen.height)) {
+                    if (this.draginator.snapped
+                        && (snapToFreeDifferentialWidth || snapToFreeDifferentialHeight)) {
+                        var correctionWidth =
+                            this.options.protoSize.width - snapToFreeDifferentialWidth;
+                        var correctionHeight =
+                            this.options.protoSize.height - snapToFreeDifferentialHeight;
+
+                        if (data[0] < 0) {
+                            correctionWidth = snapToFreeDifferentialWidth * -1;
+                        }
+
+                        if (data[1] < 0) {
+                            correctionHeight = snapToFreeDifferentialHeight * -1;
+                        }
+
+                        console.log('data0', data[0], 'data1', data[1]);
+                        console.log('coWidth', correctionWidth, 'coHeight', correctionHeight);
+                        if (currentSize[0] + correctionWidth >= this.options.protoSize.width
+                            && currentSize[1] + correctionHeight >= this.options.protoSize.height) {
+                            if (data[0] && data[1]) {
+                                this.modifier.setSize(
+                                    [currentSize[0] + correctionWidth, currentSize[1] + correctionHeight]);
+                                this.draginator.options.xRange[1] -= correctionWidth;
+                                this.draginator.options.yRange[1] -= correctionHeight;
+                            } else if (data[0]) {
+                                this.modifier.setSize(
+                                    [currentSize[0] + correctionWidth, currentSize[1]]);
+                                this.draginator.options.xRange[1] -= correctionWidth;
+                            } else if (data[1]) {
+                                this.modifier.setSize(
+                                    [currentSize[0], currentSize[1] + correctionHeight]);
+                                this.draginator.options.yRange[1] -= correctionHeight;
+                            }
+                        }
+                    } else {
+                        this.modifier.setSize([potentialWidth, potentialHeight]);
+                        this.draginator.options.xRange[1] -= data[0];
+                        this.draginator.options.yRange[1] -= data[1];
+                    }
             }
         }.bind(this));
 
