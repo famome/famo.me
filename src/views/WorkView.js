@@ -46,6 +46,10 @@ define(function(require, exports, module) {
                 width: this.options.width/this.options.cols,
                 height: this.options.height/this.options.rows
             },
+            protoSize: {
+                width: this.options.width/this.options.cols,
+                height: this.options.height/this.options.rows
+            },
             screen: {
                 width: this.options.width,
                 height: this.options.height

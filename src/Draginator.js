@@ -174,9 +174,9 @@ define(function(require, exports, module) {
                 'U+0008': _deleteElement.bind(this), // delete
                 'U+004E': _createElement.bind(this), // 'n'
                 'U+0009': _switchElement.bind(this), // tab
-                'U+001B': _deselectAll.bind(this), // space bar
+                'U+001B': _deselectAll.bind(this), // escape
                 'U+0045': _editPropertiesOfSelected.bind(this), // 'e'
-                'U+0020': _toggleSnapToGrid.bind(this), // space
+                'U+0020': _toggleSnapToGrid.bind(this), // space bar
                 Enter: _generateJSON.bind(this)
             };
 
@@ -200,7 +200,7 @@ define(function(require, exports, module) {
                     }
                     this._differential = keyMatrix[event.keyIdentifier];
                 }
-            }
+            } else return;
         } else {
             this.keybinding = false;
             this._differential = event.position;
