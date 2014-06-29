@@ -68,16 +68,23 @@ define(function(require, exports, module) {
                 );
 
                 data.flexible.push(
-                    'var ' + id + 'Surface = new Surface({\n' +
-                        '\tsize:[' + size + '],\n' +
+                    'var ' + id + 'Modifier = new Modifier({\n' +
                         '\torigin:[0,0],\n' +
-                        '\talign:[' + offset[0]/800 + ',' + offset[0]/800 + '],\n' +
+                        '\talign:[' + offset[0]/800 + ',' + offset[1]/800 + '],\n' +
+                    '});\n' +
+                    id + 'Modifier.sizeFrom(function(){\n' +
+                        '\tvar size = mainContext.getSize();\n' +
+                        '\treturn [' + size[0]/800 +'* size[0],'+ size[0]/800 +'* size[0]];' +
+                    '});\n' +
+                    'var ' + id + 'Surface = new Surface({\n' +
+                        '\tsize:[undefined, undefined],\n' +
+
                         '\tclasses: [\'red-bg\'],\n' +
                         '\tproperties: {\n' +
                             '\t\ttextAlign: \'center\'\n' +
                         '\t}\n' +
                     '});\n' +
-                    'mainContext.add('+ id + 'Surface);\n\n'
+                    'mainContext.add(' + id + 'Modifier).add('+ id + 'Surface);\n\n'
                 );
             }
 
