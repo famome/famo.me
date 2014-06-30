@@ -179,7 +179,7 @@ define(function(require, exports, module) {
 
     var dependencies = {
         'modifier': '\tvar Modifier = require(\'famous/core/Modifier\');\n',
-        'transform': '\tvar Transform = require(\'famous/core/Transform\');\n,',
+        'transform': '\tvar Transform = require(\'famous/core/Transform\');\n',
         'surface': '\tvar Surface = require(\'famous/core/Surface\');\n'
     };
 
