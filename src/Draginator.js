@@ -10,6 +10,7 @@
 define(function(require, exports, module) {
     var Transform      = require('famous/core/Transform');
     var EventHandler   = require('famous/core/EventHandler');
+    var OptionsManager = require('famous/core/OptionsManager');
 
     var Transitionable = require('famous/transitions/Transitionable');
 
@@ -37,6 +38,7 @@ define(function(require, exports, module) {
      */
     function Draginator(options) {
         this.options = Object.create(Draginator.DEFAULT_OPTIONS);
+        this._optionsManager = new OptionsManager(this.options);
         if (options) this.setOptions(options);
 
         this._positionState = new Transitionable([0,0]);
@@ -138,6 +140,7 @@ define(function(require, exports, module) {
 
         if (!this.snapped) {
             this.snapped = true;
+
             newPosition[0] = Math.round(currentPosition[0] / this.options.maxSnapX) * this.options.maxSnapX;
             newPosition[1] = Math.round(currentPosition[1] / this.options.maxSnapY) * this.options.maxSnapY;
             this.setPosition(newPosition);
@@ -259,26 +262,7 @@ define(function(require, exports, module) {
      * @param {Object} [options] overrides of default options.  See constructor.
      */
     Draginator.prototype.setOptions = function setOptions(options) {
-        var currentOptions = this.options;
-
-        if (options.projection !== undefined) {
-            var proj = options.projection;
-
-            this.options.projection = 0;
-            ['x', 'y'].forEach(function(val) {
-                if (proj.indexOf(val) !== -1) currentOptions.projection |= _direction[val];
-            });
-        }
-        if (options.scale  !== undefined) {
-            currentOptions.scale  = options.scale;
-            this.sync.setOptions({
-                scale: options.scale
-            });
-        }
-        if (options.xRange !== undefined) currentOptions.xRange = options.xRange;
-        if (options.yRange !== undefined) currentOptions.yRange = options.yRange;
-        if (options.snapX  !== undefined) currentOptions.snapX  = options.snapX;
-        if (options.snapY  !== undefined) currentOptions.snapY  = options.snapY;
+        return this._optionsManager.setOptions(options);
     };
 
     /**
