@@ -14,7 +14,7 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         var draggable = new Draggable();
-        this.icons = ['□', '⿴'];
+        this.icons = ['□', '⿴', '❖'];
         this.options.rows = Math.ceil(this.icons.length/this.options.cols);
 
         _createToolMenu.call(this, draggable);

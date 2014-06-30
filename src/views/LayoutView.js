@@ -5,7 +5,6 @@ define(function(require, exports, module) {
     var View             = require('famous/core/View');
 
     var RenderController = require('famous/views/RenderController');
-
     var StateModifier    = require('famous/modifiers/StateModifier');
 
     var Draginator       = require('Draginator');
@@ -46,7 +45,7 @@ define(function(require, exports, module) {
         this.surface.setProperties({
             boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
             backgroundColor: '#1496CC',
-            zIndex: 100
+            zIndex: 9
         });
         this.draginator.select();
     };
@@ -145,6 +144,7 @@ define(function(require, exports, module) {
         var cursor = this.surface.properties.cursor;
 
         this.dragging = true;
+        this._eventOutput.emit('startDragging', this);
         if (this.draggable) {
             this.surface.setProperties({cursor: '-webkit-grabbing'});
         }
@@ -153,8 +153,17 @@ define(function(require, exports, module) {
         }
     };
 
+    function _update() {
+            if (this.draginator.keybinding) {
+                return _ungrab.call(this);
+            } else {
+                return _grab.call(this);
+            }
+        }
+
     function _ungrab(event) {
         this.dragging = false;
+        this._eventOutput.emit('stopDragging', this);
         if (this.draggable)
             this.surface.setProperties({cursor: '-webkit-grab'});
     }
@@ -179,13 +188,7 @@ define(function(require, exports, module) {
         this._eventInput.on('mouseenter', _setEdges.bind(this));
         this._eventInput.on('mouseleave', _removeEdges.bind(this));
         this.draginator.eventOutput.on('start', _grab.bind(this));
-        this.draginator.eventOutput.on('update', function() {
-            if (this.draginator.keybinding) {
-                return _ungrab.call(this);
-            } else {
-                return _grab.call(this);
-            }
-        }.bind(this));
+        this.draginator.eventOutput.on('update', _update.bind(this));
         this.draginator.eventOutput.on('end', _ungrab.bind(this));
 
         // view listens for resize from draggable
@@ -259,20 +262,20 @@ define(function(require, exports, module) {
             if(this === selectedView) {
                 this.selectSurface.call(this);
             }
+            console.log('selected')
         }.bind(this));
 
         this._eventInput.on('deselect', function() {
             this.surface.setProperties({
                 boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
                 backgroundColor: 'pink',
-                zIndex: 9
+                zIndex: 1
             });
-
             this.modifier.setTransform(this.modifier.getTransform());
             this.draginator.deselect();
         }.bind(this));
 
-        this.surface.on('click', function() {
+        this.surface.on('mousedown', function() {
             this._eventOutput.emit('select', this);
             this.draginator.select();
             this.selectSurface.call(this);

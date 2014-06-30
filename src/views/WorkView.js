@@ -194,6 +194,29 @@ define(function(require, exports, module) {
         }.bind(this);
     }
 
+    function _unsubscribeAllButDragging(draggingLayout) {
+        var index = this.layoutsList.indexOf(draggingLayout);
+        for (var i = 0; i < this.layoutsList.length; i++) {
+            if (i !== index) {
+                var layoutView = this.layoutsList[i];
+                console.log('unsub draginator for ', layoutView);
+                layoutView.surface.setProperties({
+                    pointerEvents: 'none'
+                });
+            }
+        }
+    }
+
+    function _subscribeAll() {
+        for (var i = 0; i < this.layoutsList.length; i++) {
+            console.log('subbing draginator for ', layoutView);
+            var layoutView = this.layoutsList[i];
+            layoutView.surface.setProperties({
+                    pointerEvents: 'auto'
+                });
+        }
+    }
+
     function _setListeners() {
         this._eventInput.on('select', function(selectedLayout) {
             this.selectedLayout = selectedLayout;
@@ -226,6 +249,14 @@ define(function(require, exports, module) {
 
         this._eventInput.on('editPropertiesOfSelected', function() {
             _editProperties.call(this, this.selectedLayout);
+        }.bind(this));
+
+        this._eventInput.on('startDragging', function(draggingLayout) {
+            _unsubscribeAllButDragging.call(this, draggingLayout);
+        }.bind(this));
+
+        this._eventInput.on('stopDragging', function(draggingLayout) {
+            _subscribeAll.call(this, draggingLayout);
         }.bind(this));
 
         this.subscribe(this.grid._eventOutput);
