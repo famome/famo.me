@@ -171,25 +171,32 @@ define(function(require, exports, module) {
     function _setListeners() {
         // initialize eventing linkages
         this.modifier.eventHandler = new EventHandler();
-        this.modifier.eventHandler.pipe(this._eventInput);
+
+        // listens to start/update/end to update cursor icon and translate/resize/create (from Draginator)
         this.draginator.eventOutput.pipe(this._eventInput);
+
+        // listens to click/dblclick (from surface) to select surface and display surface info
         this.surface.pipe(this);
+
+        // allows Draginator to work with view
+        // this.modifier.eventHandler.pipe(this._eventInput);
         this._eventInput.pipe(this.draginator);
 
-        // view listens for translate from draggable
+
+        this._eventInput.on('mousemove', _setEdges.bind(this));
+        this._eventInput.on('mouseenter', _setEdges.bind(this));
+        this._eventInput.on('mouseleave', _removeEdges.bind(this));
+
+        this.draginator.eventOutput.on('start', _grab.bind(this));
+        this.draginator.eventOutput.on('update', _update.bind(this));
+        this.draginator.eventOutput.on('end', _ungrab.bind(this));
+
         this._eventInput.on('translate', function(data){
             if (this.active) {
                 this.xOffset = data[0];
                 this.yOffset = data[1];
             }
         }.bind(this));
-
-        this._eventInput.on('mousemove', _setEdges.bind(this));
-        this._eventInput.on('mouseenter', _setEdges.bind(this));
-        this._eventInput.on('mouseleave', _removeEdges.bind(this));
-        this.draginator.eventOutput.on('start', _grab.bind(this));
-        this.draginator.eventOutput.on('update', _update.bind(this));
-        this.draginator.eventOutput.on('end', _ungrab.bind(this));
 
         // view listens for resize from draggable
         this._eventInput.on('resize', function(data) {
