@@ -17,6 +17,8 @@ define(function(require, exports, module) {
 
     Generator.prototype.generate = function(layouts, width, height) {
         _initializeOutputs.call(this);
+        this.width = width;
+        this.height = height;
 
         for (var i = 0; i < layouts.length; i++) {
             var layout = layouts[i];
@@ -51,7 +53,8 @@ define(function(require, exports, module) {
     };
 
     Generator.DEFAULT_OPTIONS = {
-        active: 'fixed'
+        active: 'fixed',
+        aspectRatio: [1, 1]
     };
 
     function _determineDependencies(layout) {
@@ -72,9 +75,23 @@ define(function(require, exports, module) {
         for (var i = 0; i < keys.length; i++) {
             output += dependencies[keys[i]];
         }
-        output += '\n\tvar mainContext = Engine.createContext();\n\n';
+        output += '\n\tvar mainContext = Engine.createContext();\n';
+        output += '\tmainContext.aspectRatio = [';
+        output += this.width + ', ' + this.height;
+        output += '];\n\n';
+        output += '\t_setListeners.call(this);\n\n';
         output += input;
-        output += '});\n';
+        output += '\tfunction _setListeners() {\n'
+        output += '\t\twindow.addEventListener(\'resize\', _setAspectRatio.bind(this));\n';
+        output += '\t\twindow.addEventListener(\'load\', _setAspectRatio.bind(this));\n\t}\n\n';
+        output += '\tfunction _setAspectRatio(e) {\n';
+        output += '\t\tvar width = window.innerWidth;\n';
+        output += '\t\tvar height = window.innerHeight;\n';
+        output += '\t\tvar ratio = mainContext.aspectRatio;\n';
+        output += '\t\tif (width > height) width = height * (ratio[0] / ratio[1]);\n';
+        output += '\t\telse height = width * (ratio[1] / ratio[0])\n';
+        output += '\t\tmainContext.setSize([width, height]);\n\t}\n';
+        output += '\t});\n';
 
         return output;
     }

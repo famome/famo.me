@@ -5,7 +5,8 @@ define(function(require, exports, module) {
     var View             = require('famous/core/View');
 
     var RenderController = require('famous/views/RenderController');
-
+    var EventArbiter = require('famous/events/EventArbiter');
+    var EventFilter = require('famous/events/EventFilter');
     var StateModifier    = require('famous/modifiers/StateModifier');
 
     var Draginator       = require('Draginator');
@@ -46,7 +47,7 @@ define(function(require, exports, module) {
         this.surface.setProperties({
             boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
             backgroundColor: '#1496CC',
-            zIndex: 100
+            zIndex: 9
         });
         this.draginator.select();
     };
@@ -84,6 +85,12 @@ define(function(require, exports, module) {
             xRange: [0, this.options.screen.width - this.options.size.width],
             yRange: [0, this.options.screen.height - this.options.size.height]
         });
+
+        this._arbiter = new EventArbiter('deselected');
+        this._filter = new EventFilter(function(type, data) {
+            if (this.draginator._selected) return true;
+            return false;
+        }.bind(this));
     }
 
     function _createLayoutModifier() {
@@ -175,7 +182,10 @@ define(function(require, exports, module) {
         this.modifier.eventHandler.pipe(this._eventInput);
         this.draginator.eventOutput.pipe(this._eventInput);
         this.surface.pipe(this);
-        this._eventInput.pipe(this.draginator);
+        
+
+        var test = this._eventInput.pipe(this._filter).pipe(this.draginator);
+
 
         // view listens for translate from draggable
         this._eventInput.on('translate', function(data){
@@ -263,15 +273,17 @@ define(function(require, exports, module) {
             if(this === selectedView) {
                 this.selectSurface.call(this);
             }
+            console.log('selected')
+            this._arbiter.setMode('selected');
         }.bind(this));
 
         this._eventInput.on('deselect', function() {
             this.surface.setProperties({
                 boxShadow: 'inset 0 0 1px rgba(0, 0, 0, 0.5)',
                 backgroundColor: 'pink',
-                zIndex: 9
+                zIndex: 1
             });
-
+            this._arbiter.setMode('deselected');
             this.modifier.setTransform(this.modifier.getTransform());
             this.draginator.deselect();
         }.bind(this));
