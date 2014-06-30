@@ -220,8 +220,6 @@ define(function(require, exports, module) {
                             correctionHeight = snapToFreeDifferentialHeight * -1;
                         }
 
-                        console.log('data0', data[0], 'data1', data[1]);
-                        console.log('coWidth', correctionWidth, 'coHeight', correctionHeight);
                         if (currentSize[0] + correctionWidth >= this.options.protoSize.width
                             && currentSize[1] + correctionHeight >= this.options.protoSize.height) {
                             if (data[0] && data[1]) {
