@@ -141,6 +141,21 @@ define(function(require, exports, module) {
                 });
 
                 this.workView.flip();
+            },
+            '❖': function() {
+                this.generator.generate(this.workView.getLayoutsList(), this.options.width, this.options.height);
+                this.generator.toggle();
+                var output = this.generator.getActiveOutput();
+                var formatted = hljs.highlight('javascript', output);
+
+                // refactor inline style
+                this.workView.codeDisplay.setContent('<pre id="code" style="background-color: transparent">'+formatted.value+'</pre>');
+                this.workView.codeDisplay.setProperties({
+                    overflowY: 'scroll',
+                    overflowX: 'hidden'
+                });
+
+                this.workView.flip();
             }
         };
 
