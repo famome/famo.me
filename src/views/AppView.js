@@ -12,13 +12,14 @@ define(function(require, exports, module) {
     
     var InputSurface  = require('famous/surfaces/InputSurface');
 
-    var generate      = require('utils/Generator');
+    var Generator      = require('utils/Generator');
     var docCookies    = require('utils/cookies'); // Simple cookies framework from MDN
 
     function AppView() {
         View.apply(this, arguments);
 
         this.menuToggle = false;
+        this.generator = new Generator();
 
         _eventCookiesHandler.call(this);
         // _checkCookies.call(this);
@@ -128,9 +129,9 @@ define(function(require, exports, module) {
                 this.workView.createLayoutView();
             },
             '⿴': function() {
-                var layouts = this.workView.getLayoutsList();
-                var data = generate.sceneData(layouts);
-                var output = generate.output(data.scene, layouts);
+                this.generator.generate(this.workView.getLayoutsList(), this.options.width, this.options.height);
+                // this.generator.toggle();
+                var output = this.generator.getActiveOutput();
                 var formatted = hljs.highlight('javascript', output);
 
                 // refactor inline style

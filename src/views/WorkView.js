@@ -57,7 +57,9 @@ define(function(require, exports, module) {
             offset: (offset || [0, 0])
         });
         // layoutView.linkTo(this.layoutsList, this.numLayouts);
-        layoutView.id = "layoutView" + this.layoutsList.length;
+        // TODO: add a way to dynamically set types.
+        layoutView.type = 'surface';
+        layoutView.id = layoutView.type + this.layoutsList.length;
         this.addLayout(layoutView);
 
         this.node.add(new Modifier({origin: [0, 0]})).add(layoutView);
