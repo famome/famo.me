@@ -45,9 +45,9 @@ define(function(require, exports, module) {
 
     AppView.DEFAULT_OPTIONS = {
         menuSize: 150,
-        width: 800,
-        height: 800,
-        dimensions: [10, 10],
+        width: 720,
+        height: 600,
+        dimensions: [12, 10],
     };
 
     function _eventCookiesHandler() {
@@ -71,7 +71,6 @@ define(function(require, exports, module) {
             _createModalOverlay.call(this);
             _getWorkviewSizeFromUser.call(this);
         }
-
     }
 
     function _createMenuView() {
