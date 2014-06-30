@@ -130,7 +130,8 @@ define(function(require, exports, module) {
             },
             '⿴': function() {
                 this.generator.generate(this.workView.getLayoutsList(), this.options.width, this.options.height);
-                var output = this.generator.getFlexibleOutput();
+                // this.generator.toggle();
+                var output = this.generator.getActiveOutput();
                 var formatted = hljs.highlight('javascript', output);
 
                 // refactor inline style
