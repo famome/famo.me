@@ -85,7 +85,6 @@ define(function(require, exports, module) {
 
     WorkView.prototype.removeLayout = function(layoutView) {
         var index = this.layoutsList.indexOf(layoutView);
-        console.log("key hit once!");
         layoutView.active = false;
         this.layoutsList.splice(index, 1);
         _cycleToNextLayout.call(this, index);
@@ -117,7 +116,6 @@ define(function(require, exports, module) {
         } else {
             var nextLayout = this.layoutsList[index - 1];
             this.selectedLayout = nextLayout;
-            console.log('next: ', index-1, nextLayout);
             nextLayout.selectSurface();
         }
     }
@@ -182,13 +180,11 @@ define(function(require, exports, module) {
     function _setKeybinds() {
         window.onkeydown = function(event) {
             if (event.keyIdentifier === 'U+004E') {
-                console.log('U+004E!!!');
                 this.createLayoutView();
             }
 
             // ESC key edits properties of selected view
             if (event.keyCode === 27) {
-                console.log('ESC!');
                 _editProperties.call(this, this.selectedLayout);
             }
         }.bind(this);
@@ -233,7 +229,6 @@ define(function(require, exports, module) {
         }.bind(this));
 
         this._eventInput.on('delete', function() {
-            console.log('wv heard delete', this.selectedLayout);
             var layoutView = this.selectedLayout;
             this.removeLayout(layoutView);
             layoutView.renderController.hide(layoutView.surface);
@@ -276,7 +271,7 @@ define(function(require, exports, module) {
         var minX = minY = maxX = maxY = 0;
         for (i = 0; i < this.layoutsList.length; i++) {
             var dimension = this.layouts
-            
+
         }
     }
 
