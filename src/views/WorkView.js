@@ -200,7 +200,9 @@ define(function(require, exports, module) {
             if (i !== index) {
                 var layoutView = this.layoutsList[i];
                 console.log('unsub draginator for ', layoutView);
-                layoutView.draginator.unsubscribe(layoutView.surface);
+                layoutView.surface.setProperties({
+                    pointerEvents: 'none'
+                });
             }
         }
     }
@@ -209,7 +211,9 @@ define(function(require, exports, module) {
         for (var i = 0; i < this.layoutsList.length; i++) {
             console.log('subbing draginator for ', layoutView);
             var layoutView = this.layoutsList[i];
-            layoutView.draginator.subscribe(layoutView.surface); 
+            layoutView.surface.setProperties({
+                    pointerEvents: 'auto'
+                });
         }
     }
 
