@@ -80,3 +80,22 @@ body {
     -webkit-backface-visibility: visible;
     backface-visibility: visible;
 }
+
+input.famous-surface {
+    background-color: black;
+    color: white;
+    font-size: 38px;
+    line-height: 80px;
+    font-family: Helvetica;
+    font-weight: 900;
+    text-align: center;
+    border: none;
+}
+
+.hint, [data-hint] {
+    position: absolute;
+}
+
+.hint:after, [data-hint]:after {
+    white-space: pre;
+}

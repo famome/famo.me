@@ -32,7 +32,17 @@ define(function(require, exports, module) {
             'Generate code: Fixed',
             'Generate code: Flexible',
             'New image surface',
-            'Help'];
+            'MOUSE || click on layout to create element | click on element to select | drag/resize' +
+            '\u000A---\u000A' +
+            'KEYBOARD || N: create surface || DELETE: delete element' +
+            '\u000A\u000A' +
+            '▲/▼/◀︎/▶︎: move element || SHIFT+▲/▼/◀︎/▶: move element faster' +
+            '\u000A\u000A' +
+            'COMMAND+▼/▶: resize element || SHIFT+COMMAND+▼/▶: resize element faster' +
+            '\u000A\u000A' +
+            'SPACE: toggle free/snapped modes || TAB: cycle through elements || ESC: unselect all elements' +
+            '\u000A\u000A' +
+            'RETURN: generate code (fixed)'];
         this.options.rows = Math.ceil(this.icons.length/this.options.cols);
 
         _createToolMenu.call(this, draggable);

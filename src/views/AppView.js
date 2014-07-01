@@ -163,6 +163,10 @@ define(function(require, exports, module) {
                 });
 
                 this.workView.flip();
+            },
+            '⏍': function() {
+            },
+            '⍰': function() {
             }
         };
 
