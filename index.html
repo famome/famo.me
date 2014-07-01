@@ -1,45 +1,54 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>famo.us App</title>
-        <meta name="viewport" content="width=device-width, maximum-scale=1, user-scalable=no" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-        <!-- shims for backwards compatibility -->
-        <script type="text/javascript" src="http://code.famo.us/lib/functionPrototypeBind.js"></script>
-        <script type="text/javascript" src="http://code.famo.us/lib/classList.js"></script>
-        <script type="text/javascript" src="http://code.famo.us/lib/requestAnimationFrame.js"></script>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
-        <!-- module loader -->
-        <script type="text/javascript" src="http://code.famo.us/lib/require.js"></script>
+    <title>Famo.me by famome</title>
+  </head>
 
-        <!-- famous -->
-        <link rel="stylesheet" type="text/css" href="http://code.famo.us/famous/0.2/famous.css" />
-        <script type="text/javascript" src="http://code.famo.us/famous/0.2/famous.min.js"></script>
+  <body>
 
-        <!-- highlight.js for syntax highlighting -->
-        <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/default.min.css">
-        <script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script>
+    <header>
+      <div class="container">
+        <h1>Famo.me</h1>
+        <h2>I&#39;ll make you famo.us</h2>
 
-        <!-- hint.css for tooltips -->
-        <link rel="stylesheet" href="http://cdn.jsdelivr.net/hint.css/1.3.2/hint.min.css">
+        <section id="downloads">
+          <a href="https://github.com/famome/famo.me/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/famome/famo.me/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/famome/famo.me" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
 
-        <!-- app code -->
-        <link rel="stylesheet" type="text/css" href="http://code.famo.us/assets/famous_styles.css" />
-        <link rel="stylesheet" type="text/css" href="./css/app.css" />
+    <div class="container">
+      <section id="main_content">
+        <h3>
+<a name="famome" class="anchor" href="#famome"><span class="octicon octicon-link"></span></a>Famo.Me</h3>
 
-        <script type="text/javascript">
-            require.config({baseUrl: 'src/'});
-            require(['main']);
+<h2>
+<a name="the-famo-thing" class="anchor" href="#the-famo-thing"><span class="octicon octicon-link"></span></a>The Famo Thing</h2>
 
-        </script>
+<p>This automatic awesome generator is the easiest way to create beautiful layouts for your Famo.us projects. </p>
 
-        <style>
+<ul>
+<li>Layout Stuff</li>
+<li>Preview Stuff</li>
+<li>GenerateStuff</li>
+</ul><p>Then just Include GeneratedStuffParser module and your GeneratedStuff in your project like so:</p>
 
-        </style>
-    </head>
-    <body></body>
+<pre><code>require('GeneratedStuffParse')
+require('GeneratedStuff.json') // How?
+// Go forth
+</code></pre>
+      </section>
+    </div>
+
+
+  </body>
 </html>
