@@ -83,7 +83,6 @@ define(function(require, exports, module) {
         requestAnimationFrame(function() {
             for (var i = 0; i < this.menuView.icons.length; i++) {
                 var el = document.getElementsByClassName(this.menuView.iconNames[i]);
-                console.log(el[0]);
                 el[0].setAttribute('data-hint', this.menuView.tooltipsText[i]);
             }
         }.bind(this));
@@ -165,6 +164,7 @@ define(function(require, exports, module) {
                 this.workView.flip();
             },
             '⏍': function() {
+                console.log('Add image surface');
             },
             '⍰': function() {
             }
