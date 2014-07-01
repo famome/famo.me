@@ -14,7 +14,25 @@ define(function(require, exports, module) {
         View.apply(this, arguments);
 
         var draggable = new Draggable();
-        this.icons = ['□', '⿴', '❖'];
+        this.icons = ['□', '⿴', '❖', '⏍', '⍰'];
+        this.iconNames = [
+            'surface',
+            'generate',
+            'toggleFlexible',
+            'imageSurface',
+            'help'];
+        this.tooltipsPos = [
+            'hint--left',
+            'hint--right',
+            'hint--left',
+            'hint--right',
+            'hint--left'];
+        this.tooltipsText = [
+            'New surface',
+            'Generate code: Fixed',
+            'Generate code: Flexible',
+            'New image surface',
+            'Help'];
         this.options.rows = Math.ceil(this.icons.length/this.options.cols);
 
         _createToolMenu.call(this, draggable);
@@ -33,7 +51,7 @@ define(function(require, exports, module) {
 
     function _createToolMenu(draggable) {
         this.toolMenu = new Surface({
-            size: [this.options.cols * this.options.spacing + this.options.padding, 
+            size: [this.options.cols * this.options.spacing + this.options.padding,
                    this.options.rows * this.options.spacing + this.options.padding],
             properties: {
                 backgroundColor: '#FFFFF5',
@@ -55,10 +73,11 @@ define(function(require, exports, module) {
             .add(this.toolMenu);
     }
 
-    function _createButtons(draggable) {        
+    function _createButtons(draggable) {
         var grid = new GridLayout({
             dimensions: [this.options.cols, this.options.rows],
-            gutterSize: [5, 5]
+            // gutterSize: [5, 5]
+            gutterSize: [15, 15]
         });
 
         var tools = [];
@@ -73,6 +92,7 @@ define(function(require, exports, module) {
             var toolView = new ToolView();
             toolView.tool.setOptions({
                 content: this.icons[i],
+                classes: [this.tooltipsPos[i], this.iconNames[i]],
                 properties: {
                     backgroundColor: 'pink',
                     lineHeight: '60px',
@@ -90,7 +110,7 @@ define(function(require, exports, module) {
         }
 
         var gridModifier = new StateModifier({
-            size: [this.options.spacing * this.options.cols, 
+            size: [this.options.spacing * this.options.cols,
                    this.options.spacing * this.options.rows],
             origin: [0.5, 0],
             align: [0.5, 0.12],

@@ -9,7 +9,7 @@ define(function(require, exports, module) {
     var ModalOverlay  = require('views/ModalOverlay');
 
     var StateModifier = require('famous/modifiers/StateModifier');
-    
+
     var InputSurface  = require('famous/surfaces/InputSurface');
 
     var Generator      = require('utils/Generator');
@@ -80,6 +80,13 @@ define(function(require, exports, module) {
             origin: [1, 0]
         });
         this.add(this.menuModifier).add(this.menuView);
+        requestAnimationFrame(function() {
+            for (var i = 0; i < this.menuView.icons.length; i++) {
+                var el = document.getElementsByClassName(this.menuView.iconNames[i]);
+                console.log(el[0]);
+                el[0].setAttribute('data-hint', this.menuView.tooltipsText[i]);
+            }
+        }.bind(this));
     }
 
     function _createWorkView() {

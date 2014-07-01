@@ -24,11 +24,15 @@
         <script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
 
+        <!-- hint.css for tooltips -->
+        <link rel="stylesheet" href="http://cdn.jsdelivr.net/hint.css/1.3.2/hint.min.css">
+
         <!-- app code -->
         <link rel="stylesheet" type="text/css" href="http://code.famo.us/assets/famous_styles.css" />
         <script type="text/javascript">
             require.config({baseUrl: 'src/'});
             require(['main']);
+
         </script>
 
         <style>
@@ -41,6 +45,9 @@
                 font-weight: 900;
                 text-align: center;
                 border: none;
+            }
+            .hint, [data-hint] {
+                position: absolute;
             }
         </style>
     </head>
